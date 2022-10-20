@@ -6,6 +6,7 @@ import { Buffer } from 'buffer'
 
 window.Buffer = Buffer
 
+import 'primeflex/primeflex.css'
 import './index.scss'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
