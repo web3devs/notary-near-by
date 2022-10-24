@@ -21,7 +21,6 @@ export const AuthProvider = ({ children }) => {
   }, [nearUser])
 
   const logout = () => {
-    console.log(nearUser)
     nearUser?.disconnect()
   }
 

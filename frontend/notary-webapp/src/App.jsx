@@ -20,48 +20,15 @@ import {
   useLocation
 } from 'react-router-dom'
 import { useNearUser } from 'react-near'
-import CreateSessionPage from './pages/CreateSession.page'
-import DashboardLayout from './layouts/Dashboard.layout'
 import { AuthProvider } from './context/AuthProvider'
 
-const RequireAuth = ({ children }) => {
-  const nearUser = useNearUser()
-
-  const location = useLocation()
-  console.log(nearUser)
-  if (!nearUser || !nearUser.isConnected) {
-    return <Navigate to="/sign-in" state={{ from: location }} replace />
-  }
-  return children
-}
-
-const router = createBrowserRouter([
-  {
-    path: '/',
-    element: <HomePage />
-  },
-  {
-    path: '/sign-in',
-    element: <SignInPage />
-  },
-  {
-    path: '/create-session',
-    element: (
-      <RequireAuth>
-        <DashboardLayout>
-          <CreateSessionPage />
-        </DashboardLayout>
-      </RequireAuth>
-    )
-  }
-])
-
-function App() {
+import { AppRouter } from './routes'
+const App = () => {
   return (
     <NearEnvironmentProvider defaultEnvironment={NearEnvironment.TestNet}>
       <NearProvider authContractId="bujal.testnet">
         <AuthProvider>
-          <RouterProvider router={router} />
+          <AppRouter />
         </AuthProvider>
       </NearProvider>
     </NearEnvironmentProvider>
