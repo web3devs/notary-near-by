@@ -16,6 +16,10 @@ export const useAuth = () => useContext(AuthContext)
 export const AuthProvider = ({ children }) => {
   const nearUser = useNearUser()
 
+  const accountAddress = useMemo(() => {
+    return nearUser?.address
+  })
+
   const isConnected = useMemo(() => {
     return nearUser?.isConnected
   }, [nearUser])
@@ -29,8 +33,8 @@ export const AuthProvider = ({ children }) => {
   }
 
   const value = useMemo(
-    () => ({ isConnected, logout, login }),
-    [isConnected, login, logout]
+    () => ({ isConnected, logout, login, accountAddress }),
+    [isConnected, login, logout, accountAddress]
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
