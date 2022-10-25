@@ -8,8 +8,7 @@
     "compile": "npx hardhat compile",
     "test": "",
     "deploy:dev": "yarn clean && yarn compile && npx hardhat run scripts/deploy.js --network local_aurora",
-    "deploy:aurora": "yarn clean && yarn compile && npx hardhat run scripts/deploy.js --network testnet_aurora",
-    "deploy:ropsten": "yarn clean && yarn compile && npx hardhat run scripts/deploy.js --network ropsten"
+    "deploy:testnet": "yarn clean npx hardhat run scripts/deploy.js --network aurora_local&& yarn compile && npx hardhat run scripts/deploy.js --network testnet_aurora"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.2",
