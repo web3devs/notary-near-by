@@ -12,11 +12,11 @@ import { useNearUser } from 'react-near'
 import CreateSessionPage from '../pages/CreateSession.page'
 import DashboardLayout from '../layouts/Dashboard.layout'
 import NotaryDashPage from '../pages/notary/NotaryDash.page'
-import ClientDashPage from '../pages/client/ClientDash.page'
+import ParticipantDashPage from '../pages/participant/ParticipantDash.page'
 import HomePage from '../pages/Home.page'
 import SignInPage from '../pages/SignIn.page'
 import SignUpPage from '../pages/notary/NotarySignUp.page'
-import ClientSignUpPage from '../pages/client/ClientSignUp.page'
+import ParticipantSignUpPage from '../pages/participant/ParticipantSignUp.page'
 
 const RequireAuth = ({ children }) => {
   const nearUser = useNearUser()
@@ -65,21 +65,21 @@ export const AppRouter = () => {
           }
         />
         <Route
-          path="/client"
+          path="/participant"
           element={
             <RequireAuth>
               <DashboardLayout>
-                <ClientDashPage />
+                <ParticipantDashPage />
               </DashboardLayout>
             </RequireAuth>
           }
         />
         <Route
-          path="/client/sign-up"
+          path="/participant/sign-up"
           element={
             <RequireAuth>
               <DashboardLayout>
-                <ClientSignUpPage />
+                <ParticipantSignUpPage />
               </DashboardLayout>
             </RequireAuth>
           }

@@ -8,19 +8,19 @@ export const signUpNotary = (companyName, notaryLicenseFile, stampFile) => {
   })
 }
 
-export const signUpClient = (form, idFile) => {
+export const signUpParticipant = (form, idFile) => {
   // add actual contract interaction here
   return new Promise((res, rej) => {
     setTimeout(() => {
-      tmpClientState = { ...tmpClientState, isClient: true }
+      tmpParticipantState = { ...tmpParticipantState, isParticipant: true }
       res()
     }, 3000)
   })
 }
 
 // mock data
-let tmpClientState = {
-  isClient: false
+let tmpParticipantState = {
+  isParticipant: false
 }
 let tmpNotaryState = {
   isNotary: false
@@ -30,8 +30,8 @@ export const getNotaryAccount = (accountAddress) => {
   return tmpNotaryState
 }
 
-export const getClientAccount = (accountAddress) => {
-  return tmpClientState
+export const getParticipantAccount = (accountAddress) => {
+  return tmpParticipantState
 }
 
 export const getOrders = () => {

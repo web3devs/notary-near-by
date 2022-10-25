@@ -8,12 +8,12 @@ export default () => {
       <div className="w-7 flex flex-column justify-content-center align-items-center">
         <div className="text-4xl font-bold mb-4">Notary</div>
         <div className="flex gap-2">
-          <Link to="/client" aria-disabled={!isConnected}>
-            <Button label="I'm a client" disabled={!isConnected} />
+          <Link to="/participant" aria-disabled={!isConnected}>
+            <Button label="I'm a Participant" disabled={!isConnected} />
           </Link>
 
           <Link to="/notary" aria-disabled={!isConnected}>
-            <Button label="I'm a notary" disabled={!isConnected} />
+            <Button label="I'm a Notary" disabled={!isConnected} />
           </Link>
         </div>
         {!isConnected && (

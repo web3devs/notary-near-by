@@ -2,7 +2,7 @@ import { InputText } from 'primereact'
 import { Button } from 'primereact/Button'
 import { useRef, useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { signUpClient } from '../../contracts'
+import { signUpParticipant } from '../../contracts'
 
 export default () => {
   const [isSubmiting, setIsSubmiting] = useState(false)
@@ -16,14 +16,14 @@ export default () => {
 
   const handleSubmit = useCallback(async () => {
     setIsSubmiting(true)
-    await signUpClient(form, ID)
+    await signUpParticipant(form, ID)
     setIsSubmiting(false)
-    navigate('/client')
+    navigate('/participant')
   }, [form, ID])
 
   return (
     <div>
-      <h1>Sign up as a Client</h1>
+      <h1>Sign up as a Participant</h1>
       <span className="p-float-label mb-2">
         <InputText
           id="firstName"

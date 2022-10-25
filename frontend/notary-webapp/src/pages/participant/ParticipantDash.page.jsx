@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 import { Button } from 'primereact/Button'
 import ListItem from '../../components/dash/ListItem'
 import { useAuth } from '../../context/AuthProvider'
-import { getClientAccount, getOrders } from '../../contracts'
+import { getParticipantAccount, getOrders } from '../../contracts'
 
 export default () => {
   const { accountAddress } = useAuth()
@@ -16,8 +16,8 @@ export default () => {
       setIsLoading(true)
       const o = await getOrders()
       setOrders(o)
-      const { isClient } = getClientAccount(accountAddress)
-      setIsSigned(isClient)
+      const { isParticipant } = getParticipantAccount(accountAddress)
+      setIsSigned(isParticipant)
       setIsLoading(false)
     })()
   }, [])
@@ -30,7 +30,7 @@ export default () => {
   }
   return (
     <div className="flex flex-column align-items justify-content-center">
-      <h1>Client Dashboard</h1>
+      <h1>Participant Dashboard</h1>
       <div className="w-full">
         {isSigned ? (
           <>
@@ -40,8 +40,10 @@ export default () => {
           </>
         ) : (
           <>
-            <div className="mb-4">You are not registered as a Client yet.</div>
-            <Link to="/client/sign-up">
+            <div className="mb-4">
+              You are not registered as a Participant yet.
+            </div>
+            <Link to="/participant/sign-up">
               <Button label="Sign up " />
             </Link>
           </>

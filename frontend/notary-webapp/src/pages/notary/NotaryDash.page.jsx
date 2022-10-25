@@ -12,8 +12,8 @@ export default () => {
       setIsLoading(true)
       const o = await getOrders()
       setOrders(o)
-      const { isClient } = getNotaryAccount(accountAddress)
-      setIsSigned(isClient)
+      const { isParticipant } = getNotaryAccount(accountAddress)
+      setIsSigned(isParticipant)
       setIsLoading(false)
     })()
   }, [])
@@ -36,7 +36,7 @@ export default () => {
       ) : (
         <>
           <div className="mb-4">You are not registered as a notary yet.</div>
-          <Link to="/client/sign-up">
+          <Link to="/participant/sign-up">
             <Button label="Sign up " />
           </Link>
         </>
