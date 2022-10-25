@@ -55,7 +55,28 @@ func (_x *Service) Connect(_in *ConnectInput) (*ConnectOutput, error) {
 		return nil, fmt.Errorf("failed saving Session in DB: %w", err)
 	}
 
-	m, err := json.Marshal(s)
+	// m, err := json.Marshal(s)
+	// if err != nil {
+	// 	return nil, fmt.Errorf("failed marshalling Session: %w", err)
+	// }
+
+	// _, err = _x.snsc.Publish(&sns.PublishInput{
+	// 	TopicArn: aws.String("arn:aws:sns:us-east-1:789146734688:notarynearby-dev-wssessions"),
+	// 	Message:  aws.String(string(m)),
+	// })
+	// if err != nil {
+	// 	return nil, fmt.Errorf("failed publishing Session to SNS: %w", err)
+	// }
+
+	return &ConnectOutput{
+		ConnectionID: _in.ConnectionID,
+		CallbackURL:  _in.CallbackURL,
+	}, nil
+}
+
+//DispatchAction sends messages to other session participants
+func (_x *Service) DispatchAction(_in *DispatchActionInput) (*DispatchActionOutput, error) {
+	m, err := json.Marshal(_in)
 	if err != nil {
 		return nil, fmt.Errorf("failed marshalling Session: %w", err)
 	}
@@ -68,7 +89,7 @@ func (_x *Service) Connect(_in *ConnectInput) (*ConnectOutput, error) {
 		return nil, fmt.Errorf("failed publishing Session to SNS: %w", err)
 	}
 
-	return &ConnectOutput{
+	return &DispatchActionOutput{
 		ConnectionID: _in.ConnectionID,
 		CallbackURL:  _in.CallbackURL,
 	}, nil

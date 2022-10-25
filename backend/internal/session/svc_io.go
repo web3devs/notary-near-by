@@ -11,3 +11,16 @@ type ConnectOutput struct {
 	ConnectionID string
 	CallbackURL  string
 }
+
+//DispatchActionInput input for dispatching actions
+type DispatchActionInput struct {
+	ConnectionID string `json:"connection_id"`
+	CallbackURL  string `json:"callback_url"`
+	Action       Action `json:"action"`
+}
+
+//DispatchActionOutput for action dispatching results
+type DispatchActionOutput struct {
+	ConnectionID string
+	CallbackURL  string
+}

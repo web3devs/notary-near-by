@@ -17,35 +17,49 @@ import (
 
 //Handler is our lambda handler invoked by the `lambda.Start` function call
 func Handler(ctx context.Context, request events.APIGatewayWebsocketProxyRequest) (events.APIGatewayProxyResponse, error) {
-	fmt.Println("connection handler ran")
+	connectionID := request.RequestContext.ConnectionID
+	callbackURL := fmt.Sprintf("https://%s/%s", request.RequestContext.DomainName, request.RequestContext.Stage)
 
-	fmt.Println("ConnectionID: ", request.RequestContext.ConnectionID)
-	fmt.Println("CallbackURL: ", fmt.Sprintf("https://%s/%s", request.RequestContext.DomainName, request.RequestContext.Stage))
+	if request.Body == "" { //new connection
+		if _, err := ns.Connect(&_ns.ConnectInput{
+			ConnectionID: connectionID,
+			CallbackURL:  callbackURL,
+		}); err != nil {
+			fmt.Println("ERROR: failed storing WS Connection details: ", err)
+			var buf bytes.Buffer
 
-	o, err := ns.Connect(&_ns.ConnectInput{
-		ConnectionID: request.RequestContext.ConnectionID,
-		CallbackURL:  fmt.Sprintf("https://%s/%s", request.RequestContext.DomainName, request.RequestContext.Stage),
-	})
-	if err != nil {
-		fmt.Println("ERROR: failed storing WS Connection details: ", err)
-		var buf bytes.Buffer
+			body, err := json.Marshal(map[string]interface{}{
+				"message": fmt.Sprintf("ERROR: %v", err),
+			})
+			if err != nil {
+				return events.APIGatewayProxyResponse{StatusCode: 500}, err
+			}
 
-		body, err := json.Marshal(map[string]interface{}{
-			"message": fmt.Sprintf("ERROR: %v", err),
-		})
-		if err != nil {
-			return events.APIGatewayProxyResponse{StatusCode: 500}, err
+			json.HTMLEscape(&buf, body)
+			return events.APIGatewayProxyResponse{
+				StatusCode:      500,
+				IsBase64Encoded: false,
+				Body:            buf.String(),
+			}, nil
 		}
 
-		json.HTMLEscape(&buf, body)
 		return events.APIGatewayProxyResponse{
-			StatusCode:      500,
-			IsBase64Encoded: false,
-			Body:            buf.String(),
+			StatusCode: 200,
 		}, nil
 	}
 
-	fmt.Println("O: ", o)
+	var a _ns.Action
+	if err := json.Unmarshal([]byte(request.Body), &a); err != nil {
+		fmt.Println("ERROR: failed unmarshaling Action: ", err)
+	}
+
+	if _, err = ns.DispatchAction(&_ns.DispatchActionInput{
+		ConnectionID: connectionID,
+		CallbackURL:  callbackURL,
+		Action:       a,
+	}); err != nil {
+		fmt.Println("ERROR: failed processing Action: ", err)
+	}
 
 	return events.APIGatewayProxyResponse{
 		StatusCode: 200,

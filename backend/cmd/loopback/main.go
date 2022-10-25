@@ -26,23 +26,53 @@ type Response events.APIGatewayProxyResponse
 func Handler(context context.Context, records events.SNSEvent) error {
 	fmt.Println("loopback handler ran")
 	for _, r := range records.Records {
-		var m _ns.Session
+		fmt.Println("r.SNS.Message: ", r.SNS.Message)
+		var m _ns.DispatchActionInput
 		err := json.Unmarshal([]byte(r.SNS.Message), &m)
 		if err != nil {
-			fmt.Println("sns unmarshal error")
-			fmt.Println(err)
+			fmt.Println("sns unmarshal error: ", err)
+			continue
 		}
-		url := fmt.Sprintf(m.CallbackURL)
-		apigw := apigatewaymanagementapi.New(sess, &aws.Config{
-			Endpoint: aws.String(url),
-		})
-		_, err = apigw.PostToConnection(&apigatewaymanagementapi.PostToConnectionInput{
-			ConnectionId: aws.String(m.ConnectionID),
-			Data:         []byte(`hello`),
-		})
-		if err != nil {
-			fmt.Println("error")
-			fmt.Println(err)
+
+		switch m.Action.Action {
+		case _ns.ActionMessage:
+			var tmp struct {
+				SessionID string `json:"session_id"`
+				Message   string `json:"message"`
+			}
+			err := json.Unmarshal(*m.Action.Data, &tmp)
+			if err != nil {
+				fmt.Println("ERROR: failed unmarshaling Action.Data: ", err)
+				continue
+			}
+
+			fmt.Println("tmp: ", tmp)
+			fmt.Println("ns.Reader: ", ns.Reader)
+
+			//Get all ConnectionIDs but the sender's
+			cs, err := ns.Reader.GetAllBySession(tmp.SessionID)
+			if err != nil {
+				fmt.Println("ERROR: failed fetching Connections: ", err)
+				continue
+			}
+
+			for _, c := range cs {
+				if c.ConnectionID == m.ConnectionID { //TODO: Exclude it in GetAllBySession?
+					continue
+				}
+				apigw := apigatewaymanagementapi.New(sess, &aws.Config{
+					Endpoint: aws.String(c.CallbackURL),
+				})
+				_, err := apigw.PostToConnection(&apigatewaymanagementapi.PostToConnectionInput{
+					ConnectionId: aws.String(c.ConnectionID),
+					Data:         []byte(tmp.Message),
+				})
+				if err != nil {
+					fmt.Println("ERROR: failed posting to Connections: ", err)
+					continue
+				}
+			}
+			break
 		}
 	}
 	return nil
@@ -58,6 +88,11 @@ func main() {
 	})
 	if err != nil {
 		panic(fmt.Errorf("failed starting AWS Session: %w", err))
+	}
+
+	ns, err = _ns.New(sess)
+	if err != nil {
+		panic(fmt.Errorf("failed starting NNB Session Service: %w", err))
 	}
 
 	lambda.Start(Handler)
