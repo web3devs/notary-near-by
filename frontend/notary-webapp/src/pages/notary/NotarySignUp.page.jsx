@@ -2,7 +2,7 @@ import { FileUpload, InputText } from 'primereact'
 import { Button } from 'primereact/Button'
 import { useRef, useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { signUpNotary } from '../contracts'
+import { signUpNotary } from '../../contracts'
 
 export default () => {
   const [isSubmiting, setIsSubmiting] = useState(false)
@@ -22,7 +22,7 @@ export default () => {
 
   return (
     <div>
-      <h1>Sign up as a notary</h1>
+      <h1>Sign up as a Notary</h1>
       <span className="p-float-label mb-2">
         <InputText
           id="companyName"
