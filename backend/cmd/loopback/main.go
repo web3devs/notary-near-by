@@ -16,12 +16,6 @@ import (
 	_ns "notarynearby/internal/session"
 )
 
-// Response is of type APIGatewayProxyResponse since we're leveraging the
-// AWS Lambda Proxy Request functionality (default behavior)
-//
-// https://serverless.com/framework/docs/providers/aws/events/apigateway/#lambda-proxy-integration
-type Response events.APIGatewayProxyResponse
-
 // Handler is our lambda handler invoked by the `lambda.Start` function call
 func Handler(context context.Context, records events.SNSEvent) error {
 	fmt.Println("loopback handler ran")
@@ -38,7 +32,6 @@ func Handler(context context.Context, records events.SNSEvent) error {
 		case _ns.ActionMessage:
 			var tmp struct {
 				OrderID string `json:"order_id"`
-				Message string `json:"message"`
 			}
 			err := json.Unmarshal(*m.Action.Data, &tmp)
 			if err != nil {
@@ -56,6 +49,12 @@ func Handler(context context.Context, records events.SNSEvent) error {
 				continue
 			}
 
+			a, err := json.Marshal(m.Action)
+			if err != nil {
+				fmt.Println("ERROR: failed marshaling Action into JSON: ", err)
+				continue
+			}
+
 			for _, c := range cs {
 				if c.ConnectionID == m.ConnectionID { //TODO: Exclude it in GetAllBySession?
 					continue
@@ -65,7 +64,7 @@ func Handler(context context.Context, records events.SNSEvent) error {
 				})
 				_, err := apigw.PostToConnection(&apigatewaymanagementapi.PostToConnectionInput{
 					ConnectionId: aws.String(c.ConnectionID),
-					Data:         []byte(tmp.Message),
+					Data:         a,
 				})
 				if err != nil {
 					fmt.Println("ERROR: failed posting to Connections: ", err)

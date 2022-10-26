@@ -25,6 +25,9 @@ Resources:
             KeyType: RANGE
           Projection:
             ProjectionType: ALL
+      TimeToLiveSpecification:
+        AttributeName: TTL
+        Enabled: true
 
 #TODO: Add TTL
 

@@ -35,6 +35,10 @@ func (_x *Reader) GetOne(connectionID string) (Session, error) {
 func (_x *Reader) GetAllByOrder(orderID string) ([]Session, error) {
 	var rr []Session
 
+	if orderID == "--DISABLED--" {
+		return rr, nil
+	}
+
 	err := _x.table().Get("OrderID", orderID).Index("ByOrderID").All(&rr)
 
 	return rr, err

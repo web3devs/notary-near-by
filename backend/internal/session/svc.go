@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"notarynearby/internal/db"
 	"os"
+	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
@@ -45,10 +46,13 @@ func New(sess *session.Session) (*Service, error) {
 
 //Connect stores data about WS connection and publishes it to SNS
 func (_x *Service) Connect(_in *ConnectInput) (*ConnectOutput, error) {
+	exp := time.Now().Add(1 * time.Hour)
 	s := &Session{
 		ConnectionID: _in.ConnectionID,
 		CallbackURL:  _in.CallbackURL,
-		OrderID:      "TODO", //TODO
+		ExpiresAt:    exp,
+		TTL:          exp.Unix(),
+		OrderID:      "--DISABLED--",
 	}
 	//TODO: validate
 	if err := _x.Writer.SaveSession(s); err != nil {
