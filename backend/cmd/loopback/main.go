@@ -37,8 +37,8 @@ func Handler(context context.Context, records events.SNSEvent) error {
 		switch m.Action.Action {
 		case _ns.ActionMessage:
 			var tmp struct {
-				SessionID string `json:"session_id"`
-				Message   string `json:"message"`
+				OrderID string `json:"order_id"`
+				Message string `json:"message"`
 			}
 			err := json.Unmarshal(*m.Action.Data, &tmp)
 			if err != nil {
@@ -50,7 +50,7 @@ func Handler(context context.Context, records events.SNSEvent) error {
 			fmt.Println("ns.Reader: ", ns.Reader)
 
 			//Get all ConnectionIDs but the sender's
-			cs, err := ns.Reader.GetAllBySession(tmp.SessionID)
+			cs, err := ns.Reader.GetAllByOrder(tmp.OrderID)
 			if err != nil {
 				fmt.Println("ERROR: failed fetching Connections: ", err)
 				continue

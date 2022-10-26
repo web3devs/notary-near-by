@@ -22,12 +22,20 @@ func (_x *Reader) table() dynamo.Table {
 	return _x.svc.DB.Table(_x.svc.TableName)
 }
 
-//GetAllBySession returns all Deposits for provided Owner
-func (_x *Reader) GetAllBySession(sessionID string) ([]Session, error) {
+//GetOne returns Session for provided ConnectionID
+func (_x *Reader) GetOne(connectionID string) (Session, error) {
+	var r Session
+
+	err := _x.table().Get("ConnectionID", connectionID).One(&r)
+
+	return r, err
+}
+
+//GetAllByOrder returns all Deposits for provided Order
+func (_x *Reader) GetAllByOrder(orderID string) ([]Session, error) {
 	var rr []Session
 
-	// err := _x.table().Get("SessionID", sessionID).Index("BySessionID").All(&rr) //TODO: use this when connected
-	err := _x.table().Scan().All(&rr)
+	err := _x.table().Get("OrderID", orderID).Index("ByOrderID").All(&rr)
 
 	return rr, err
 }

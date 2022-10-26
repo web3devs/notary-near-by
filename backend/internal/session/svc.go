@@ -48,25 +48,12 @@ func (_x *Service) Connect(_in *ConnectInput) (*ConnectOutput, error) {
 	s := &Session{
 		ConnectionID: _in.ConnectionID,
 		CallbackURL:  _in.CallbackURL,
-		SessionID:    "TODO", //TODO
+		OrderID:      "TODO", //TODO
 	}
 	//TODO: validate
 	if err := _x.Writer.SaveSession(s); err != nil {
 		return nil, fmt.Errorf("failed saving Session in DB: %w", err)
 	}
-
-	// m, err := json.Marshal(s)
-	// if err != nil {
-	// 	return nil, fmt.Errorf("failed marshalling Session: %w", err)
-	// }
-
-	// _, err = _x.snsc.Publish(&sns.PublishInput{
-	// 	TopicArn: aws.String("arn:aws:sns:us-east-1:789146734688:notarynearby-dev-wssessions"),
-	// 	Message:  aws.String(string(m)),
-	// })
-	// if err != nil {
-	// 	return nil, fmt.Errorf("failed publishing Session to SNS: %w", err)
-	// }
 
 	return &ConnectOutput{
 		ConnectionID: _in.ConnectionID,
@@ -79,6 +66,37 @@ func (_x *Service) DispatchAction(_in *DispatchActionInput) (*DispatchActionOutp
 	m, err := json.Marshal(_in)
 	if err != nil {
 		return nil, fmt.Errorf("failed marshalling Session: %w", err)
+	}
+
+	s, err := _x.Reader.GetOne(_in.ConnectionID)
+	if err != nil {
+		return nil, fmt.Errorf("no Session found: %w", err)
+	}
+
+	switch _in.Action.Action {
+	case ActionJoin:
+		var tmp struct {
+			OrderID   string `json:"order_id"`
+			PublicKey string `json:"public_key"`
+			Signature string `json:"signature"`
+		}
+		err := json.Unmarshal(*_in.Action.Data, &tmp)
+		if err != nil {
+			return nil, fmt.Errorf("failed unmarshaling action: %w", err)
+		}
+
+		//TODO:
+		//read OrderID
+		//fetch associated Order
+		//read publicKey and signature
+		//verify signature/pubKey (see if pubKey matches signature AND pubKey exists in the Order!)
+		//if ok - update Session with provided OrderID
+		s.OrderID = tmp.OrderID
+		if err := _x.Writer.JoinSession(&s); err != nil {
+			return nil, fmt.Errorf("failed joining session: %w", err)
+		}
+
+		break
 	}
 
 	_, err = _x.snsc.Publish(&sns.PublishInput{

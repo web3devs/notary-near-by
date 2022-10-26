@@ -7,6 +7,8 @@ Resources:
       PointInTimeRecoverySpecification:
         PointInTimeRecoveryEnabled: false
       AttributeDefinitions:
+        - AttributeName: OrderID
+          AttributeType: S
         - AttributeName: ConnectionID
           AttributeType: S
       KeySchema:
@@ -14,13 +16,15 @@ Resources:
           KeyType: HASH
         # - AttributeName: ConnectionID
         #   KeyType: RANGE
-      # GlobalSecondaryIndexes:
-      #   - IndexName: ByConnectionID
-      #     KeySchema:
-      #     - AttributeName: ConnectionID
-      #       KeyType: HASH
-      #     Projection:
-      #       ProjectionType: ALL
+      GlobalSecondaryIndexes:
+        - IndexName: ByOrderID
+          KeySchema:
+          - AttributeName: OrderID
+            KeyType: HASH
+          - AttributeName: ConnectionID
+            KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
 
 #TODO: Add TTL
 
