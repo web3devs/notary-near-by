@@ -1,6 +1,6 @@
 import { ProgressSpinner } from 'primereact'
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { Button } from 'primereact/Button'
 import ListItem from '../../components/dash/ListItem'
 import { useAuth } from '../../context/AuthProvider'
@@ -11,6 +11,7 @@ export default () => {
   const [orders, setOrders] = useState([])
   const [isLoading, setIsLoading] = useState(false)
   const [isSigned, setIsSigned] = useState(false)
+  const navigate = useNavigate()
   useEffect(() => {
     ;(async () => {
       setIsLoading(true)
@@ -34,8 +35,19 @@ export default () => {
       <div className="w-full">
         {isSigned ? (
           <>
+            <Link to="/participant/create-session">
+              <Button label="Create session" className="mb-4" />
+            </Link>
             {orders.map((o, idx) => {
-              return <ListItem data={o} key={JSON.stringify(o) + idx} />
+              return (
+                <ListItem
+                  data={o}
+                  key={o.id}
+                  onClick={() => {
+                    navigate('/participant/session/' + o.id)
+                  }}
+                />
+              )
             })}
           </>
         ) : (

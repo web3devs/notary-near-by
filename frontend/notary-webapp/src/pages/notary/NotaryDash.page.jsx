@@ -1,9 +1,13 @@
+import { ProgressSpinner } from 'primereact'
 import { Button } from 'primereact/Button'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { useAuth } from '../../context/AuthProvider'
 import { getNotaryAccount, getOrders } from '../../contracts'
 
 export default () => {
   const { accountAddress } = useAuth()
+
   const [orders, setOrders] = useState([])
   const [isLoading, setIsLoading] = useState(false)
   const [isSigned, setIsSigned] = useState(false)
@@ -30,13 +34,21 @@ export default () => {
       {isSigned ? (
         <>
           {orders.map((o, idx) => {
-            return <ListItem data={o} key={JSON.stringify(o) + idx} />
+            return (
+              <ListItem
+                data={o}
+                key={o.id}
+                onClick={() => {
+                  navigator('/notary/session/' + o.id)
+                }}
+              />
+            )
           })}
         </>
       ) : (
         <>
           <div className="mb-4">You are not registered as a notary yet.</div>
-          <Link to="/participant/sign-up">
+          <Link to="/notary/sign-up">
             <Button label="Sign up " />
           </Link>
         </>

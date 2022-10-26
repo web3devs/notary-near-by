@@ -14,7 +14,7 @@ export default ({ className }) => {
       <div>
         <Button
           className="p-button-outlined"
-          label="disconnect"
+          label="Disconnect"
           onClick={() => {
             logout()
           }}
