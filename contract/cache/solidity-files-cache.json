@@ -2,7 +2,7 @@
   "_format": "hh-sol-cache-2",
   "files": {
     "/Users/ken/Projects/notary-near-by/contract/contracts/NotarizedDocumentNft.sol": {
-      "lastModificationDate": 1666846295728,
+      "lastModificationDate": 1666909416812,
       "contentHash": "276f27f1a5e671a940df513cf15c89ac",
       "sourceName": "contracts/NotarizedDocumentNft.sol",
       "solcConfig": {
@@ -228,41 +228,6 @@
         "Context"
       ]
     },
-    "/Users/ken/Projects/notary-near-by/contract/node_modules/@openzeppelin/contracts/utils/Strings.sol": {
-      "lastModificationDate": 1666842234329,
-      "contentHash": "cf46906c4035f51639a22265066a9e78",
-      "sourceName": "@openzeppelin/contracts/utils/Strings.sol",
-      "solcConfig": {
-        "version": "0.8.4",
-        "settings": {
-          "optimizer": {
-            "enabled": false,
-            "runs": 200
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [],
-      "versionPragmas": [
-        "^0.8.0"
-      ],
-      "artifacts": [
-        "Strings"
-      ]
-    },
     "/Users/ken/Projects/notary-near-by/contract/node_modules/@openzeppelin/contracts/utils/Address.sol": {
       "lastModificationDate": 1666842234329,
       "contentHash": "c476b3895a94798b88a4bb97399e6dfe",
@@ -296,6 +261,41 @@
       ],
       "artifacts": [
         "Address"
+      ]
+    },
+    "/Users/ken/Projects/notary-near-by/contract/node_modules/@openzeppelin/contracts/utils/Strings.sol": {
+      "lastModificationDate": 1666842234329,
+      "contentHash": "cf46906c4035f51639a22265066a9e78",
+      "sourceName": "@openzeppelin/contracts/utils/Strings.sol",
+      "solcConfig": {
+        "version": "0.8.4",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "Strings"
       ]
     },
     "/Users/ken/Projects/notary-near-by/contract/node_modules/@openzeppelin/contracts/token/ERC721/IERC721.sol": {
@@ -333,43 +333,6 @@
       ],
       "artifacts": [
         "IERC721"
-      ]
-    },
-    "/Users/ken/Projects/notary-near-by/contract/node_modules/@openzeppelin/contracts/utils/introspection/ERC165.sol": {
-      "lastModificationDate": 1666842235673,
-      "contentHash": "0e7db055ce108f9da7bb6686a00287c0",
-      "sourceName": "@openzeppelin/contracts/utils/introspection/ERC165.sol",
-      "solcConfig": {
-        "version": "0.8.4",
-        "settings": {
-          "optimizer": {
-            "enabled": false,
-            "runs": 200
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [
-        "./IERC165.sol"
-      ],
-      "versionPragmas": [
-        "^0.8.0"
-      ],
-      "artifacts": [
-        "ERC165"
       ]
     },
     "/Users/ken/Projects/notary-near-by/contract/node_modules/@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol": {
@@ -444,6 +407,43 @@
         "IERC721Metadata"
       ]
     },
+    "/Users/ken/Projects/notary-near-by/contract/node_modules/@openzeppelin/contracts/utils/introspection/ERC165.sol": {
+      "lastModificationDate": 1666842235673,
+      "contentHash": "0e7db055ce108f9da7bb6686a00287c0",
+      "sourceName": "@openzeppelin/contracts/utils/introspection/ERC165.sol",
+      "solcConfig": {
+        "version": "0.8.4",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./IERC165.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "ERC165"
+      ]
+    },
     "/Users/ken/Projects/notary-near-by/contract/node_modules/@openzeppelin/contracts/utils/introspection/IERC165.sol": {
       "lastModificationDate": 1666842235675,
       "contentHash": "03e6768535ac4da0e9756f1d8a4a018a",
@@ -480,8 +480,8 @@
       ]
     },
     "/Users/ken/Projects/notary-near-by/contract/contracts/Notary.sol": {
-      "lastModificationDate": 1666843448440,
-      "contentHash": "f7785038a99e8105e1230e8f696ffc8a",
+      "lastModificationDate": 1666909482788,
+      "contentHash": "e07c94a3df81eb9b125c8aa9722d4995",
       "sourceName": "contracts/Notary.sol",
       "solcConfig": {
         "version": "0.8.4",
