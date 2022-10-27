@@ -480,8 +480,8 @@
       ]
     },
     "/Users/ken/Projects/notary-near-by/contract/contracts/Notary.sol": {
-      "lastModificationDate": 1666843448440,
-      "contentHash": "f7785038a99e8105e1230e8f696ffc8a",
+      "lastModificationDate": 1666909068025,
+      "contentHash": "e07c94a3df81eb9b125c8aa9722d4995",
       "sourceName": "contracts/Notary.sol",
       "solcConfig": {
         "version": "0.8.4",
