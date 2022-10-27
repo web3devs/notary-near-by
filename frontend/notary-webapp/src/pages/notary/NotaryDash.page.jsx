@@ -42,7 +42,7 @@ export default () => {
                 data={o}
                 key={o.id}
                 onClick={() => {
-                  navigate('/notary/session/' + o.id)
+                  navigate('/notary/order/' + o.id)
                 }}
               />
             )

@@ -12,7 +12,7 @@ export default () => {
   }, [])
   return (
     <div>
-      <h1>Participant session</h1>
+      <h1>Participant order</h1>
       <div className="flex flex-column justify-content-center align-items-center mt-4">
         {isWaiting ? (
           <>
@@ -20,7 +20,7 @@ export default () => {
             <div>Waiting for Notary</div>
           </>
         ) : (
-          <div>Session content</div>
+          <div>Order content</div>
         )}
       </div>
     </div>

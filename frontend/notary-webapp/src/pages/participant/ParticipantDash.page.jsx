@@ -31,12 +31,12 @@ export default () => {
   }
   return (
     <div className="flex flex-column align-items justify-content-center">
-      <h1>Participant Dashboard</h1>
+      <h1>Participants orders</h1>
       <div className="w-full">
         {isSigned ? (
           <>
-            <Link to="/participant/create-session">
-              <Button label="Create session" className="mb-4" />
+            <Link to="/participant/create-order">
+              <Button label="Create order" className="mb-4" />
             </Link>
             {orders.map((o, idx) => {
               return (
@@ -44,7 +44,7 @@ export default () => {
                   data={o}
                   key={o.id}
                   onClick={() => {
-                    navigate('/participant/session/' + o.id)
+                    navigate('/participant/order/' + o.id)
                   }}
                 />
               )

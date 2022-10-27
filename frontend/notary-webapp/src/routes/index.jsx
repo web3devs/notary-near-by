@@ -9,7 +9,7 @@ import {
 } from 'react-router-dom'
 import { useNearUser } from 'react-near'
 
-import CreateSessionPage from '../pages/participant/CreateSession.page'
+import CreateOrderPage from '../pages/participant/CreateOrder.page'
 import DashboardLayout from '../layouts/Dashboard.layout'
 import NotaryDashPage from '../pages/notary/NotaryDash.page'
 import ParticipantDashPage from '../pages/participant/ParticipantDash.page'
@@ -17,8 +17,8 @@ import HomePage from '../pages/Home.page'
 import SignInPage from '../pages/SignIn.page'
 import SignUpPage from '../pages/notary/NotarySignUp.page'
 import ParticipantSignUpPage from '../pages/participant/ParticipantSignUp.page'
-import ParticipantSessionPage from '../pages/participant/ParticipantSession.page'
-import NotarySessionPage from '../pages/notary/NotarySession.page'
+import ParticipantOrderPage from '../pages/participant/ParticipantOrder.page'
+import NotaryOrderPage from '../pages/notary/NotaryOrder.page'
 
 const RequireAuth = ({ children }) => {
   const nearUser = useNearUser()
@@ -48,11 +48,11 @@ export const AppRouter = () => {
           }
         />
         <Route
-          path="/notary/session/:id"
+          path="/notary/Order/:id"
           element={
             <RequireAuth>
               <DashboardLayout>
-                <NotarySessionPage />
+                <NotaryOrderPage />
               </DashboardLayout>
             </RequireAuth>
           }
@@ -78,21 +78,21 @@ export const AppRouter = () => {
           }
         />
         <Route
-          path="/participant/create-session"
+          path="/participant/create-Order"
           element={
             <RequireAuth>
               <DashboardLayout>
-                <CreateSessionPage />
+                <CreateOrderPage />
               </DashboardLayout>
             </RequireAuth>
           }
         />
         <Route
-          path="/participant/session/:id"
+          path="/participant/Order/:id"
           element={
             <RequireAuth>
               <DashboardLayout>
-                <ParticipantSessionPage />
+                <ParticipantOrderPage />
               </DashboardLayout>
             </RequireAuth>
           }
