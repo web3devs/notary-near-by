@@ -8,7 +8,7 @@
     "compile": "npx hardhat compile",
     "test": "npx hardhat test",
     "deploy:dev": "yarn clean && yarn compile && npx hardhat run scripts/deploy.js --network local_aurora",
-    "deploy:testnet": "yarn clean npx hardhat run scripts/deploy.js --network aurora_local&& yarn compile && npx hardhat run scripts/deploy.js --network testnet_aurora"
+    "deploy:testnet": "yarn clean && yarn compile && npx hardhat run scripts/deploy.js --network testnet_aurora"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-chai-matchers": "^1.0.4",
