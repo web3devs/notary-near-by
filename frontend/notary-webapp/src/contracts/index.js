@@ -23,7 +23,7 @@ let tmpParticipantState = {
   isParticipant: false
 }
 let tmpNotaryState = {
-  isNotary: false
+  isNotary: true
 }
 
 export const getNotaryAccount = (accountAddress) => {
