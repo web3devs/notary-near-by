@@ -1,46 +1,55 @@
-// We require the Hardhat Runtime Environment explicitly here. This is optional 
-// but useful for running the script in a standalone fashion through `node <script>`.
-//
-// When running the script with `hardhat run <script>` you'll find the Hardhat
-// Runtime Environment's members available in the global scope.
 require('dotenv').config();
 const hre = require("hardhat");
 
-async function main() {
-    // Hardhat always runs the compile task when running scripts with its command
-    // line interface.
-    //
-    // If this script is run directly using `node` you may want to call compile
-    // manually to make sure everything is compiled
-    // await hre.run('compile');
-
-    const provider = hre.ethers.provider;
-    const deployerWallet = new hre.ethers.Wallet(process.env.AURORA_PRIVATE_KEY, provider);
-
-    console.log(
-        "Deploying contracts with the account:",
-        deployerWallet.address
-    );
-
-    console.log(
-        "Account balance:",
-        (await deployerWallet.getBalance()).toString()
-    );
-
-    const Nft = await hre.ethers.getContractFactory("NotaryNearbyNFT");
+async function deployNotarizedDocumentNft(deployerWallet) {
+    const Nft = await hre.ethers.getContractFactory("NotarizedDocumentNft");
     const nft = await Nft
         .connect(deployerWallet)
         .deploy();
     await nft.deployed();
-
-    console.log("NotarizedDocumentNft deployed to:", nft.address);
+    return nft
 }
 
-// We recommend this pattern to be able to use async/await everywhere
-// and properly handle errors.
-main()
-    .then(() => process.exit(0))
-    .catch(error => {
-        console.error(error);
-        process.exit(1);
-    });
+async function deployNotary(deployerWallet) {
+    const Notary = await hre.ethers.getContractFactory("Notary");
+    const notary = await Notary
+        .connect(deployerWallet)
+        .deploy();
+    await notary.deployed();
+    return notary
+}
+
+async function deployContacts(wallet) {
+    console.log(
+        "Deploying contracts with the account:",
+        wallet.address
+    );
+
+    const notaryContract = await deployNotary(wallet);
+    const notarizedDocumentNftContract = await deployNotarizedDocumentNft(wallet);
+    await notaryContract.setNotarizedDocumentNftContact(notarizedDocumentNftContract.address)
+    await notarizedDocumentNftContract.transferOwnership(notaryContract.address)
+
+    return {notaryContract, notarizedDocumentNftContract}
+}
+
+const main = async () => {
+    const provider = hre.ethers.provider;
+    const deployerWallet = new hre.ethers.Wallet(process.env.AURORA_PRIVATE_KEY, provider);
+    return await deployContacts(deployerWallet);
+}
+
+if (require.main === module) {
+    main()
+        .then(({notaryContract, notarizedDocumentNftContract}) => {
+            console.log(`Notary contract deployed to ${notaryContract.address}`)
+            console.log(`NotarizedDocumentNft contract deployed to ${notarizedDocumentNftContract.address}`)
+            process.exit(0)
+        })
+        .catch(error => {
+            console.error(error);
+            process.exit(1);
+        });
+}
+
+module.exports = deployContacts;

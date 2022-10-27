@@ -1,4 +1,5 @@
-require("@nomiclabs/hardhat-waffle");
+require("@nomicfoundation/hardhat-chai-matchers");
+require("@nomiclabs/hardhat-ethers");
 require("./tasks/account");
 require("./tasks/transfer");
 require("./tasks/totalSupply");
@@ -12,7 +13,7 @@ const AURORA_API_KEY = process.env.AURORA_API_KEY;
 
 module.exports = {
   solidity: "0.8.4",
-  defaultNetwork: "local_aurora",
+  defaultNetwork: "hardhat",
   networks: {
     aurora: {
       url: `https://mainnet.aurora.dev/${AURORA_API_KEY}`,

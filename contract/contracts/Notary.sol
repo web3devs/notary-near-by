@@ -10,10 +10,13 @@ struct UnmintedTokenData {
 }
 
 contract Notary is AccessControl {
-    NotarizedDocumentNft ndn;
+    NotarizedDocumentNft public ndn;
 
     bytes32 public constant NOTARY_ROLE = keccak256("NOTARY_ROLE");
     mapping(string => UnmintedTokenData) public unmintedToken;
+
+    event NotarizedDocumentCreated(address notary, address authorizedMinter, uint256 price, string metadataUrl);
+    event NotarizedDocumentNftMinted(address authorizedMinter, uint256 price, string metadataUrl, uint256 tokenId);
 
     error TokenNotMintable(string metadataUri);
     error MinterNotAuthorized(string metadataUri);
@@ -33,9 +36,10 @@ contract Notary is AccessControl {
         string memory _metadataUrl
     ) external onlyRole(NOTARY_ROLE) {
         unmintedToken[_metadataUrl] = UnmintedTokenData(_authorizedMinter, _mintingPrice);
+        emit NotarizedDocumentCreated(msg.sender, _authorizedMinter, _mintingPrice, _metadataUrl);
     }
 
-    function mint(string memory _metadataUrl) payable external {
+    function mint(string memory _metadataUrl) payable external returns (uint256 tokenId) {
         UnmintedTokenData memory tokenParameters = unmintedToken[_metadataUrl];
         if (tokenParameters.authorizedMinter == address(0)) {
             revert TokenNotMintable(_metadataUrl);
@@ -46,8 +50,10 @@ contract Notary is AccessControl {
         if (tokenParameters.costToMint != msg.value) {
             revert IncorrectAmountSent(_metadataUrl, msg.value);
         }
-        ndn.mint(_metadataUrl);
+        tokenId = ndn.mint(msg.sender, _metadataUrl);
         delete unmintedToken[_metadataUrl];
+
+        emit NotarizedDocumentNftMinted(msg.sender, msg.value, _metadataUrl, tokenId);
     }
 }
 
