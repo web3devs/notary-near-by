@@ -1,10 +1,11 @@
 # Aurora Contracts
 
 ## Integration Settings
+**Last deployed at Oct-27-2022 10:55 PM +UTC** 
 | Contract                                                                                               | Mainnet Deployment | Testnet Address                                                                                                                 |
 |--------------------------------------------------------------------------------------------------------|--------------------|---------------------------------------------------------------------------------------------------------------------------------|
-| Notary [[ABI](./artifacts/contracts/Notary.sol/Notary.json)]                                           |    not deployed    | [0x969947A98B96f7ec7bFc22ec959985692c476341](https://testnet.aurorascan.dev/address/0x969947a98b96f7ec7bfc22ec959985692c476341) |
-| NotarizedDocumentNft [[ABI](./artifacts/contracts/NotarizedDocumentNft.sol/NotarizedDocumentNft.json)] |    not deployed    | [0xFAD78427aBF5B06491ad21E14b28D85C7751397f](https://testnet.aurorascan.dev/address/0xfad78427abf5b06491ad21e14b28d85c7751397f) |
+| Notary [[ABI](./artifacts/contracts/Notary.sol/Notary.json)]                                           |    not deployed    | [0x3468A7e79bD12E6d128E8207cbE4FB4496848Db7](https://testnet.aurorascan.dev/address/0x3468A7e79bD12E6d128E8207cbE4FB4496848Db7) |
+| NotarizedDocumentNft [[ABI](./artifacts/contracts/NotarizedDocumentNft.sol/NotarizedDocumentNft.json)] |    not deployed    | [0x38e38D74Be65B291bD7Df38eF74089916bdA7124](https://testnet.aurorascan.dev/address/0x38e38D74Be65B291bD7Df38eF74089916bdA7124) |
 
 ## Notes about dev install
 The currently implemented dev blockchain is the hardhat standard chain. In the future, the aurora local chain may be needed if the contracts interact with the NEAR precompiles.
