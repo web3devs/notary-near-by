@@ -1,0 +1,6 @@
+#!/bin/sh
+
+export NEAR_ENV=local
+near delete aurora.test.near test.near
+near create-account aurora.test.near --master-account=test.near --initial-balance 1000000
+aurora install --chain 1313161556 --owner test.near bin/mainnet-release.wasm
