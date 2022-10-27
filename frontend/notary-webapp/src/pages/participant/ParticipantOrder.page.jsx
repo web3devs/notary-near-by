@@ -1,14 +1,19 @@
-import { ProgressSpinner } from 'primereact'
+import { Button, Dialog, ProgressSpinner } from 'primereact'
 import { useEffect, useState } from 'react'
+import Mint from '../../components/order-participant/Mint'
 
 export default () => {
   const [isWaiting, setIsWaiting] = useState(false)
-
+  const [showDialog, setShowDialog] = useState(false)
   useEffect(() => {
     setIsWaiting(true)
     setTimeout(() => {
       setIsWaiting(false)
     }, 3000)
+
+    setTimeout(() => {
+      setShowDialog(true)
+    }, 1000)
   }, [])
   return (
     <div>
@@ -23,6 +28,9 @@ export default () => {
           <div>Order content</div>
         )}
       </div>
+      <Dialog visible={showDialog} showHeader={false}>
+        <Mint />
+      </Dialog>
     </div>
   )
 }
