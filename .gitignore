@@ -1,4 +1,5 @@
 .env
+node_modules
 # IntelliJ project files
 .idea
 *.iml
