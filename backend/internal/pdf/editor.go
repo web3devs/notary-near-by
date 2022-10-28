@@ -1,6 +1,9 @@
 package pdf
 
 import (
+	"encoding/json"
+	"fmt"
+
 	"github.com/go-pdf/fpdf"
 	"github.com/go-pdf/fpdf/contrib/gofpdi"
 )
@@ -55,16 +58,18 @@ func (_x *Editor) loadPage(p int) {
 
 //RenderFields renders all defined fields to PDF
 func (_x *Editor) RenderFields() {
+	_x.pdf.AddLayer("Widgets", false)
+
 	ps := len(_x.pageSizes)
 	for p := 0; p < ps; p++ {
 		_x.pdf.AddPage()
+		_x.loadPage(p)
 		//TextFields
 		for _, t := range _x.textFields {
-			if t.page == p {
+			if t.Page == p {
 				t.Render(_x.pdf)
 			}
 		}
-		_x.loadPage(p)
 
 		//DateFields
 		for _, t := range _x.dateFields {
@@ -72,7 +77,6 @@ func (_x *Editor) RenderFields() {
 				t.Render(_x.pdf)
 			}
 		}
-		_x.loadPage(p)
 	}
 }
 
@@ -81,13 +85,34 @@ func (_x *Editor) SaveToFile(filePath string) error {
 	return _x.pdf.OutputFileAndClose(filePath)
 }
 
-func (_x *Editor) AddMapping(j string) error {
-	// var fields []Field
+func (_x *Editor) LoadWidgets(j []byte) error {
+	var widgets []json.RawMessage
+	err := json.Unmarshal(j, &widgets)
+	if err != nil {
+		return fmt.Errorf("widget parsing mapping: %w", err)
+	}
 
-	// err := json.Unmarshal([]byte(j), &fields)
-	// if err != nil {
-	// 	return fmt.Errorf("failed parsing mapping: %w", err)
-	// }
+	for _, f := range widgets {
+		var wt struct {
+			Type string `json:"type"`
+		}
+		err := json.Unmarshal(f, &wt)
+		if err != nil {
+			return fmt.Errorf("widget parsing mapping: %w", err)
+		}
+
+		if wt.Type == "text" {
+			var w TextField
+			err := json.Unmarshal(f, &w)
+			if err != nil {
+				return fmt.Errorf("widget parsing mapping: %w", err)
+			}
+
+			_x.AddTextField(w.Page-1, w.Value, w.X, w.Y, w.W, w.H)
+		}
+	}
+
+	// fmt.Println("FIELDS: ", fields)
 
 	// for _, f := range fields {
 	// 	switch f.FieldType {
