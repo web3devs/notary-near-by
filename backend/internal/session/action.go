@@ -11,6 +11,12 @@ const (
 
 	//ActionMessage for sending messages
 	ActionMessage ActionType = "message"
+
+	//ActionAddWidget for adding widgets
+	ActionAddWidget ActionType = "add-widget"
+
+	//ActionUpdateWidget for updating widgets
+	ActionUpdateWidget ActionType = "update-widget"
 )
 
 //Action is our client action

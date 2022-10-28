@@ -104,7 +104,7 @@ func (_x *Service) DispatchAction(_in *DispatchActionInput) (*DispatchActionOutp
 	}
 
 	_, err = _x.snsc.Publish(&sns.PublishInput{
-		TopicArn: aws.String("arn:aws:sns:us-east-1:789146734688:notarynearby-dev-wssessions"),
+		TopicArn: aws.String(os.Getenv("SNS_SESSIONS_ARN")),
 		Message:  aws.String(string(m)),
 	})
 	if err != nil {

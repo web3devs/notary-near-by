@@ -1,6 +1,9 @@
 package session
 
-import "time"
+import (
+	"encoding/json"
+	"time"
+)
 
 //Session combines WebSocket session with notarization ceremony
 type Session struct {
@@ -9,4 +12,6 @@ type Session struct {
 	CallbackURL  string    `dynamo:"CallbackURL" json:"callback_url" validate:"required"`
 	ExpiresAt    time.Time `dynamo:"ExpiresAt"`
 	TTL          int64     `dynamo:"TTL"`
+
+	Widgets []json.RawMessage `dynamo:"Widgets" json:"widgets"`
 }

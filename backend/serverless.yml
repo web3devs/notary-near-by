@@ -11,6 +11,13 @@ provider:
     PROJECT_NAME: ${self:service}
     STAGE: ${self:provider.stage}
     REGION: ${self:provider.region}
+    SNS_SESSIONS_ARN:
+      Fn::Join:
+        - ':'
+        - - 'arn:aws:sns'
+          - Ref: 'AWS::Region'
+          - Ref: 'AWS::AccountId'
+          - notarynearby-${self:provider.stage}-wssessions
   iam:
     role:
       statements:
