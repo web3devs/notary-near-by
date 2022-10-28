@@ -7,15 +7,13 @@ Resources:
       PointInTimeRecoverySpecification:
         PointInTimeRecoveryEnabled: false
       AttributeDefinitions:
-        - AttributeName: OrderID
-          AttributeType: S
         - AttributeName: ConnectionID
+          AttributeType: S
+        - AttributeName: OrderID
           AttributeType: S
       KeySchema:
         - AttributeName: ConnectionID
           KeyType: HASH
-        # - AttributeName: ConnectionID
-        #   KeyType: RANGE
       GlobalSecondaryIndexes:
         - IndexName: ByOrderID
           KeySchema:
@@ -29,7 +27,68 @@ Resources:
         AttributeName: TTL
         Enabled: true
 
-#TODO: Add TTL
+  ParticipantsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: ${self:service}-${opt:stage, self:provider.stage}-participants
+      BillingMode: PAY_PER_REQUEST
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: false
+      AttributeDefinitions:
+        - AttributeName: PublicKey
+          AttributeType: S
+      KeySchema:
+        - AttributeName: PublicKey
+          KeyType: HASH
+
+  NotariesTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: ${self:service}-${opt:stage, self:provider.stage}-notaries
+      BillingMode: PAY_PER_REQUEST
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: false
+      AttributeDefinitions:
+        - AttributeName: PublicKey
+          AttributeType: S
+      KeySchema:
+        - AttributeName: PublicKey
+          KeyType: HASH
+
+  OrdersTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: ${self:service}-${opt:stage, self:provider.stage}-orders
+      BillingMode: PAY_PER_REQUEST
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: false
+      AttributeDefinitions:
+        - AttributeName: Owner
+          AttributeType: S
+        - AttributeName: ID
+          AttributeType: S
+        - AttributeName: Notary
+          AttributeType: S
+      KeySchema:
+        - AttributeName: Owner
+          KeyType: HASH
+        - AttributeName: ID
+          KeyType: RANGE
+      GlobalSecondaryIndexes:
+        - IndexName: ByNotary
+          KeySchema:
+          - AttributeName: Notary
+            KeyType: HASH
+          - AttributeName: ID
+            KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
+        - IndexName: ByID
+          KeySchema:
+          - AttributeName: ID
+            KeyType: HASH
+          Projection:
+            ProjectionType: ALL
 
   WSSessionsTopic:
     Type: "AWS::SNS::Topic"
