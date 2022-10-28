@@ -1,5 +1,3 @@
-import { useNearAccount } from 'react-near'
-
 import {
   BrowserRouter,
   Navigate,
@@ -7,7 +5,6 @@ import {
   Route,
   Routes
 } from 'react-router-dom'
-import { useNearUser } from 'react-near'
 
 import CreateOrderPage from '../pages/participant/CreateOrder.page'
 import DashboardLayout from '../layouts/Dashboard.layout'
@@ -19,12 +16,13 @@ import SignUpPage from '../pages/notary/NotarySignUp.page'
 import ParticipantSignUpPage from '../pages/participant/ParticipantSignUp.page'
 import ParticipantOrderPage from '../pages/participant/ParticipantOrder.page'
 import NotaryOrderPage from '../pages/notary/NotaryOrder.page'
+import { useAuth } from '../context/AuthProvider'
 
 const RequireAuth = ({ children }) => {
-  const nearUser = useNearUser()
+  const { isConnected } = useAuth()
 
   const location = useLocation()
-  if (!nearUser || !nearUser.isConnected) {
+  if (!isConnected) {
     return <Navigate to="/sign-in" state={{ from: location }} replace />
   }
   return children

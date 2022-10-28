@@ -1,5 +1,10 @@
-import { createContext, useContext, useMemo } from 'react'
-import { useNearAccount, useNearUser } from 'react-near'
+import { createContext, useContext, useEffect, useMemo, useState } from 'react'
+import {
+  connectToWallet,
+  getAccountAddress,
+  registerCallback,
+  unregisterCallback
+} from '../contracts'
 
 const AuthContext = createContext({
   isConnected: false,
@@ -14,22 +19,26 @@ const AuthContext = createContext({
 export const useAuth = () => useContext(AuthContext)
 
 export const AuthProvider = ({ children }) => {
-  const nearUser = useNearUser()
-
-  const accountAddress = useMemo(() => {
-    return nearUser?.address
-  })
+  useEffect(() => {
+    registerCallback('auth', () => {
+      setAccountAddress(getAccountAddress())
+    })
+    return () => {
+      unregisterCallback('auth')
+    }
+  }, [])
+  const [accountAddress, setAccountAddress] = useState(null)
 
   const isConnected = useMemo(() => {
-    return nearUser?.isConnected
-  }, [nearUser])
+    return !!accountAddress
+  }, [accountAddress])
 
   const logout = () => {
-    nearUser?.disconnect()
+    console.error('not implemented')
   }
 
   const login = () => {
-    nearUser?.connect()
+    connectToWallet()
   }
 
   const value = useMemo(

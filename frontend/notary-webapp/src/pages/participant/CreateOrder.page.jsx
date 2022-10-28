@@ -1,5 +1,6 @@
 import { Button } from 'primereact'
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import FileUpload from '../../components/FileUpload'
 
 export default () => {
@@ -9,7 +10,9 @@ export default () => {
     <div>
       <h1>Create order</h1>
       <FileUpload onFileChange={setFile} disabled={isSubmiting} />
-      <Button label="Create order" />
+      <Link to="/participant">
+        <Button label="Create order" />
+      </Link>
     </div>
   )
 }

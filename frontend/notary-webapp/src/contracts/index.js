@@ -1,3 +1,43 @@
+import { ethers } from 'ethers'
+
+const provider = new ethers.providers.Web3Provider(window.ethereum, 'any')
+let signer = null
+let accountAddress = null
+const callbacks = {}
+
+export const unregisterCallback = (key) => {
+  delete callbacks[key]
+}
+export const registerCallback = (key, fn) => {
+  callbacks[key] = fn
+}
+const notifyCallbacks = () => {
+  Object.values(callbacks).map((fn) => fn())
+}
+
+export const getAccountAddress = () => accountAddress
+
+export const connectToWallet = async () => {
+  await provider.send('eth_requestAccounts', [])
+  signer = provider.getSigner()
+  return signer
+}
+;(async () => {
+  if (window.ethereum) {
+    const accounts = await provider.listAccounts()
+    if (accounts.length > 0) {
+      accountAddress = accounts[0]
+      notifyCallbacks()
+    }
+    window.ethereum.on('accountsChanged', function (accounts) {
+      accountAddress = accounts[0]
+      notifyCallbacks()
+    })
+  } else {
+    console.error('this brawser does not support ethereum')
+  }
+})()
+
 export const signUpNotary = (companyName, notaryLicenseFile, stampFile) => {
   // add actual contract interaction here
   return new Promise((res, rej) => {

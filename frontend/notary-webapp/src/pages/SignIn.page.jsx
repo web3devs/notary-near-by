@@ -1,21 +1,21 @@
 import { Button } from 'primereact'
 import { useEffect } from 'react'
-import { useNearUser } from 'react-near'
 import { useLocation, useNavigate } from 'react-router-dom'
+import { useAuth } from '../context/AuthProvider'
 
 export default () => {
-  const nearUser = useNearUser()
   const navigate = useNavigate()
   const location = useLocation()
+  const { isConnected, login } = useAuth()
   let from = location.state?.from?.pathname || '/'
   useEffect(() => {
-    if (nearUser.isConnected) {
+    if (isConnected) {
       navigate(from, { replace: true })
     }
-  }, [nearUser.isConnected])
+  }, [isConnected])
 
   const handleSignIn = () => {
-    nearUser.connect()
+    login()
   }
   return (
     <div>
