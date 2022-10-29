@@ -1,8 +1,6 @@
 package pdf
 
 import (
-	"fmt"
-
 	"github.com/go-pdf/fpdf"
 )
 
@@ -42,6 +40,4 @@ func (_x *Editor) AddTextField(page int, text string, x, y, w, h float64) {
 		H:     h,
 		Value: text,
 	})
-
-	fmt.Println("ADded text field")
 }

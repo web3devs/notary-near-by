@@ -85,6 +85,7 @@ func (_x *Editor) SaveToFile(filePath string) error {
 	return _x.pdf.OutputFileAndClose(filePath)
 }
 
+//LoadWidgets loads widgets from JSON input
 func (_x *Editor) LoadWidgets(j []byte) error {
 	var widgets []json.RawMessage
 	err := json.Unmarshal(j, &widgets)
@@ -111,18 +112,6 @@ func (_x *Editor) LoadWidgets(j []byte) error {
 			_x.AddTextField(w.Page-1, w.Value, w.X, w.Y, w.W, w.H)
 		}
 	}
-
-	// fmt.Println("FIELDS: ", fields)
-
-	// for _, f := range fields {
-	// 	switch f.FieldType {
-	// 	case "text":
-	// 		_x.AddTextField(f.Field["page"])
-	// 	case "date":
-	// 	}
-	// }
-
-	// fmt.Println(fields)
 
 	return nil
 }
