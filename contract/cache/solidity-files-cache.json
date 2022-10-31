@@ -632,6 +632,46 @@
       "artifacts": [
         "NotaryNft"
       ]
+    },
+    "/Users/ken/Projects/notary-near-by/contract/contracts/DocumentPermissionNft.sol": {
+      "lastModificationDate": 1667238816701,
+      "contentHash": "17f98e7eb066b846e74977292b6fca9c",
+      "sourceName": "contracts/DocumentPermissionNft.sol",
+      "solcConfig": {
+        "version": "0.8.4",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/token/ERC721/ERC721.sol",
+        "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol",
+        "@openzeppelin/contracts/utils/Counters.sol",
+        "@openzeppelin/contracts/access/Ownable.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.4"
+      ],
+      "artifacts": [
+        "DocumentPermissionNft"
+      ]
     }
   }
 }

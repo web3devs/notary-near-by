@@ -11,6 +11,7 @@ async function deployFixture() {
     console.log(`notary contract: ${deployResults.notaryContract.address}`)
     console.log(`notarized document nft contract: ${deployResults.notarizedDocumentNftContract.address}`)
     console.log(`notary nft contract: ${deployResults.notaryNft.address}`)
+    console.log(`document permission nft contract: ${deployResults.documentPermissionNft.address}`)
     return {owner, notary, alice, mallory, ...deployResults}
 }
 

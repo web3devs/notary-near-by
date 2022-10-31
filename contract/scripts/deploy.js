@@ -19,18 +19,18 @@ async function deployContacts(wallet) {
     const notaryContract = await deployContract("Notary", wallet);
     const notarizedDocumentNftContract = await deployContract("NotarizedDocumentNft", wallet);
     const notaryNft = await deployContract("NotaryNft", wallet);
+    const documentPermissionNft = await deployContract("DocumentPermissionNft", wallet);
 
     // Initialize the nft contract addresses in the Notary contract
     await notaryContract.setNotarizedDocumentNftContact(notarizedDocumentNftContract.address, {gasLimit: 3000000})
     await notaryContract.setNotaryNftContract(notaryNft.address, {gasLimit: 3000000})
 
-    // Transfer ownership of the NotarizedDocumentNft contract to the Notary contract
+    // Transfer ownership of the nft contracts to the Notary contract
     await notarizedDocumentNftContract.transferOwnership(notaryContract.address, {gasLimit: 3000000})
-
-    // Transfer ownership of the NotaryNft contract to the Notary contract
     await notaryNft.transferOwnership(notaryContract.address, {gasLimit: 3000000})
+    await documentPermissionNft.transferOwnership(notaryContract.address, {gasLimit: 3000000})
 
-    return {notaryContract, notarizedDocumentNftContract, notaryNft}
+    return {notaryContract, notarizedDocumentNftContract, notaryNft, documentPermissionNft}
 }
 
 const main = async () => {
