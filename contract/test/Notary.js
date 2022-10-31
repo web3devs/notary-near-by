@@ -5,25 +5,38 @@ const deployFixture = require("./deployFixture");
 
 const NULL_ADDRESS = '0x0000000000000000000000000000000000000000';
 describe("Notary contract", function () {
-    it("notarizedDocumentNft should be set", async function () {
+    it("should have notarizedDocumentNft set after it is deployed", async function () {
         const {notarizedDocumentNftContract, notaryContract} = await loadFixture(deployFixture)
 
         const ndn = await notaryContract.notarizedDocumentNftContract();
         expect(ndn).to.equal(notarizedDocumentNftContract.address);
     });
-    it("admin should be able to add a notary", async () => {
-        const {notaryContract, notary} = await loadFixture(deployFixture)
-        const role = await notaryContract.NOTARY_ROLE()
+    it("should have notaryNft set after it is deployed", async function() {
+        const {notaryNft, notaryContract} = await loadFixture(deployFixture)
 
-        expect(
-            await notaryContract.hasRole(role, notary.address)
-        ).to.be.false
-
-        await notaryContract.grantRole(role, notary.address)
-
-        expect(
-            await notaryContract.hasRole(role, notary.address)
-        ).to.be.true
+        const notaryNftAddress = await notaryContract.notaryNftContract();
+        expect(notaryNftAddress).to.equal(notaryNft.address);
+    })
+    it("admin should be able to issue a notary token", async () => {
+        const {notaryContract, notaryNft, owner, notary} = await loadFixture(deployFixture)
+        await expect(
+            () => notaryContract.connect(owner).issueNotaryToken(notary.address, "123ABC", "ftp://beepboop")
+        ).to.changeTokenBalance(notaryNft, notary,1)
+    })
+    it("should prevent a non-admin issuing a notary token", async () => {
+        const {notaryContract, mallory, notary} = await loadFixture(deployFixture)
+        await expect(
+            notaryContract.connect(mallory).issueNotaryToken(notary.address, "123ABC", "ftp://beepboop")
+        ).to.be.reverted
+    })
+    it("should emit NotaryCredentialsIssued when a notary token is issued", async () => {
+        const {notaryContract, owner, notary} = await loadFixture(deployFixture)
+        const mockNotaryId = "123ABC";
+        const mockMetadataUri = "ftp://beepboop";
+        await expect(
+            notaryContract.connect(owner).issueNotaryToken(notary.address, mockNotaryId, mockMetadataUri)
+        ).to.emit(notaryContract, "NotaryCredentialsIssued")
+            .withArgs(notary.address, mockNotaryId, mockMetadataUri, anyValue)
     })
     it("should not allow a sender who isn't a notary to create a notarized document", async () => {
         const {notaryContract, alice, mallory} = await loadFixture(deployFixture)
@@ -32,10 +45,8 @@ describe("Notary contract", function () {
         ).to.be.reverted
     })
     it("should emit NotarizedDocumentCreated when a notarized document is created", async () => {
-        const {notaryContract, alice, notary} = await loadFixture(deployFixture)
-        const role = await notaryContract.NOTARY_ROLE()
-        await notaryContract.grantRole(role, notary.address)
-
+        const {notaryContract, alice, notary, owner} = await loadFixture(deployFixture)
+        await notaryContract.connect(owner).issueNotaryToken(notary.address, "123ABC", "ftp://beepboop")
         await expect(
             notaryContract.connect(notary).createNotarizedDocument(alice.address, 999, 'ipfs://bogusUri')
         )
@@ -44,14 +55,13 @@ describe("Notary contract", function () {
     })
     describe("minting", () => {
         const ipfsBogusUri = 'ipfs://bogusUri';
-        let notaryContract, alice, notary, mallory, notarizedDocumentNftContract, role
+        let notarizedDocumentNftContract, notaryContract, alice, notary, mallory, owner
 
         beforeEach(async () => {
             (
-                {notaryContract, alice, notary, mallory, notarizedDocumentNftContract} = await loadFixture(deployFixture)
+                {notarizedDocumentNftContract, notaryContract, alice, notary, mallory, owner} = await loadFixture(deployFixture)
             )
-            role = await notaryContract.NOTARY_ROLE()
-            await notaryContract.grantRole(role, notary.address)
+            notaryContract.connect(owner).issueNotaryToken(notary.address, "123ABC", "ftp://beepboop")
             await notaryContract.connect(notary).createNotarizedDocument(alice.address, 99, ipfsBogusUri)
         })
         it("should emit a Transfer event when NotarizedDocumentNft is minted", async () => {
@@ -84,14 +94,13 @@ describe("Notary contract", function () {
     })
     describe("payment", async () => {
         const ipfsBogusUri = 'ipfs://bogusUri';
-        let notaryContract, alice, notary, mallory, notarizedDocumentNftContract, role
+        let notaryContract, alice, notary, mallory, notarizedDocumentNftContract
 
         beforeEach(async () => {
             (
                 {notaryContract, owner, alice, notary, mallory, notarizedDocumentNftContract} = await loadFixture(deployFixture)
             )
-            role = await notaryContract.NOTARY_ROLE()
-            await notaryContract.grantRole(role, notary.address)
+            await notaryContract.connect(owner).issueNotaryToken(notary.address, "123ABC", "ftp://beepboop")
             await notaryContract.connect(notary).createNotarizedDocument(alice.address, 100, ipfsBogusUri)
         })
         it("should set the commission payee to the contract owner", async () => {

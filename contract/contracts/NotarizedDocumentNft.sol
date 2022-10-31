@@ -16,7 +16,5 @@ contract NotarizedDocumentNft is ERC721URIStorage, Ownable {
         _safeMint(to, tokenId);
         _setTokenURI(tokenId, _metadataUri);
         _tokensCount = tokenId + 1;
-//        console.log(tokenId, _tokensCount);
-//        tokenId = 9999;
     }
 }

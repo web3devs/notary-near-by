@@ -3,6 +3,7 @@ pragma solidity ^0.8.4;
 
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "./NotarizedDocumentNft.sol";
+import "./NotaryNft.sol";
 
 struct UnmintedTokenData {
     address notary;
@@ -12,8 +13,8 @@ struct UnmintedTokenData {
 
 contract Notary is AccessControl {
     NotarizedDocumentNft public notarizedDocumentNftContract;
+    NotaryNft public notaryNftContract;
 
-    bytes32 public constant NOTARY_ROLE = keccak256("NOTARY_ROLE");
     mapping(string => UnmintedTokenData) public unmintedToken;
     address public commissionPayee;
     uint256 public defaultCommissionPercentage;
@@ -24,7 +25,9 @@ contract Notary is AccessControl {
     event CommissionPayeeChanged(address commissionPayee);
     event BalanceIncreased(address payee, uint256 amount);
     event BalanceClaimed(address payee, uint256 amountSent);
+    event NotaryCredentialsIssued(address notary, string notaryId, string metadataUri, uint256 tokenId);
 
+    error MustHaveNotaryNft();
     error TokenNotMintable(string metadataUri);
     error MinterNotAuthorized(string metadataUri);
     error IncorrectAmountSent(string metadataUri, uint256 amountSent);
@@ -33,6 +36,13 @@ contract Notary is AccessControl {
     modifier hasBalance() {
         if (balance[msg.sender] == 0) {
             revert NoBalanceAvailable(msg.sender);
+        }
+        _;
+    }
+
+    modifier onlyNotary() {
+        if (notaryNftContract.balanceOf(msg.sender) == 0) {
+            revert MustHaveNotaryNft();
         }
         _;
     }
@@ -47,8 +57,19 @@ contract Notary is AccessControl {
         notarizedDocumentNftContract = _ndn;
     }
 
+    function setNotaryNftContract(NotaryNft _notaryNft) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        notaryNftContract = _notaryNft;
+    }
+
+    function issueNotaryToken(
+        address to, string memory notaryId, string memory metadataUri
+    ) external onlyRole(DEFAULT_ADMIN_ROLE) returns (uint256 tokenId) {
+        tokenId = notaryNftContract.mint(to, notaryId, metadataUri);
+        emit NotaryCredentialsIssued(to, notaryId, metadataUri, tokenId);
+    }
+
     function setCommissionPayee(address _payee) external onlyRole(DEFAULT_ADMIN_ROLE) {
-        // Move existing commissionPayee balance to the new payee
+        // First, move existing commissionPayee balance to the new payee
         balance[_payee] += balance[commissionPayee];
         balance[commissionPayee] = 0;
 
@@ -60,7 +81,7 @@ contract Notary is AccessControl {
         address _authorizedMinter,
         uint256 _mintingPrice,
         string memory _metadataUrl
-    ) external onlyRole(NOTARY_ROLE) {
+    ) external onlyNotary {
         unmintedToken[_metadataUrl] = UnmintedTokenData(msg.sender, _authorizedMinter, _mintingPrice);
         emit NotarizedDocumentCreated(msg.sender, _authorizedMinter, _mintingPrice, _metadataUrl);
     }

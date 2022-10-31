@@ -1,22 +1,13 @@
 require('dotenv').config();
 const hre = require("hardhat");
 
-async function deployNotarizedDocumentNft(deployerWallet) {
-    const Nft = await hre.ethers.getContractFactory("NotarizedDocumentNft");
-    const nft = await Nft
+async function deployContract(contractName, deployerWallet) {
+    const Contract = await hre.ethers.getContractFactory(contractName);
+    const contractInstance = await Contract
         .connect(deployerWallet)
         .deploy();
-    await nft.deployed();
-    return nft
-}
-
-async function deployNotary(deployerWallet) {
-    const Notary = await hre.ethers.getContractFactory("Notary");
-    const notary = await Notary
-        .connect(deployerWallet)
-        .deploy();
-    await notary.deployed();
-    return notary
+    await contractInstance.deployed();
+    return contractInstance
 }
 
 async function deployContacts(wallet) {
@@ -25,16 +16,21 @@ async function deployContacts(wallet) {
         wallet.address
     );
 
-    const notaryContract = await deployNotary(wallet);
-    const notarizedDocumentNftContract = await deployNotarizedDocumentNft(wallet);
+    const notaryContract = await deployContract("Notary", wallet);
+    const notarizedDocumentNftContract = await deployContract("NotarizedDocumentNft", wallet);
+    const notaryNft = await deployContract("NotaryNft", wallet);
 
-    // Set the NotarizedDocumentNft contract address in the Notary contract
+    // Initialize the nft contract addresses in the Notary contract
     await notaryContract.setNotarizedDocumentNftContact(notarizedDocumentNftContract.address, {gasLimit: 3000000})
+    await notaryContract.setNotaryNftContract(notaryNft.address, {gasLimit: 3000000})
 
     // Transfer ownership of the NotarizedDocumentNft contract to the Notary contract
     await notarizedDocumentNftContract.transferOwnership(notaryContract.address, {gasLimit: 3000000})
 
-    return {notaryContract, notarizedDocumentNftContract}
+    // Transfer ownership of the NotaryNft contract to the Notary contract
+    await notaryNft.transferOwnership(notaryContract.address, {gasLimit: 3000000})
+
+    return {notaryContract, notarizedDocumentNftContract, notaryNft}
 }
 
 const main = async () => {
