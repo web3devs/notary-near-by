@@ -23,10 +23,10 @@ func (_x *Reader) table() dynamo.Table {
 }
 
 //GetOne returns Order for provided ID
-func (_x *Reader) GetOne(id string) (Order, error) {
+func (_x *Reader) GetOne(id string) (*Order, error) {
 	var r Order
 
-	err := _x.table().Get("ID", id).One(&r)
+	err := _x.table().Get("ID", id).Index("ByID").One(&r)
 
-	return r, err
+	return &r, err
 }

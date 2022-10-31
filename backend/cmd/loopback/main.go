@@ -13,13 +13,13 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/apigatewaymanagementapi"
 
+	_os "notarynearby/internal/order"
 	_ns "notarynearby/internal/session"
 )
 
 // Handler is our lambda handler invoked by the `lambda.Start` function call
 func Handler(context context.Context, records events.SNSEvent) error {
 	fmt.Println("loopback handler ran")
-	fmt.Println("XXX: ", os.Getenv("SNS_SESSIONS_ARN"))
 	for _, r := range records.Records {
 		fmt.Println("r.SNS.Message: ", r.SNS.Message)
 		var m _ns.DispatchActionInput
@@ -31,20 +31,8 @@ func Handler(context context.Context, records events.SNSEvent) error {
 
 		switch m.Action.Action {
 		case _ns.ActionMessage:
-			var tmp struct {
-				OrderID string `json:"order_id"`
-			}
-			err := json.Unmarshal(*m.Action.Data, &tmp)
-			if err != nil {
-				fmt.Println("ERROR: failed unmarshaling Action.Data: ", err)
-				continue
-			}
-
-			fmt.Println("tmp: ", tmp)
-			fmt.Println("ns.Reader: ", ns.Reader)
-
-			//Get all ConnectionIDs but the sender's
-			cs, err := ns.Reader.GetAllByOrder(tmp.OrderID)
+			//Get all ConnectionIDs
+			cs, err := ns.Reader.GetAllByOrder(m.Action.OrderID)
 			if err != nil {
 				fmt.Println("ERROR: failed fetching Connections: ", err)
 				continue
@@ -75,7 +63,6 @@ func Handler(context context.Context, records events.SNSEvent) error {
 			break
 		case _ns.ActionUpdateWidget:
 			var tmp struct {
-				OrderID   string          `json:"order_id"`
 				PublicKey string          `json:"public_key"`
 				Signature string          `json:"signature"`
 				Widget    json.RawMessage `json:"data"`
@@ -91,9 +78,16 @@ func Handler(context context.Context, records events.SNSEvent) error {
 			}
 
 			//Get all ConnectionIDs
-			cs, err := ns.Reader.GetAllByOrder(tmp.OrderID)
+			cs, err := ns.Reader.GetAllByOrder(m.Action.OrderID)
 			if err != nil {
 				fmt.Println("ERROR: failed fetching Connections: ", err)
+				continue
+			}
+
+			//Get order
+			o, err := oss.Reader.GetOne(m.Action.OrderID)
+			if err != nil {
+				fmt.Println("ERROR: failed fetching Order: ", err)
 				continue
 			}
 
@@ -104,9 +98,7 @@ func Handler(context context.Context, records events.SNSEvent) error {
 				continue
 			}
 
-			_widgets := cs[0].Widgets
-
-			for k, w := range _widgets {
+			for k, w := range o.Widgets {
 				wg := wid{}
 				err := json.Unmarshal(w, &wg)
 				if err != nil {
@@ -114,24 +106,22 @@ func Handler(context context.Context, records events.SNSEvent) error {
 					continue
 				}
 				if wg.ID == widget.ID {
-					_widgets[k] = tmp.Widget
+					o.Widgets[k] = tmp.Widget
+					if err := oss.Writer.UpdateWidgets(o); err != nil {
+						fmt.Println("ERROR: failed updating widgets: ", err)
+						continue
+					}
 					break
 				}
 			}
 
 			for _, c := range cs {
-				c.Widgets = _widgets
-				if err := ns.Writer.UpdateWidgets(&c); err != nil {
-					fmt.Println("ERROR: failed updating widgets: ", err)
-					continue
-				}
-
 				a, err := json.Marshal(struct {
 					Action string            `json:"action"`
 					Data   []json.RawMessage `json:"data"`
 				}{
 					Action: "update-widgets",
-					Data:   c.Widgets,
+					Data:   o.Widgets,
 				})
 
 				apigw := apigatewaymanagementapi.New(sess, &aws.Config{
@@ -149,7 +139,6 @@ func Handler(context context.Context, records events.SNSEvent) error {
 			break
 		case _ns.ActionAddWidget:
 			var tmp struct {
-				OrderID   string          `json:"order_id"`
 				PublicKey string          `json:"public_key"`
 				Signature string          `json:"signature"`
 				Widget    json.RawMessage `json:"data"`
@@ -160,15 +149,22 @@ func Handler(context context.Context, records events.SNSEvent) error {
 				continue
 			}
 
-			type wid struct {
-				ID string `json:"id"`
-			}
-
 			//Get all ConnectionIDs
-			cs, err := ns.Reader.GetAllByOrder(tmp.OrderID)
+			cs, err := ns.Reader.GetAllByOrder(m.Action.OrderID)
 			if err != nil {
 				fmt.Println("ERROR: failed fetching Connections: ", err)
 				continue
+			}
+
+			//Get order
+			o, err := oss.Reader.GetOne(m.Action.OrderID)
+			if err != nil {
+				fmt.Println("ERROR: failed fetching Order: ", err)
+				continue
+			}
+
+			type wid struct {
+				ID string `json:"id"`
 			}
 
 			widget := wid{}
@@ -178,22 +174,22 @@ func Handler(context context.Context, records events.SNSEvent) error {
 				continue
 			}
 
-			_widgets := cs[0].Widgets
-			_widgets = append(_widgets, tmp.Widget)
+			fmt.Println("widgets.pre: ", o.Widgets)
+			o.Widgets = append(o.Widgets, tmp.Widget)
+			fmt.Println("widgets.post: ", o.Widgets)
+			if err := oss.Writer.UpdateWidgets(o); err != nil {
+				fmt.Println("ERROR: failed updating widgets: ", err)
+				continue
+			}
+			fmt.Println("widgets.post2: ", o.Widgets)
 
 			for _, c := range cs {
-				c.Widgets = _widgets
-				if err := ns.Writer.UpdateWidgets(&c); err != nil {
-					fmt.Println("ERROR: failed updating widgets: ", err)
-					continue
-				}
-
 				a, err := json.Marshal(struct {
 					Action string            `json:"action"`
 					Data   []json.RawMessage `json:"data"`
 				}{
 					Action: "update-widgets",
-					Data:   c.Widgets,
+					Data:   o.Widgets,
 				})
 
 				apigw := apigatewaymanagementapi.New(sess, &aws.Config{
@@ -218,6 +214,7 @@ func Handler(context context.Context, records events.SNSEvent) error {
 var err error
 var sess *session.Session
 var ns *_ns.Service
+var oss *_os.Service
 
 func main() {
 	sess, err = session.NewSession(&aws.Config{
@@ -230,6 +227,11 @@ func main() {
 	ns, err = _ns.New(sess)
 	if err != nil {
 		panic(fmt.Errorf("failed starting NNB Session Service: %w", err))
+	}
+
+	oss, err = _os.New(sess)
+	if err != nil {
+		panic(fmt.Errorf("failed starting Orders Service: %w", err))
 	}
 
 	lambda.Start(Handler)

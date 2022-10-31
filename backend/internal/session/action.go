@@ -21,6 +21,7 @@ const (
 
 //Action is our client action
 type Action struct {
-	Action ActionType       `json:"action"`
-	Data   *json.RawMessage `json:"data"`
+	OrderID string           `json:"order_id"`
+	Action  ActionType       `json:"action" validate:"required"`
+	Data    *json.RawMessage `json:"data"`
 }

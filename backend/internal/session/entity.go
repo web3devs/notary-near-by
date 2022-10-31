@@ -1,7 +1,6 @@
 package session
 
 import (
-	"encoding/json"
 	"time"
 )
 
@@ -12,6 +11,4 @@ type Session struct {
 	CallbackURL  string    `dynamo:"CallbackURL" json:"callback_url" validate:"required"`
 	ExpiresAt    time.Time `dynamo:"ExpiresAt"`
 	TTL          int64     `dynamo:"TTL"`
-
-	Widgets []json.RawMessage `dynamo:"Widgets" json:"widgets"`
 }

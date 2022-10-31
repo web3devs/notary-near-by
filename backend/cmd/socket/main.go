@@ -12,6 +12,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 
+	_os "notarynearby/internal/order"
 	_ns "notarynearby/internal/session"
 )
 
@@ -53,11 +54,21 @@ func Handler(ctx context.Context, request events.APIGatewayWebsocketProxyRequest
 		fmt.Println("ERROR: failed unmarshaling Action: ", err)
 	}
 
-	if _, err = ns.DispatchAction(&_ns.DispatchActionInput{
+	//Get associated order
+	o, err := oss.Reader.GetOne(a.OrderID)
+	if err != nil {
+		fmt.Println("ERROR: failed unmarshaling Action: ", err)
+	}
+
+	d := _ns.DispatchActionInput{
 		ConnectionID: connectionID,
 		CallbackURL:  callbackURL,
 		Action:       a,
-	}); err != nil {
+	}
+	if o.ID != "" {
+		d.Order = o
+	}
+	if _, err = ns.DispatchAction(&d); err != nil {
 		fmt.Println("ERROR: failed processing Action: ", err)
 	}
 
@@ -69,6 +80,7 @@ func Handler(ctx context.Context, request events.APIGatewayWebsocketProxyRequest
 var err error
 var sess *session.Session
 var ns *_ns.Service
+var oss *_os.Service
 
 func main() {
 	sess, err = session.NewSession(&aws.Config{
@@ -81,6 +93,11 @@ func main() {
 	ns, err = _ns.New(sess)
 	if err != nil {
 		panic(fmt.Errorf("failed starting NNB Session Service: %w", err))
+	}
+
+	oss, err = _os.New(sess)
+	if err != nil {
+		panic(fmt.Errorf("failed starting Orders Service: %w", err))
 	}
 
 	lambda.Start(Handler)

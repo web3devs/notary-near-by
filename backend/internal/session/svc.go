@@ -67,11 +67,6 @@ func (_x *Service) Connect(_in *ConnectInput) (*ConnectOutput, error) {
 
 //DispatchAction sends messages to other session participants
 func (_x *Service) DispatchAction(_in *DispatchActionInput) (*DispatchActionOutput, error) {
-	m, err := json.Marshal(_in)
-	if err != nil {
-		return nil, fmt.Errorf("failed marshalling Session: %w", err)
-	}
-
 	s, err := _x.Reader.GetOne(_in.ConnectionID)
 	if err != nil {
 		return nil, fmt.Errorf("no Session found: %w", err)
@@ -79,28 +74,21 @@ func (_x *Service) DispatchAction(_in *DispatchActionInput) (*DispatchActionOutp
 
 	switch _in.Action.Action {
 	case ActionJoin:
-		var tmp struct {
-			OrderID   string `json:"order_id"`
-			PublicKey string `json:"public_key"`
-			Signature string `json:"signature"`
-		}
-		err := json.Unmarshal(*_in.Action.Data, &tmp)
-		if err != nil {
-			return nil, fmt.Errorf("failed unmarshaling action: %w", err)
-		}
-
 		//TODO:
-		//read OrderID
-		//fetch associated Order
 		//read publicKey and signature
 		//verify signature/pubKey (see if pubKey matches signature AND pubKey exists in the Order!)
 		//if ok - update Session with provided OrderID
-		s.OrderID = tmp.OrderID
+		s.OrderID = _in.Action.OrderID
 		if err := _x.Writer.JoinSession(&s); err != nil {
 			return nil, fmt.Errorf("failed joining session: %w", err)
 		}
 
 		break
+	}
+
+	m, err := json.Marshal(_in)
+	if err != nil {
+		return nil, fmt.Errorf("failed marshalling Session: %w", err)
 	}
 
 	_, err = _x.snsc.Publish(&sns.PublishInput{

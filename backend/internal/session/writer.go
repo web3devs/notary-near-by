@@ -28,11 +28,3 @@ func (_x *Writer) JoinSession(i *Session) error {
 		Set("OrderID", i.OrderID).
 		Value(i)
 }
-
-//UpdateWidgets update widgets in DB
-func (_x *Writer) UpdateWidgets(i *Session) error {
-	return _x.svc.DB.Table(_x.svc.TableName).
-		Update("ConnectionID", i.ConnectionID).
-		Set("Widgets", i.Widgets).
-		Value(i)
-}
