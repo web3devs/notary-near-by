@@ -35,3 +35,20 @@ func New(sess *session.Session) (*Service, error) {
 		Writer: w,
 	}, nil
 }
+
+//Create creates Participants
+func (_x *Service) Create(_in *CreateInput) (*CreateOutput, error) {
+	s := &Notary{
+		PublicKey: _in.PublicKey,
+		FirstName: _in.FirstName,
+		LastName:  _in.LastName,
+	}
+	//TODO: Validate PublicKey and Signature
+	if err := _x.Writer.Create(s); err != nil {
+		return nil, fmt.Errorf("failed saving Session in DB: %w", err)
+	}
+
+	return &CreateOutput{
+		Notary: s,
+	}, nil
+}

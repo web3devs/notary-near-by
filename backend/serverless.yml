@@ -63,11 +63,7 @@ functions:
           route: $connect
       - websocket:
           route: $disconnect
-      # - websocket:
-      #     route: $default
-      #     routeResponseSelectionExpression: $default
-      # - websocket:
-      #     route: customroute
+
   loopback:
     handler: bin/loopback
     events:
@@ -75,19 +71,27 @@ functions:
           arn: !Ref WSSessionsTopic
           topicName: ${self:service}-${opt:stage, self:provider.stage}-wssessions
 
-  hello:
-    handler: bin/hello
+  participantsCreate:
+    handler: bin/participants/create
     events:
       - httpApi:
-          path: /hello
-          method: get
+          path: /participants
+          method: post
 
-  # world:
-  #   handler: bin/world
-  #   events:
-  #     - httpApi:
-  #         path: /world
-  #         method: get
+  notariesCreate:
+    handler: bin/notaries/create
+    events:
+      - httpApi:
+          path: /notaries
+          method: post
+
+  ordersCreate:
+    handler: bin/orders/create
+    events:
+      - httpApi:
+          path: /orders
+          method: post
+
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
 #    Check the event documentation for details

@@ -2,9 +2,12 @@
 
 build: gomodgen
 	export GO111MODULE=on
-	env GOARCH=amd64 GOOS=linux go build -ldflags="-s -w" -o bin/hello cmd/hello/main.go
 	env GOARCH=amd64 GOOS=linux go build -ldflags="-s -w" -o bin/socket cmd/socket/main.go
 	env GOARCH=amd64 GOOS=linux go build -ldflags="-s -w" -o bin/loopback cmd/loopback/main.go
+
+	env GOARCH=amd64 GOOS=linux go build -ldflags="-s -w" -o bin/participants/create cmd/participants/create/main.go
+	env GOARCH=amd64 GOOS=linux go build -ldflags="-s -w" -o bin/notaries/create cmd/notaries/create/main.go
+	env GOARCH=amd64 GOOS=linux go build -ldflags="-s -w" -o bin/orders/create cmd/orders/create/main.go
 
 clean:
 	rm -rf ./bin

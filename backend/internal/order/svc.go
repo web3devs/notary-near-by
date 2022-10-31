@@ -1,11 +1,13 @@
 package order
 
 import (
+	"encoding/json"
 	"fmt"
 	"notarynearby/internal/db"
 	"os"
 
 	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/gofrs/uuid"
 )
 
 //Service is the all in one entrypoint for managing Orders
@@ -33,5 +35,29 @@ func New(sess *session.Session) (*Service, error) {
 		sess:   sess,
 		Reader: r,
 		Writer: w,
+	}, nil
+}
+
+//Create creates Order
+func (_x *Service) Create(_in *CreateInput) (*CreateOutput, error) {
+	id, err := uuid.NewV4()
+	if err != nil {
+		return nil, fmt.Errorf("failed generating UUID: %w", err)
+	}
+
+	s := &Order{
+		Owner:        _in.Owner,
+		ID:           id.String(),
+		Participants: _in.Participants,
+		Witnesses:    _in.Witnesses,
+		Widgets:      []json.RawMessage{},
+	}
+	//TODO: Validate PublicKey and Signature
+	if err := _x.Writer.Create(s); err != nil {
+		return nil, fmt.Errorf("failed saving Session in DB: %w", err)
+	}
+
+	return &CreateOutput{
+		Order: s,
 	}, nil
 }
