@@ -10,12 +10,8 @@ require (
 )
 
 require (
-	github.com/cenkalti/backoff/v4 v4.1.2 // indirect
-	github.com/gofrs/uuid v4.2.0+incompatible // indirect
-	github.com/guregu/dynamo v1.17.0 // indirect
-	github.com/jmespath/go-jmespath v0.4.0 // indirect
-	github.com/phpdave11/gofpdi v1.0.13 // indirect
-	github.com/pkg/errors v0.9.1 // indirect
-	golang.org/x/crypto v0.0.0-20220331220935-ae2d96664a29 // indirect
-	golang.org/x/net v0.0.0-20220127200216-cd36cc0744dd // indirect
+	github.com/ethereum/go-ethereum v1.10.25
+	github.com/gofrs/uuid v4.2.0+incompatible
+	github.com/guregu/dynamo v1.17.0
+	github.com/storyicon/sigverify v1.1.0
 )
