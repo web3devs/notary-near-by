@@ -1,11 +1,20 @@
 import { Button } from 'primereact'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import FileUpload from '../../components/FileUpload'
+import { signMessage } from '../../contracts'
 
 export default () => {
   const [isSubmiting, setIsSubmiting] = useState(false)
   const [file, setFile] = useState(null)
+
+  useEffect(() => {
+    ;(async () => {
+      const result = await signMessage('test')
+
+      console.log(result)
+    })()
+  }, [])
   return (
     <div>
       <h1>Create order</h1>

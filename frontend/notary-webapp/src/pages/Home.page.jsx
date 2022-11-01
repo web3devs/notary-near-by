@@ -1,8 +1,11 @@
-import { Button } from 'primereact'
+import { Button } from 'primereact/Button'
+import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthProvider'
+import { signMessage } from '../contracts'
 export default () => {
   const { isConnected, login } = useAuth()
+
   return (
     <div className="flex justify-content-center align-items-center h-screen">
       <div className="w-7 flex flex-column justify-content-center align-items-center">

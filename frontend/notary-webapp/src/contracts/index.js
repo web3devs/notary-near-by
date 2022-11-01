@@ -1,9 +1,38 @@
 import { ethers } from 'ethers'
+import { utils } from 'ethers'
 
 const provider = new ethers.providers.Web3Provider(window.ethereum, 'any')
 let signer = null
 let accountAddress = null
 const callbacks = {}
+
+export const signMessage = async (msg) => {
+  // const a = signer.signMessage(msg)
+  // const w = new ethers.Wallet(
+  //   '3a3c42176cefbc00c0b7865a2fed88f20c793713118aa41452f22605428c3c31'
+  // )
+  // await connectToWallet()
+  const w = signer
+  console.log('signer', w)
+  // const a = await w.getAccountAddress()
+  // console.log('add', w.address)
+
+  console.log('accountAddress', accountAddress)
+  const sig = await w.signMessage('hello!')
+  // const hash = ethers.utils.keccak256(
+  //   '0x352aBe22d01AC782bbe79A042B79964f770B91e2'
+  // )
+  // console.log('rawHash', hash)
+  // console.log('hash', ethers.utils.arrayify(hash))
+  // const sig = await w.signMessage(ethers.utils.arrayify(hash))
+  // new ethers.utils.SigningKey()
+  console.log('sig', sig)
+  // const pk = ethers.utils.recoverPublicKey(hash, sig)
+  // console.log('pk', pk)
+
+  // const output = utils.verifyMessage(ethers.utils.arrayify(hash), sig)
+  // console.log(output)
+}
 
 export const unregisterCallback = (key) => {
   delete callbacks[key]
@@ -18,18 +47,25 @@ const notifyCallbacks = () => {
 export const getAccountAddress = () => accountAddress
 
 export const connectToWallet = async () => {
+  console.log('connect to wallet')
   await provider.send('eth_requestAccounts', [])
   signer = provider.getSigner()
+  console.log('signer', signer)
+  signMessage()
   return signer
 }
 ;(async () => {
   if (window.ethereum) {
     const accounts = await provider.listAccounts()
     if (accounts.length > 0) {
+      signer = provider.getSigner()
+      console.log('signer', signer)
+      console.log('accountAddress', accountAddress)
       accountAddress = accounts[0]
       notifyCallbacks()
     }
     window.ethereum.on('accountsChanged', function (accounts) {
+      console.log('accountsChanged')
       accountAddress = accounts[0]
       notifyCallbacks()
     })
