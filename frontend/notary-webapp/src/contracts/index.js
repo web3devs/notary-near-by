@@ -7,18 +7,8 @@ let accountAddress = null
 const callbacks = {}
 
 export const signMessage = async (msg) => {
-  // const a = signer.signMessage(msg)
-  // const w = new ethers.Wallet(
-  //   '3a3c42176cefbc00c0b7865a2fed88f20c793713118aa41452f22605428c3c31'
-  // )
-  // await connectToWallet()
-  const w = signer
-  console.log('signer', w)
-  // const a = await w.getAccountAddress()
-  // console.log('add', w.address)
-
   console.log('accountAddress', accountAddress)
-  const sig = await w.signMessage('hello!')
+  const sig = await signer.signMessage('hello!')
   // const hash = ethers.utils.keccak256(
   //   '0x352aBe22d01AC782bbe79A042B79964f770B91e2'
   // )
@@ -32,6 +22,8 @@ export const signMessage = async (msg) => {
 
   // const output = utils.verifyMessage(ethers.utils.arrayify(hash), sig)
   // console.log(output)
+
+  return sig
 }
 
 export const unregisterCallback = (key) => {
