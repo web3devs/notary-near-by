@@ -14,7 +14,7 @@ import HomePage from '../pages/Home.page'
 import SignInPage from '../pages/SignIn.page'
 import SignUpPage from '../pages/notary/NotarySignUp.page'
 import ParticipantSignUpPage from '../pages/participant/ParticipantSignUp.page'
-import ParticipantOrderPage from '../pages/participant/ParticipantOrder.page'
+import OrderSessionPage from '../pages/order/Session.page'
 import NotaryOrderPage from '../pages/notary/NotaryOrder.page'
 import { useAuth } from '../context/AuthProvider'
 
@@ -86,11 +86,11 @@ export const AppRouter = () => {
           }
         />
         <Route
-          path="/participant/Order/:id"
+          path="/orders/:id"
           element={
             <RequireAuth>
               <DashboardLayout>
-                <ParticipantOrderPage />
+                <OrderSessionPage />
               </DashboardLayout>
             </RequireAuth>
           }

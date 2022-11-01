@@ -3,25 +3,29 @@ import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Button } from 'primereact'
 import ListItem from '../../components/dash/ListItem'
-import { useAuth } from '../../context/AuthProvider'
-import { getParticipantAccount, getOrders } from '../../contracts'
+import { useAuth, useOrders } from '../../context'
+import { getParticipantAccount } from '../../contracts'
 
 export default () => {
-  const { accountAddress } = useAuth()
   const [orders, setOrders] = useState([])
   const [isLoading, setIsLoading] = useState(false)
   const [isSigned, setIsSigned] = useState(false)
+
+  const { accountAddress } = useAuth()
+  const { getByOwner } = useOrders()
   const navigate = useNavigate()
+
   useEffect(() => {
     ;(async () => {
       setIsLoading(true)
-      const o = await getOrders()
-      setOrders(o)
+      const os = await getByOwner(accountAddress)
+      setOrders(os)
       const { isParticipant } = getParticipantAccount(accountAddress)
       setIsSigned(isParticipant)
       setIsLoading(false)
     })()
   }, [])
+
   if (isLoading) {
     return (
       <div className="flex align-items-center justify-content-center">
@@ -29,6 +33,7 @@ export default () => {
       </div>
     )
   }
+
   return (
     <div className="flex flex-column align-items justify-content-center">
       <h1>Participants orders</h1>
@@ -44,7 +49,7 @@ export default () => {
                   data={o}
                   key={o.id}
                   onClick={() => {
-                    navigate('/participant/order/' + o.id)
+                    navigate('/orders/' + o.id)
                   }}
                 />
               )

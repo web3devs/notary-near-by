@@ -6,13 +6,21 @@ import 'primeicons/primeicons.css' //icons
 
 import './App.scss'
 
-import { AuthProvider } from './context/AuthProvider'
+import {
+  AuthProvider,
+  OrdersProvider,
+  WSProvider,
+} from './context'
 
 import { AppRouter } from './routes'
 const App = () => {
   return (
     <AuthProvider>
-      <AppRouter />
+      <OrdersProvider>
+        <WSProvider>
+          <AppRouter />
+        </WSProvider>
+      </OrdersProvider>
     </AuthProvider>
   )
 }
