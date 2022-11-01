@@ -1,4 +1,4 @@
-import { Button } from 'primereact/Button'
+import { Button } from 'primereact'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthProvider'
 

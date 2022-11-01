@@ -1,5 +1,5 @@
 import { FileUpload, InputText } from 'primereact'
-import { Button } from 'primereact/Button'
+import { Button } from 'primereact'
 import { useRef, useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { signUpNotary } from '../../contracts'

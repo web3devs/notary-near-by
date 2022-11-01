@@ -1,5 +1,5 @@
 import { ProgressSpinner } from 'primereact'
-import { Button } from 'primereact/Button'
+import { Button } from 'primereact'
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import ListItem from '../../components/dash/ListItem'

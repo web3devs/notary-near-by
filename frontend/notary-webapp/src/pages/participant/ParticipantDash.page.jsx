@@ -1,7 +1,7 @@
 import { ProgressSpinner } from 'primereact'
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Button } from 'primereact/Button'
+import { Button } from 'primereact'
 import ListItem from '../../components/dash/ListItem'
 import { useAuth } from '../../context/AuthProvider'
 import { getParticipantAccount, getOrders } from '../../contracts'
