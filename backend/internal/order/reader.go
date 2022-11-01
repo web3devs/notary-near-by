@@ -2,6 +2,7 @@ package order
 
 import (
 	"notarynearby/internal/db"
+	_pk "notarynearby/internal/pk"
 
 	"github.com/guregu/dynamo"
 )
@@ -29,4 +30,22 @@ func (_x *Reader) GetOne(id string) (*Order, error) {
 	err := _x.table().Get("ID", id).Index("ByID").One(&r)
 
 	return &r, err
+}
+
+//GetAll returns all Orders
+func (_x *Reader) GetAll() ([]Order, error) {
+	var r []Order
+
+	err := _x.table().Scan().All(&r)
+
+	return r, err
+}
+
+//GetByOwner returns all Orders by owner address
+func (_x *Reader) GetByOwner(owner _pk.PublicKey) ([]Order, error) {
+	var r []Order
+
+	err := _x.table().Get("Owner", string(owner)).All(&r)
+
+	return r, err
 }

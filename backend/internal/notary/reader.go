@@ -2,6 +2,7 @@ package notary
 
 import (
 	"notarynearby/internal/db"
+	_pk "notarynearby/internal/pk"
 
 	"github.com/guregu/dynamo"
 )
@@ -22,11 +23,11 @@ func (_x *Reader) table() dynamo.Table {
 	return _x.svc.DB.Table(_x.svc.TableName)
 }
 
-//GetOne returns Notary for provided ID
-func (_x *Reader) GetOne(id string) (Notary, error) {
+//GetOne returns Notary for provided PublicKey
+func (_x *Reader) GetOne(id _pk.PublicKey) (Notary, error) {
 	var r Notary
 
-	err := _x.table().Get("ID", id).One(&r)
+	err := _x.table().Get("PublicKey", id).One(&r)
 
 	return r, err
 }

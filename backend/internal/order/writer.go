@@ -29,3 +29,30 @@ func (_x *Writer) UpdateWidgets(i *Order) error {
 		Set("Widgets", i.Widgets).
 		Value(i)
 }
+
+//NotaryJoined update widgets in DB
+func (_x *Writer) NotaryJoined(i *Order) error {
+	return _x.svc.DB.Table(_x.svc.TableName).
+		Update("Owner", i.Owner).
+		Range("ID", i.ID).
+		Set("NotaryJoined", i.NotaryJoined).
+		Value(i)
+}
+
+//ParticipantJoined update widgets in DB
+func (_x *Writer) ParticipantJoined(i *Order) error {
+	return _x.svc.DB.Table(_x.svc.TableName).
+		Update("Owner", i.Owner).
+		Range("ID", i.ID).
+		Set("ParticipantsJoined", i.ParticipantsJoined).
+		Value(i)
+}
+
+//WitnessJoined update widgets in DB
+func (_x *Writer) WitnessJoined(i *Order) error {
+	return _x.svc.DB.Table(_x.svc.TableName).
+		Update("Owner", i.Owner).
+		Range("ID", i.ID).
+		Set("WitnessesJoined", i.WitnessesJoined).
+		Value(i)
+}

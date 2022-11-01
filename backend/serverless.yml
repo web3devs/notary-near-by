@@ -6,6 +6,8 @@ provider:
   runtime: go1.x
   stage: dev
   region: us-east-1
+  httpApi:
+    cors: true
 
   environment:
     PROJECT_NAME: ${self:service}
@@ -91,6 +93,21 @@ functions:
       - httpApi:
           path: /orders
           method: post
+
+  ordersGetAll:
+    handler: bin/orders/getAll
+    events:
+      - httpApi:
+          path: /orders
+          method: get
+
+  ordersGetByOwner:
+    handler: bin/orders/getByOwner
+    events:
+      - httpApi:
+          path: /orders/{owner}/by-owner
+          method: get
+
 
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events

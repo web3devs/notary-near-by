@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"notarynearby/internal/db"
+	_pk "notarynearby/internal/pk"
 	"os"
 
 	"github.com/aws/aws-sdk-go/aws/session"
@@ -60,4 +61,34 @@ func (_x *Service) Create(_in *CreateInput) (*CreateOutput, error) {
 	return &CreateOutput{
 		Order: s,
 	}, nil
+}
+
+func (_x *Service) NotaryJoined(o *Order, p *Person) error {
+	o.NotaryJoined = p
+
+	return _x.Writer.NotaryJoined(o)
+}
+
+func (_x *Service) ParticipantJoined(o *Order, pk _pk.PublicKey, p *Person) error {
+	for _, x := range o.Participants {
+		if pk == x {
+			o.ParticipantsJoined[pk] = p
+
+			return _x.Writer.ParticipantJoined(o)
+		}
+	}
+
+	return fmt.Errorf("participant not found")
+}
+
+func (_x *Service) WitnessJoined(o *Order, pk _pk.PublicKey, p *Person) error {
+	for _, x := range o.Witnesses {
+		if pk == x {
+			o.WitnessesJoined[pk] = p
+
+			return _x.Writer.WitnessJoined(o)
+		}
+	}
+
+	return fmt.Errorf("witness not found")
 }

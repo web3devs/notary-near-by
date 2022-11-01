@@ -2,6 +2,7 @@ package participant
 
 import (
 	"notarynearby/internal/db"
+	_pk "notarynearby/internal/pk"
 
 	"github.com/guregu/dynamo"
 )
@@ -23,10 +24,10 @@ func (_x *Reader) table() dynamo.Table {
 }
 
 //GetOne returns Participant for provided ID
-func (_x *Reader) GetOne(id string) (Participant, error) {
+func (_x *Reader) GetOne(id _pk.PublicKey) (Participant, error) {
 	var r Participant
 
-	err := _x.table().Get("ID", id).One(&r)
+	err := _x.table().Get("PublicKey", id).One(&r)
 
 	return r, err
 }

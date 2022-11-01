@@ -67,25 +67,6 @@ func (_x *Service) Connect(_in *ConnectInput) (*ConnectOutput, error) {
 
 //DispatchAction sends messages to other session participants
 func (_x *Service) DispatchAction(_in *DispatchActionInput) (*DispatchActionOutput, error) {
-	s, err := _x.Reader.GetOne(_in.ConnectionID)
-	if err != nil {
-		return nil, fmt.Errorf("no Session found: %w", err)
-	}
-
-	switch _in.Action.Action {
-	case ActionJoin:
-		//TODO:
-		//read publicKey and signature
-		//verify signature/pubKey (see if pubKey matches signature AND pubKey exists in the Order!)
-		//if ok - update Session with provided OrderID
-		s.OrderID = _in.Action.OrderID
-		if err := _x.Writer.JoinSession(&s); err != nil {
-			return nil, fmt.Errorf("failed joining session: %w", err)
-		}
-
-		break
-	}
-
 	m, err := json.Marshal(_in)
 	if err != nil {
 		return nil, fmt.Errorf("failed marshalling Session: %w", err)
