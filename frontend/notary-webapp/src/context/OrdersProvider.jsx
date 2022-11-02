@@ -69,11 +69,49 @@ export const OrdersProvider = ({ children }) => {
     };
 
     const getOne = async (id) => {
-        console.log(`Orders: get ${id}`);
+        console.log(`Orders: get one: ${id}`);
+
+        const baseURL = 'https://nrsqfdo2y0.execute-api.us-east-1.amazonaws.com'
+        const url = `${baseURL}/orders/${id}`;
+
+        const response = await fetch(url, {
+            method: 'GET',
+            mode: 'cors', // no-cors, *cors, same-origin
+            cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+            // credentials: 'same-origin', // include, *same-origin, omit
+            headers: {
+                'Content-Type': 'application/json'
+                // 'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            // redirect: 'follow', // manual, *follow, error
+            // referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+            // body: JSON.stringify(data) // body data type must match "Content-Type" header
+        });
+
+        return response.json();
     };
 
     const getAll = async () => {
         console.log(`Orders: get all`);
+
+        const baseURL = 'https://nrsqfdo2y0.execute-api.us-east-1.amazonaws.com'
+        const url = `${baseURL}/orders`;
+
+        const response = await fetch(url, {
+            method: 'GET',
+            mode: 'cors', // no-cors, *cors, same-origin
+            cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+            // credentials: 'same-origin', // include, *same-origin, omit
+            headers: {
+                'Content-Type': 'application/json'
+                // 'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            // redirect: 'follow', // manual, *follow, error
+            // referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+            // body: JSON.stringify(data) // body data type must match "Content-Type" header
+        });
+
+        return response.json();
     };
 
     const getByOwner = async (ownerAddress) => {

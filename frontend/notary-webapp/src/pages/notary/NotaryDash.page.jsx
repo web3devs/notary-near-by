@@ -3,11 +3,12 @@ import { Button } from 'primereact'
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import ListItem from '../../components/dash/ListItem'
-import { useAuth } from '../../context/AuthProvider'
-import { getNotaryAccount, getOrders } from '../../contracts'
+import { useAuth, useOrders } from '../../context'
+import { getNotaryAccount } from '../../contracts'
 
 export default () => {
-  const { accountAddress } = useAuth()
+  const { accountAddress, role } = useAuth()
+  const { getAll } = useOrders()
   const [orders, setOrders] = useState([])
   const [isLoading, setIsLoading] = useState(false)
   const [isSigned, setIsSigned] = useState(false)
@@ -16,7 +17,8 @@ export default () => {
   useEffect(() => {
     ;(async () => {
       setIsLoading(true)
-      const o = await getOrders()
+      const o = await getAll()
+      console.log('ORDERS: ', o)
       setOrders(o)
       const { isNotary } = getNotaryAccount(accountAddress)
       setIsSigned(isNotary)
@@ -42,7 +44,7 @@ export default () => {
                 data={o}
                 key={o.id}
                 onClick={() => {
-                  navigate('/notary/order/' + o.id)
+                  navigate('/orders/' + o.id)
                 }}
               />
             )

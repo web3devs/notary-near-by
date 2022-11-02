@@ -87,7 +87,7 @@ export const WSProvider = ({ children }) => {
             sendMessage,
             ping,
         }),
-        [ws]
+        [ws, msgs]
     )
 
     return <WSContext.Provider value={value}>{children}</WSContext.Provider>
