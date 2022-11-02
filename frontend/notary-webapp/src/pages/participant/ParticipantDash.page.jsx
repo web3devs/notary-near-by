@@ -11,7 +11,7 @@ export default () => {
   const [isLoading, setIsLoading] = useState(false)
   const [isSigned, setIsSigned] = useState(false)
 
-  const { accountAddress } = useAuth()
+  const { accountAddress, role } = useAuth()
   const { getByOwner } = useOrders()
   const navigate = useNavigate()
 

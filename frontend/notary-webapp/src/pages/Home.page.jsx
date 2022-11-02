@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthProvider'
 import { signMessage } from '../contracts'
 export default () => {
-  const { isConnected, login } = useAuth()
+  const { isConnected, login, setRole } = useAuth()
 
   return (
     <div className="flex justify-content-center align-items-center h-screen">
@@ -12,11 +12,11 @@ export default () => {
         <div className="text-4xl font-bold mb-4">Notary</div>
         <div className="flex gap-2">
           <Link to="/participant" aria-disabled={!isConnected}>
-            <Button label="I'm a Participant" disabled={!isConnected} />
+            <Button label="I'm a Participant" disabled={!isConnected} onClick={() => setRole('participant')} />
           </Link>
 
           <Link to="/notary" aria-disabled={!isConnected}>
-            <Button label="I'm a Notary" disabled={!isConnected} />
+            <Button label="I'm a Notary" disabled={!isConnected} onClick={() => setRole('notary')} />
           </Link>
         </div>
         {!isConnected && (

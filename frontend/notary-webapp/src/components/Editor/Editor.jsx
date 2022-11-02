@@ -8,6 +8,7 @@ import { Menu } from 'primereact/menu';
 import { Toast } from 'primereact/toast';
 import { v4 as uuidv4 } from 'uuid';
 import { useWS } from '../../context';
+import { useAuth } from '../../context';
 
 import './editor.css';
 
@@ -56,22 +57,22 @@ const Editor = ({ orderID, publicKey, signature }) => {
     join,
     ping,
   } = useWS();
-  const webSocket = ws;
-
-  console.log('WS: ', ws)
+  const {
+    role,
+  } = useAuth();
 
   useEffect(() => {
     ; (async () => {
-      if (webSocket) {
-        await join(orderID, publicKey, signature);
+      if (ws) {
+        await join(orderID, publicKey, signature, role);
         await ping(orderID);
       }
     })()
-  }, [webSocket]);
+  }, [ws]);
 
   useEffect(() => {
-    if (webSocket) {
-      webSocket.addEventListener('message', (evt) => {
+    if (ws) {
+      ws.addEventListener('message', (evt) => {
         if (evt.data !== '') {
           const a = JSON.parse(evt.data);
           console.log('MESSAGE BACK: ', a)
@@ -85,7 +86,7 @@ const Editor = ({ orderID, publicKey, signature }) => {
         ping(orderID);
       }, 60 * 1000)
     }
-  }, [webSocket]);
+  }, [ws]);
 
 
   useEffect(() => {
@@ -98,11 +99,11 @@ const Editor = ({ orderID, publicKey, signature }) => {
   const upsertWidget = async (widget) => {
     const aw = [...widgets];
     const w = aw.filter(w => w.id === widget.id);
-    const ws = aw.filter(w => w.id !== widget.id);
+    const wdgts = aw.filter(w => w.id !== widget.id);
 
     if (w.length === 1) { //update existing widget
-      ws.push(widget);
-      await webSocket.send(
+      wdgts.push(widget);
+      await ws.send(
         JSON.stringify({
           order_id: orderID,
           action: "update-widget",
@@ -111,13 +112,13 @@ const Editor = ({ orderID, publicKey, signature }) => {
           },
         })
       );
-      setWidgets(ws);
+      setWidgets(wdgts);
       return;
     }
 
     //add new widget
     aw.push(widget);
-    await webSocket.send(
+    await ws.send(
       JSON.stringify({
         order_id: orderID,
         action: "add-widget",

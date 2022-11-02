@@ -45,7 +45,7 @@ export const WSProvider = ({ children }) => {
         }
     }, [ws]);
 
-    const join = async (orderID, publicKey, signature) => {
+    const join = async (orderID, publicKey, signature, role) => {
         ws.send(
             JSON.stringify({
                 order_id: orderID,
@@ -53,10 +53,10 @@ export const WSProvider = ({ children }) => {
                 data: {
                     public_key: publicKey,
                     signature: signature,
+                    role: role,
                 },
             })
         );
-        setJoined(true)
     };
 
     const sendMessage = async (orderID, message) => {
