@@ -80,7 +80,7 @@ export const OrdersProvider = ({ children }) => {
         console.log(`Orders: get by owner ${ownerAddress}`);
 
         const baseURL = 'https://nrsqfdo2y0.execute-api.us-east-1.amazonaws.com'
-        const url = `${baseURL}/orders/${ownerAddress}/by-owner`;
+        const url = `${baseURL}/orders-by-owner/${ownerAddress}`;
 
         const response = await fetch(url, {
             method: 'GET',
