@@ -45,3 +45,8 @@ func ResponseOK(data interface{}) events.APIGatewayProxyResponse {
 func ResponseError(err error) events.APIGatewayProxyResponse {
 	return Response(500, WrapError(err))
 }
+
+//ResponseNotFound for HTTP 404
+func ResponseNotFound(err error) events.APIGatewayProxyResponse {
+	return Response(404, WrapError(err))
+}

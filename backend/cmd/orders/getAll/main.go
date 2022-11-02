@@ -18,7 +18,7 @@ import (
 func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	os, err := ps.Reader.GetAll()
 	if err != nil {
-		return _api.ResponseError(fmt.Errorf("Failed fetching Orders: %w", err)), nil
+		return _api.ResponseNotFound(fmt.Errorf("Failed fetching Orders: %w", err)), nil
 	}
 
 	return _api.ResponseOK(os), nil

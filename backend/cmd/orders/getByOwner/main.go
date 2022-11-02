@@ -19,7 +19,7 @@ import (
 func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	os, err := ps.Reader.GetByOwner(pk.PublicKey(request.PathParameters["owner"]))
 	if err != nil {
-		return _api.ResponseError(fmt.Errorf("Failed fetching Orders: %w", err)), nil
+		return _api.ResponseNotFound(fmt.Errorf("Failed fetching Orders: %w", err)), nil
 	}
 
 	return _api.ResponseOK(os), nil
