@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Button } from 'primereact'
 import ListItem from '../../components/dash/ListItem'
-import { useAuth, useOrders } from '../../context'
+import { useAuth } from '../../context'
 import { getParticipantProfile, getOwnersOrders } from '../../api'
 
 export default () => {
@@ -19,7 +19,6 @@ export default () => {
       setIsLoading(true)
       try {
         const participant = await getParticipantProfile(accountAddress)
-        console.log(participant)
         console.log(participant)
         const os = await getOwnersOrders(accountAddress)
         setOrders(os)
@@ -52,6 +51,9 @@ export default () => {
             <Link to="/participant/create-order">
               <Button label="Create order" className="mb-4" />
             </Link>
+            {orders.length === 0 && (
+              <div className="p-4 text-center">There are no orders</div>
+            )}
             {orders.map((o, idx) => {
               return (
                 <ListItem

@@ -52,3 +52,8 @@ export const getOrder = async (orderId) => {
   const { data } = await api.get(`/orders/${orderId}`)
   return data
 }
+
+export const getAllOrders = async () => {
+  const [data] = await api.get('/orders')
+  return data || []
+}

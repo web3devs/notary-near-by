@@ -7,11 +7,8 @@ import { signMessage } from '../../contracts'
 export default () => {
   const [isSubmiting, setIsSubmiting] = useState(false)
   const [file, setFile] = useState(null)
-
   useEffect(() => {
     ;(async () => {
-      const result = await signMessage('test')
-
       console.log(result)
     })()
   }, [])
