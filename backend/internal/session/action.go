@@ -15,6 +15,9 @@ const (
 	//ActionAddWidget for adding widgets
 	ActionAddWidget ActionType = "add-widget"
 
+	//ActionRemoveWidget for removing widgets
+	ActionRemoveWidget ActionType = "remove-widget"
+
 	//ActionUpdateWidget for updating widgets
 	ActionUpdateWidget ActionType = "update-widget"
 )
