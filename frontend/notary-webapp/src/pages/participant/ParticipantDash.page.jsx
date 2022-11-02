@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { Button } from 'primereact'
 import ListItem from '../../components/dash/ListItem'
 import { useAuth, useOrders } from '../../context'
-import { getParticipantAccount } from '../../contracts'
+import { getParticipantProfile, getOwnersOrders } from '../../api'
 
 export default () => {
   const [orders, setOrders] = useState([])
@@ -12,17 +12,26 @@ export default () => {
   const [isSigned, setIsSigned] = useState(false)
 
   const { accountAddress, role } = useAuth()
-  const { getByOwner } = useOrders()
   const navigate = useNavigate()
 
   useEffect(() => {
     ;(async () => {
       setIsLoading(true)
-      const os = await getByOwner(accountAddress)
-      setOrders(os)
-      const { isParticipant } = getParticipantAccount(accountAddress)
-      setIsSigned(isParticipant)
-      setIsLoading(false)
+      try {
+        const participant = await getParticipantProfile(accountAddress)
+        console.log(participant)
+        console.log(participant)
+        const os = await getOwnersOrders(accountAddress)
+        setOrders(os)
+        setIsSigned(true)
+      } catch (e) {
+        console.log(e)
+        if (e.response.status === 404) {
+          setIsSigned(false)
+        }
+      } finally {
+        setIsLoading(false)
+      }
     })()
   }, [])
 

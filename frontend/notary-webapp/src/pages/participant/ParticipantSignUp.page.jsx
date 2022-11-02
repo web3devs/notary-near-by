@@ -2,10 +2,12 @@ import { InputText } from 'primereact'
 import { Button } from 'primereact'
 import { useRef, useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { signUpParticipant } from '../../contracts'
+import { signUpParticipant } from '../../api'
+import { useAuth } from '../../context'
 
 export default () => {
   const [isSubmiting, setIsSubmiting] = useState(false)
+  const { accountAddress, signature } = useAuth()
   const [form, setForm] = useState({
     firstName: '',
     lastName: ''
@@ -16,7 +18,12 @@ export default () => {
 
   const handleSubmit = useCallback(async () => {
     setIsSubmiting(true)
-    await signUpParticipant(form, ID)
+    await signUpParticipant(
+      accountAddress,
+      signature,
+      form.firstName,
+      form.lastName
+    )
     setIsSubmiting(false)
     navigate('/participant')
   }, [form, ID])
