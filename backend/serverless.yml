@@ -80,12 +80,26 @@ functions:
           path: /participants
           method: post
 
+  participantsGetOne:
+    handler: bin/participants/getOne
+    events:
+      - httpApi:
+          path: /participants/{participant}
+          method: get
+
   notariesCreate:
     handler: bin/notaries/create
     events:
       - httpApi:
           path: /notaries
           method: post
+
+  notariesGetOne:
+    handler: bin/notaries/getOne
+    events:
+      - httpApi:
+          path: /notaries/{notary}
+          method: get
 
   ordersCreate:
     handler: bin/orders/create
@@ -101,11 +115,18 @@ functions:
           path: /orders
           method: get
 
+  ordersGetOne:
+    handler: bin/orders/getOne
+    events:
+      - httpApi:
+          path: /orders/{order_id}
+          method: get
+
   ordersGetByOwner:
     handler: bin/orders/getByOwner
     events:
       - httpApi:
-          path: /orders/{owner}/by-owner
+          path: /orders-by-owner/{owner}
           method: get
 
 
