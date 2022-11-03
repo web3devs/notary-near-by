@@ -3,8 +3,6 @@ import { usePdf } from '@mikecousins/react-pdf';
 import { Button } from 'primereact/button';
 import { Panel } from 'primereact/panel';
 import { ProgressSpinner } from 'primereact/progressspinner';
-import { Badge } from 'primereact/badge';
-import { Rnd } from 'react-rnd';
 import { Menu } from 'primereact/menu';
 import { Toast } from 'primereact/toast';
 import { ScrollPanel } from 'primereact/scrollpanel';
@@ -15,47 +13,16 @@ import {
   useOrders,
 } from '../../context';
 import './editor.css';
-
-const TextWidget = ({ widget, updateWidget, deleteWidget }) => {
-  const [valid, setValid] = useState(true); //TODO
-  let { x, y, value } = widget;
-
-  return (
-    <Rnd
-      size={{ width: 250, height: 15 }}
-      enableResizing={false}
-      bounds="parent"
-      className={`widget widget-text widget-is-valid-${valid} p-overlay-badge`}
-      onClick={e => {
-        e.preventDefault();
-        e.stopPropagation();
-      }}
-      position={{ x, y }}
-      onDragStop={(e, d) => {
-        if (e.srcElement.className === 'pi pi-trash') {
-          return;
-        }
-
-        if (e.srcElement.className === 'pi pi-file-edit') {
-          return;
-        }
-        updateWidget({ ...widget, x: d.x, y: d.y})
-      }}
-    >
-      {value}
-      <div className="context-menu" onClick={() => {e.preventDefault(); e.stopPropagation();}}>
-        <i className="pi pi-file-edit" />
-        <i className="pi pi-trash" onClick={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          deleteWidget(widget)
-        }} />
-      </div>
-    </Rnd>
-  )
-}
+import {
+  TextWidget,
+  SignatureWidget,
+} from './widgets';
+import { Flow } from './Flow'
+import { Participants } from './Participants'
+import { getOrder } from '../../api';
 
 const Editor = ({ orderID, publicKey, signature }) => {
+  const [order, setOrder] = useState(null);
   const [body, setBody] = useState('');
   const [page, setPage] = useState(1);
   const [loaded, setLoaded] = useState(false);
@@ -81,9 +48,6 @@ const Editor = ({ orderID, publicKey, signature }) => {
   const {
     role,
   } = useAuth();
-  const {
-    getOne: getOrder
-  } = useOrders();
 
   useEffect(() => {
     if (!role) {
@@ -95,6 +59,7 @@ const Editor = ({ orderID, publicKey, signature }) => {
     ; (async () => {
       const o = await getOrder(orderID);
       setWidgets([...o.widgets]);
+      setOrder({...o});
     })()
   }, []);
 
@@ -112,9 +77,9 @@ const Editor = ({ orderID, publicKey, signature }) => {
       ws.addEventListener('message', (evt) => {
         if (evt.data !== '') {
           const a = JSON.parse(evt.data);
-          console.log('MESSAGE BACK: ', a)
           if (a.action === 'update-order') {
             setWidgets([...a.data.widgets]);
+            setOrder({ ...a.data });
           }
         }
       });
@@ -190,7 +155,9 @@ const Editor = ({ orderID, publicKey, signature }) => {
 
     switch (widget.type) {
       case 'text':
-        return <TextWidget key={`widget-${widget.type}-${widget.id}`} widget={widget} updateWidget={upsertWidget} deleteWidget={deleteWidget} />
+        return <TextWidget order={order} disabled={role !== 'notary'} key={`widget-${widget.type}-${widget.id}`} widget={widget} updateWidget={upsertWidget} deleteWidget={deleteWidget} />
+      case 'signature':
+        return <SignatureWidget order={order} disabled={role !== 'notary'} key={`widget-${widget.type}-${widget.id}`} widget={widget} updateWidget={upsertWidget} deleteWidget={deleteWidget} />
       default:
         break;
     }
@@ -201,7 +168,21 @@ const Editor = ({ orderID, publicKey, signature }) => {
       id: uuidv4(),
       type: 'text',
       page: page,
-      value: 'Yadda yadda yadda',
+      value: '',
+      x: 0,
+      y: 0,
+      w: 250,
+      h: 15,
+    })
+  };
+
+  const addSignatureWidget = () => {
+    console.log('add signature')
+    upsertWidget({
+      id: uuidv4(),
+      type: 'signature',
+      page: page,
+      value: '',
       x: 0,
       y: 0,
       w: 250,
@@ -222,14 +203,20 @@ const Editor = ({ orderID, publicKey, signature }) => {
       <div className="col-12">ROLE: {role}</div>
       <Toast ref={toast} />
       <div className="col-2">
+        {
+          role === 'notary' && (
+            <Flow />
+          )
+        }
+
         { role === 'notary' && (
           <Menu model={[
             {
-              label: 'Widgets',
+              label: 'Editor',
               items: [
                 {label: 'Text', icon: 'pi pi-book', command: addTextWidget},
                 {label: 'Date', icon: 'pi pi-calendar', command: () => todoWidget('Date')},
-                {label: 'Signature', icon: 'pi pi-pencil', command: () => todoWidget('Signature')},
+                {label: 'Signature', icon: 'pi pi-pencil', command: addSignatureWidget},
                 {label: 'Notary Seal', icon: 'pi pi-check-square', command: () => todoWidget('Notary Seal')},
               ]
             },
@@ -279,9 +266,11 @@ const Editor = ({ orderID, publicKey, signature }) => {
         )}
       </div>
 
-      <div className="col-2">
-        TODO: Participants, notary, etc
-      </div>
+      { order && (
+        <div className="col-2">
+          <Participants {...order} />
+        </div>
+      )}
     </div>
   )};
 
