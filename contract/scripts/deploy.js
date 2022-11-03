@@ -10,26 +10,58 @@ async function deployContract(contractName, deployerWallet) {
     return contractInstance
 }
 
+const registerContractAddressGasLimit = 3_000_000;
+const transferOwnershipGasLimit = 3_000_000;
+
+async function deployNotarizedDocumentNftContractAndInitialize(wallet, notaryContract) {
+    console.log('Deploying NotarizedDocumentNft')
+    const contract = await deployContract("NotarizedDocumentNft", wallet);
+    console.log('setNotarizedDocumentNftContact')
+    await (
+        await notaryContract.setNotarizedDocumentNftContact(contract.address, {gasLimit: registerContractAddressGasLimit})
+    ).wait()
+    console.log('notarizedDocumentNftContract.transferOwnership')
+    await (
+        await contract.transferOwnership(notaryContract.address, {gasLimit: transferOwnershipGasLimit})
+    ).wait()
+    return contract;
+}
+
+async function deployNotaryNftContract(wallet, notaryContract) {
+    console.log('Deploying NotaryNft')
+    const contract = await deployContract("NotaryNft", wallet);
+    console.log('setNotaryNftContract')
+    await (
+        await notaryContract.setNotaryNftContract(contract.address, {gasLimit: registerContractAddressGasLimit})
+    ).wait()
+    console.log('notaryNft.transferOwnership')
+    await (
+        await contract.transferOwnership(notaryContract.address, {gasLimit: transferOwnershipGasLimit})
+    ).wait()
+    return contract;
+}
+
+async function deployDocumentPermissionsNftContract(wallet, notaryContract) {
+    console.log('Deploying DocumentPermissionNft')
+    const contract = await deployContract("DocumentPermissionNft", wallet);
+    console.log('setDocumentPermissionNftContract')
+    await (
+        await notaryContract.setDocumentPermissionNftContract(contract.address, {gasLimit: registerContractAddressGasLimit})
+    ).wait()
+    console.log('documentPermissionNft.transferOwnership')
+    await (
+        await contract.transferOwnership(notaryContract.address, {gasLimit: transferOwnershipGasLimit})
+    ).wait()
+    return contract;
+}
+
 async function deployContacts(wallet) {
-    console.log(
-        "Deploying contracts with the account:",
-        wallet.address
-    );
+    console.log(`Deploying contracts with ${wallet.address}`);
 
     const notaryContract = await deployContract("Notary", wallet);
-    const notarizedDocumentNftContract = await deployContract("NotarizedDocumentNft", wallet);
-    const notaryNft = await deployContract("NotaryNft", wallet);
-    const documentPermissionNft = await deployContract("DocumentPermissionNft", wallet);
-
-    // Initialize the nft contract addresses in the Notary contract
-    await notaryContract.setNotarizedDocumentNftContact(notarizedDocumentNftContract.address, {gasLimit: 3000000})
-    await notaryContract.setNotaryNftContract(notaryNft.address, {gasLimit: 3000000})
-    await notaryContract.setDocumentPermissionNftContract(documentPermissionNft.address, {gasLimit: 3000000})
-
-    // Transfer ownership of the nft contracts to the Notary contract
-    await notarizedDocumentNftContract.transferOwnership(notaryContract.address, {gasLimit: 3000000})
-    await notaryNft.transferOwnership(notaryContract.address, {gasLimit: 3000000})
-    await documentPermissionNft.transferOwnership(notaryContract.address, {gasLimit: 3000000})
+    const notarizedDocumentNftContract = await deployNotarizedDocumentNftContractAndInitialize(wallet, notaryContract);
+    const notaryNft = await deployNotaryNftContract(wallet, notaryContract);
+    const documentPermissionNft = await deployDocumentPermissionsNftContract(wallet, notaryContract);
 
     return {notaryContract, notarizedDocumentNftContract, notaryNft, documentPermissionNft}
 }
@@ -42,9 +74,11 @@ const main = async () => {
 
 if (require.main === module) {
     main()
-        .then(({notaryContract, notarizedDocumentNftContract}) => {
+        .then(({notaryContract, notarizedDocumentNftContract, notaryNft, documentPermissionNft}) => {
             console.log(`Notary contract deployed to ${notaryContract.address}`)
             console.log(`NotarizedDocumentNft contract deployed to ${notarizedDocumentNftContract.address}`)
+            console.log(`notaryNft contract deployed to ${notaryNft.address}`)
+            console.log(`documentPermissionNft contract deployed to ${documentPermissionNft.address}`)
             process.exit(0)
         })
         .catch(error => {
