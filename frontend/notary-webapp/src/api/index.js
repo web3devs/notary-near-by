@@ -54,7 +54,23 @@ export const getOrder = async (orderId) => {
 }
 
 export const getAllOrders = async () => {
-  const {data} = await api.get('/orders')
+  const { data } = await api.get('/orders')
 
   return data || []
+}
+
+export const createOrer = async ({
+  participants,
+  witnesses,
+  documentType,
+  accountAddress
+}) => {
+  const { data } = await api.post('/orders', {
+    participants,
+    witnesses,
+    document_type: documentType,
+    owner: accountAddress
+  })
+
+  return data
 }

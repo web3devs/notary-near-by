@@ -1,6 +1,7 @@
 import { Button, Dialog, Dropdown, InputText } from 'primereact'
 import { useCallback, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { createOrer } from '../../api'
 import FileUpload from '../../components/FileUpload'
 import { useAuth } from '../../context'
 import { signMessage } from '../../contracts'
@@ -12,6 +13,7 @@ const options = [
 ]
 export default () => {
   const { accountAddress } = useAuth()
+
   const [type, setType] = useState(options[0])
   const [newAddress, setNewAddress] = useState('')
   const [showAddWitness, setShowAddWitness] = useState(false)
@@ -20,12 +22,23 @@ export default () => {
   const [participants, setParticipants] = useState([])
   const [isSubmiting, setIsSubmiting] = useState(false)
   const [file, setFile] = useState(null)
-  useEffect(() => {
-    ;(async () => {
-      console.log()
-    })()
-  }, [])
-  const handleSubmit = useCallback(() => {}, [accountAddress])
+
+  const handleSubmit = useCallback(async () => {
+    try {
+      setIsSubmiting(true)
+      const res = await createOrer({
+        participants,
+        witnesses,
+        documentType: type,
+        accountAddress
+      })
+      console.log(res)
+    } catch (err) {
+      console.error(err)
+    } finally {
+      setIsSubmiting(false)
+    }
+  }, [accountAddress])
 
   const handleAddWitness = () => {
     setWitnesses((prev) => [...prev, newAddress])
