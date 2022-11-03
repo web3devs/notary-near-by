@@ -9,6 +9,7 @@ type CreateInput struct {
 	Owner        _pk.PublicKey   `json:"owner" validate:"required"`
 	Participants []_pk.PublicKey `json:"participants"`
 	Witnesses    []_pk.PublicKey `json:"witnesses"`
+	DocumentType string          `json:"document_type" validate:"required"`
 }
 
 //CreateOutput result of Connect

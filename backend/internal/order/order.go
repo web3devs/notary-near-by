@@ -20,6 +20,8 @@ type Order struct {
 	Witnesses    []_pk.PublicKey   `dynamo:"Witnesses" json:"witnesses" validate:"required"`
 	Widgets      []json.RawMessage `dynamo:"Widgets" json:"widgets"`
 
+	DocumentType string `dynamo:"DocumentType" json:"document_type" validate:"required"`
+
 	NotaryJoined       *Person                   `json:"notary_joined"`
 	ParticipantsJoined map[_pk.PublicKey]*Person `json:"participants_joined"`
 	WitnessesJoined    map[_pk.PublicKey]*Person `json:"witnesses_joined"`

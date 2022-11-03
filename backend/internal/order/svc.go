@@ -52,6 +52,7 @@ func (_x *Service) Create(_in *CreateInput) (*CreateOutput, error) {
 		Participants: _in.Participants,
 		Witnesses:    _in.Witnesses,
 		Widgets:      []json.RawMessage{},
+		DocumentType: _in.DocumentType,
 	}
 	//TODO: Validate PublicKey and Signature
 	if err := _x.Writer.Create(s); err != nil {
@@ -70,6 +71,10 @@ func (_x *Service) NotaryJoined(o *Order, p *Person) error {
 }
 
 func (_x *Service) ParticipantJoined(o *Order, pk _pk.PublicKey, p *Person) error {
+	if o.ParticipantsJoined == nil {
+		o.ParticipantsJoined = map[_pk.PublicKey]*Person{}
+	}
+
 	for _, x := range o.Participants {
 		if pk == x {
 			o.ParticipantsJoined[pk] = p
@@ -82,6 +87,10 @@ func (_x *Service) ParticipantJoined(o *Order, pk _pk.PublicKey, p *Person) erro
 }
 
 func (_x *Service) WitnessJoined(o *Order, pk _pk.PublicKey, p *Person) error {
+	if o.WitnessesJoined == nil {
+		o.WitnessesJoined = map[_pk.PublicKey]*Person{}
+	}
+
 	for _, x := range o.Witnesses {
 		if pk == x {
 			o.WitnessesJoined[pk] = p
