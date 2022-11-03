@@ -42,8 +42,6 @@ export const connectToWallet = async () => {
   console.log('connect to wallet')
   await provider.send('eth_requestAccounts', [])
   signer = provider.getSigner()
-  console.log('signer', signer)
-  signMessage()
   return signer
 }
 ;(async () => {

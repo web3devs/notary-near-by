@@ -1,3 +1,4 @@
+import { isAddress } from 'ethers/lib/utils'
 import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 import {
   connectToWallet,
@@ -29,9 +30,20 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     registerCallback('auth', async () => {
-      setAccountAddress(getAccountAddress())
-      const sig = await signMessage()
-      setSigature(sig)
+      const addres = getAccountAddress()
+      if (addres) {
+        setAccountAddress(getAccountAddress())
+        let sig = localStorage.getItem('sig')
+        if (!sig) {
+          sig = await signMessage()
+          localStorage.setItem('sig', sig)
+        }
+        setSigature(sig)
+      } else {
+        setAccountAddress(null)
+        setSigature(null)
+        localStorage.clear()
+      }
     })
     return () => {
       unregisterCallback('auth')
