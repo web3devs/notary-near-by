@@ -4,8 +4,7 @@ import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { getAllOrders, getNotaryProfile } from '../../api'
 import ListItem from '../../components/dash/ListItem'
-import { useAuth, useOrders } from '../../context'
-import { getNotaryAccount } from '../../contracts'
+import { useAuth } from '../../context'
 
 export default () => {
   const { accountAddress } = useAuth()
