@@ -1,9 +1,10 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.4;
+pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "./NotarizedDocumentNft.sol";
 import "./NotaryNft.sol";
+import "./DocumentPermissionNft.sol";
 
 struct UnmintedTokenData {
     address notary;
@@ -14,6 +15,7 @@ struct UnmintedTokenData {
 contract Notary is AccessControl {
     NotarizedDocumentNft public notarizedDocumentNftContract;
     NotaryNft public notaryNftContract;
+    DocumentPermissionNft public documentPermissionNftContract;
 
     mapping(string => UnmintedTokenData) public unmintedToken;
     address public commissionPayee;
@@ -26,12 +28,15 @@ contract Notary is AccessControl {
     event BalanceIncreased(address payee, uint256 amount);
     event BalanceClaimed(address payee, uint256 amountSent);
     event NotaryCredentialsIssued(address notary, string notaryId, string metadataUri, uint256 tokenId);
+    event PermissionAuthorized(uint256 permissionTokenId, address grantee, uint256 documentTokenId);
+    event PermissionRevoked(address grantee, uint256 documentTokenId);
 
     error MustHaveNotaryNft();
     error TokenNotMintable(string metadataUri);
     error MinterNotAuthorized(string metadataUri);
     error IncorrectAmountSent(string metadataUri, uint256 amountSent);
     error NoBalanceAvailable(address payee);
+    error MustBeDocumentOwner();
 
     modifier hasBalance() {
         if (balance[msg.sender] == 0) {
@@ -43,6 +48,13 @@ contract Notary is AccessControl {
     modifier onlyNotary() {
         if (notaryNftContract.balanceOf(msg.sender) == 0) {
             revert MustHaveNotaryNft();
+        }
+        _;
+    }
+
+    modifier OnlyDocumentOwner(uint256 documentTokenId) {
+        if (notarizedDocumentNftContract.ownerOf(documentTokenId) != msg.sender) {
+            revert MustBeDocumentOwner();
         }
         _;
     }
@@ -59,6 +71,11 @@ contract Notary is AccessControl {
 
     function setNotaryNftContract(NotaryNft _notaryNft) external onlyRole(DEFAULT_ADMIN_ROLE) {
         notaryNftContract = _notaryNft;
+    }
+
+    function setDocumentPermissionNftContract(DocumentPermissionNft _documentPermissionNftContract)
+    external onlyRole(DEFAULT_ADMIN_ROLE) {
+        documentPermissionNftContract = _documentPermissionNftContract;
     }
 
     function issueNotaryToken(
@@ -105,11 +122,23 @@ contract Notary is AccessControl {
         emit NotarizedDocumentNftMinted(msg.sender, msg.value, _metadataUrl, tokenId);
     }
 
+    function grantDocumentViewPermission(address to, uint256 documentTokenId)
+    external OnlyDocumentOwner(documentTokenId) returns (uint256 tokenId) {
+        tokenId = documentPermissionNftContract.mint(to, documentTokenId);
+        emit PermissionAuthorized(tokenId, to, documentTokenId);
+    }
+
+    function revokeDocumentViewPermission(address to, uint256 documentTokenId)
+    external OnlyDocumentOwner(documentTokenId) {
+        documentPermissionNftContract.burn(to, documentTokenId);
+        emit PermissionRevoked(to, documentTokenId);
+    }
+
     function payableBalance() public view returns (uint256 _balance) {
         _balance = balance[msg.sender];
     }
 
-    function claim() public hasBalance {
+    function claim() external hasBalance {
         uint256 amountToSend = balance[msg.sender];
         balance[msg.sender] = 0;
         payable(msg.sender).transfer(amountToSend);
@@ -119,7 +148,7 @@ contract Notary is AccessControl {
     function _splitPayment(uint256 amount, address notary) internal {
         uint256 commission = amount * defaultCommissionPercentage / 100;
         uint256 notaryPayment = amount - commission;
-        require(commission + notaryPayment == amount); // Math broke. This should catch any uncaught over/under flows
+        require(commission + notaryPayment == amount); // If math broke, this will catch it
 
         balance[notary] += notaryPayment;
         emit BalanceIncreased(notary, notaryPayment);
