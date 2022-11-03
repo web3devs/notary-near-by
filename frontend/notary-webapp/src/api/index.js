@@ -54,6 +54,7 @@ export const getOrder = async (orderId) => {
 }
 
 export const getAllOrders = async () => {
-  const [data] = await api.get('/orders')
+  const {data} = await api.get('/orders')
+
   return data || []
 }
