@@ -19,11 +19,12 @@ export default () => {
       try {
         setIsLoading(true)
         const notary = await getNotaryProfile(accountAddress)
-        console.log(notary)
-        const o = await getAllOrders()
-        console.log('ORDERS: ', o)
-        setOrders(o)
-        setIsSigned(true)
+        if (notary) {
+          setIsSigned(true);
+        }
+
+        const o = await getAllOrders();
+        setOrders(o);
       } catch (e) {
         if (e.response.status === 404) {
           setIsSigned(false)
