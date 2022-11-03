@@ -2,8 +2,8 @@
   "_format": "hh-sol-cache-2",
   "files": {
     "/Users/ken/Projects/notary-near-by/contract/contracts/NotarizedDocumentNft.sol": {
-      "lastModificationDate": 1667189090196,
-      "contentHash": "ed1fc2e77523291c2f0727f2252b27b8",
+      "lastModificationDate": 1667447452359,
+      "contentHash": "a0fad03dacd0f1de3018695e48534d21",
       "sourceName": "contracts/NotarizedDocumentNft.sol",
       "solcConfig": {
         "version": "0.8.4",
@@ -35,7 +35,7 @@
         "@openzeppelin/contracts/access/Ownable.sol"
       ],
       "versionPragmas": [
-        "^0.8.4"
+        "^0.8.0"
       ],
       "artifacts": [
         "NotarizedDocumentNft"
@@ -480,8 +480,8 @@
       ]
     },
     "/Users/ken/Projects/notary-near-by/contract/contracts/Notary.sol": {
-      "lastModificationDate": 1667194020662,
-      "contentHash": "3deca3c6456959cbf76a38699b4012a3",
+      "lastModificationDate": 1667447452361,
+      "contentHash": "8a881313bb0ed4e94f09b8c48d216734",
       "sourceName": "contracts/Notary.sol",
       "solcConfig": {
         "version": "0.8.4",
@@ -509,10 +509,11 @@
       "imports": [
         "@openzeppelin/contracts/access/AccessControl.sol",
         "./NotarizedDocumentNft.sol",
-        "./NotaryNft.sol"
+        "./NotaryNft.sol",
+        "./DocumentPermissionNft.sol"
       ],
       "versionPragmas": [
-        "^0.8.4"
+        "^0.8.0"
       ],
       "artifacts": [
         "Notary"
@@ -594,8 +595,8 @@
       ]
     },
     "/Users/ken/Projects/notary-near-by/contract/contracts/NotaryNft.sol": {
-      "lastModificationDate": 1667190380394,
-      "contentHash": "4bbcd5ac8a96029b99e4c9ebdfd402e9",
+      "lastModificationDate": 1667447452365,
+      "contentHash": "709a7c571ceafe84c1e7c660bd676cc6",
       "sourceName": "contracts/NotaryNft.sol",
       "solcConfig": {
         "version": "0.8.4",
@@ -627,15 +628,15 @@
         "@openzeppelin/contracts/access/Ownable.sol"
       ],
       "versionPragmas": [
-        "^0.8.4"
+        "^0.8.0"
       ],
       "artifacts": [
         "NotaryNft"
       ]
     },
     "/Users/ken/Projects/notary-near-by/contract/contracts/DocumentPermissionNft.sol": {
-      "lastModificationDate": 1667238816701,
-      "contentHash": "17f98e7eb066b846e74977292b6fca9c",
+      "lastModificationDate": 1667448022626,
+      "contentHash": "841f24320183a421313bdb57df0ea424",
       "sourceName": "contracts/DocumentPermissionNft.sol",
       "solcConfig": {
         "version": "0.8.4",
@@ -662,15 +663,90 @@
       },
       "imports": [
         "@openzeppelin/contracts/token/ERC721/ERC721.sol",
-        "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol",
+        "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol",
         "@openzeppelin/contracts/utils/Counters.sol",
         "@openzeppelin/contracts/access/Ownable.sol"
       ],
       "versionPragmas": [
-        "^0.8.4"
+        "^0.8.0"
       ],
       "artifacts": [
         "DocumentPermissionNft"
+      ]
+    },
+    "/Users/ken/Projects/notary-near-by/contract/node_modules/@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol": {
+      "lastModificationDate": 1666842236094,
+      "contentHash": "88095889e59d16821879a8083f906503",
+      "sourceName": "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol",
+      "solcConfig": {
+        "version": "0.8.4",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../ERC721.sol",
+        "./IERC721Enumerable.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "ERC721Enumerable"
+      ]
+    },
+    "/Users/ken/Projects/notary-near-by/contract/node_modules/@openzeppelin/contracts/token/ERC721/extensions/IERC721Enumerable.sol": {
+      "lastModificationDate": 1666842236095,
+      "contentHash": "f4dd06783f321aa26179bc2b6e361c29",
+      "sourceName": "@openzeppelin/contracts/token/ERC721/extensions/IERC721Enumerable.sol",
+      "solcConfig": {
+        "version": "0.8.4",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../IERC721.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "IERC721Enumerable"
       ]
     }
   }

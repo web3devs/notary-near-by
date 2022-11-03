@@ -24,6 +24,7 @@ async function deployContacts(wallet) {
     // Initialize the nft contract addresses in the Notary contract
     await notaryContract.setNotarizedDocumentNftContact(notarizedDocumentNftContract.address, {gasLimit: 3000000})
     await notaryContract.setNotaryNftContract(notaryNft.address, {gasLimit: 3000000})
+    await notaryContract.setDocumentPermissionNftContract(documentPermissionNft.address, {gasLimit: 3000000})
 
     // Transfer ownership of the nft contracts to the Notary contract
     await notarizedDocumentNftContract.transferOwnership(notaryContract.address, {gasLimit: 3000000})

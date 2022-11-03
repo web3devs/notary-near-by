@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.4;
+pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
@@ -10,22 +10,25 @@ import "@openzeppelin/contracts/access/Ownable.sol";
  * DocumentPermissionNft
  * An NFT that that grants permission to view a notarized document
  */
-contract DocumentPermissionNft is ERC721URIStorage, Ownable {
-    uint256 private _tokensCount = 0;
-
-    mapping(string => uint256) public tokenByNotaryId;
-    mapping(uint256 => bool) public isActive;
+contract DocumentPermissionNft is ERC721Enumerable, Ownable {
+    mapping(uint256 => uint256) public notarizedDocument;
 
     constructor() ERC721("DocumentPermissionNft", "AUTH") {}
 
-    function mint(address to, string memory notaryId, string memory _metadataUri) external onlyOwner returns (uint256 tokenId) {
-        tokenId = _tokensCount + 1;
-        tokenByNotaryId[notaryId] = tokenId;
-        isActive[tokenId] = true;
+    function mint(address to, uint256 documentTokenId) external onlyOwner returns (uint256 tokenId) {
+        tokenId = getTokenId(to, documentTokenId);
+        notarizedDocument[tokenId] = documentTokenId;
         _safeMint(to, tokenId);
-        _setTokenURI(tokenId, _metadataUri);
-        _tokensCount = tokenId + 1;
     }
 
-    // TODO implement a way of revoking the authorization that this token grants
+    function burn(address to, uint256 documentTokenId) external onlyOwner {
+        uint256 tokenId = getTokenId(to, documentTokenId);
+        super._burn(tokenId);
+    }
+
+    function getTokenId(address to, uint256 documentTokenId) public pure returns (uint256 tokenId) {
+        tokenId = uint256(keccak256(abi.encodePacked(to, documentTokenId)));
+    }
+
+    // TODO revoke all grants when the NotarizedDocumentNft is revoked
 }

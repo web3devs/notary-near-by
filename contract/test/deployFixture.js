@@ -1,7 +1,7 @@
 const deploy = require("../scripts/deploy");
 
 async function deployFixture() {
-    const [owner, notary, alice, mallory] = await ethers.getSigners();
+    const [owner, notary, alice, bob, mallory] = await ethers.getSigners();
     const deployResults = await deploy(owner)
 
     console.log(`owner: ${owner.address}`)
@@ -12,7 +12,7 @@ async function deployFixture() {
     console.log(`notarized document nft contract: ${deployResults.notarizedDocumentNftContract.address}`)
     console.log(`notary nft contract: ${deployResults.notaryNft.address}`)
     console.log(`document permission nft contract: ${deployResults.documentPermissionNft.address}`)
-    return {owner, notary, alice, mallory, ...deployResults}
+    return {owner, notary, alice, bob, mallory, ...deployResults}
 }
 
 module.exports = deployFixture
