@@ -113,8 +113,13 @@ describe("Notary contract", function () {
             await expect(notaryContract.connect(alice).mint(ipfsBogusUri, {value: 99}))
                 .to.be.revertedWithCustomError(notaryContract, "TokenNotMintable")
         })
-        it.skip("should set the metadata irl on the minted token", async () => {
-            const tokenId = await notaryContract.connect(alice).mint(ipfsBogusUri, {value: 99}) // FIXME A transaction is returned
+        it("should set the metadata irl on the minted token", async () => {
+            const tokenId = (
+                await executeAndGetEvent(
+                    notaryContract.connect(alice).mint(ipfsBogusUri, {value: 99}),
+                    "NotarizedDocumentNftMinted"
+                )
+            ).tokenId
             expect(await notarizedDocumentNftContract.tokenURI(tokenId)).to.equal(ipfsBogusUri)
         })
     })
