@@ -1,12 +1,18 @@
-import { Button, Dialog, InputText } from 'primereact'
+import { Button, Dialog, Dropdown, InputText } from 'primereact'
 import { useCallback, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import FileUpload from '../../components/FileUpload'
 import { useAuth } from '../../context'
 import { signMessage } from '../../contracts'
 
+const options = [
+  'Attestation of title',
+  'Purchase and Sale',
+  'Last Will/Testament'
+]
 export default () => {
   const { accountAddress } = useAuth()
+  const [type, setType] = useState(options[0])
   const [newAddress, setNewAddress] = useState('')
   const [showAddWitness, setShowAddWitness] = useState(false)
   const [showAddParticipant, setSHowAddParticipant] = useState(false)
@@ -38,13 +44,23 @@ export default () => {
     setParticipants((prev) => [...prev.filter((w) => w !== participant)])
   }
   return (
-    <div className="flex flex-column justify-items-center align-items-center">
+    <div className="flex flex-column justify-items-center align-items-start">
       <h1>Create order</h1>
+
+      <div className="text-lg text-300 mb-4">Document type</div>
+      <Dropdown
+        options={options}
+        value={type}
+        onChange={(e) => {
+          setType(e.value)
+        }}
+        className="mb-4"
+      />
       <div className="text-lg text-300 mb-4">Witnesses</div>
       {witnesses.map((w) => {
         return (
           <div
-            className="flex justify-content-between mb-2 w-5 align-items-center border-round-xs"
+            className="flex justify-content-between mb-2 w-5 align-items-center p2"
             key={w}
           >
             <span className="mr-4">{w}</span>
