@@ -6,7 +6,7 @@ import {
   Routes
 } from 'react-router-dom'
 
-import CreateOrderPage from '../pages/participant/CreateOrder.page'
+import CreateOrderPage from '../pages/order/CreateOrder.page'
 import DashboardLayout from '../layouts/Dashboard.layout'
 import NotaryDashPage from '../pages/notary/NotaryDash.page'
 import ParticipantDashPage from '../pages/participant/ParticipantDash.page'
