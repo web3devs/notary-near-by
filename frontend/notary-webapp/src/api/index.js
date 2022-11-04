@@ -1,4 +1,6 @@
 import axios from 'axios'
+import { getAccountAddress, signMessage } from '../contracts'
+import * as store from '../storage'
 
 const api = axios.create({
   baseURL: 'https://nrsqfdo2y0.execute-api.us-east-1.amazonaws.com',
@@ -17,6 +19,27 @@ const api = axios.create({
 //     return Promise.reject(error)
 //   }
 // )
+
+api.interceptors.request.use(
+  async (config) => {
+    let { data } = config
+    let signature = store.getSignature()
+    console.log('signature', signature)
+    if (!signature) {
+      signature = await signMessage()
+      store.saveSignature(signature)
+    }
+    const sig = (data = {
+      ...data,
+      public_key: getAccountAddress(),
+      signature
+    })
+    return { ...config, data }
+  },
+  (error) => {
+    return Promise.reject(error)
+  }
+)
 
 export const signUpParticipant = async (
   address,

@@ -18,8 +18,7 @@ export default () => {
     ;(async () => {
       setIsLoading(true)
       try {
-        const participant = await getParticipantProfile(accountAddress)
-        console.log(participant)
+        await getParticipantProfile(accountAddress)
         const os = await getOwnersOrders(accountAddress)
         setOrders(os)
         setIsSigned(true)

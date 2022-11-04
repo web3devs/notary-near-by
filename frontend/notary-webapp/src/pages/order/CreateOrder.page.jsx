@@ -1,10 +1,8 @@
 import { Button, Dialog, Dropdown, InputText } from 'primereact'
 import { useCallback, useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
 import { createOrer } from '../../api'
 import FileUpload from '../../components/FileUpload'
 import { useAuth } from '../../context'
-import { signMessage } from '../../contracts'
 
 const options = [
   'Attestation of title',

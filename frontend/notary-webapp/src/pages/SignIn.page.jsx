@@ -24,8 +24,8 @@ export default () => {
     login()
   }
   return (
-    <div>
-      <Button label="Sign in" onClick={handleSignIn} />
+    <div className="flex justify-content-center align-items-center h-screen">
+      <Button label="Connect wallet" onClick={handleSignIn} />
     </div>
   )
 }

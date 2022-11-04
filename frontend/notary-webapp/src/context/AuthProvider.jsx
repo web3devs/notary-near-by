@@ -1,17 +1,16 @@
-import { isAddress } from 'ethers/lib/utils'
 import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 import {
   connectToWallet,
   getAccountAddress,
   registerCallback,
-  signMessage,
   unregisterCallback
 } from '../contracts'
+
+import * as store from '../storage'
 
 const AuthContext = createContext({
   role: null,
   isConnected: false,
-  signature: null,
   login: () => {
     console.error('not implemented')
   },
@@ -20,11 +19,9 @@ const AuthContext = createContext({
   },
   setRole: (role) => console.log('not implemented')
 })
-
 export const useAuth = () => useContext(AuthContext)
 
 export const AuthProvider = ({ children }) => {
-  const [signature, setSigature] = useState(null)
   const [role, setRole] = useState(null)
   const [accountAddress, setAccountAddress] = useState(null)
 
@@ -33,16 +30,9 @@ export const AuthProvider = ({ children }) => {
       const addres = getAccountAddress()
       if (addres) {
         setAccountAddress(getAccountAddress())
-        let sig = localStorage.getItem('sig')
-        if (!sig) {
-          sig = await signMessage()
-          localStorage.setItem('sig', sig)
-        }
-        setSigature(sig)
       } else {
         setAccountAddress(null)
-        setSigature(null)
-        localStorage.clear()
+        store.clear()
       }
     })
     return () => {
@@ -55,11 +45,11 @@ export const AuthProvider = ({ children }) => {
   }, [accountAddress])
 
   const logout = () => {
-    console.error('not implemented')
+    store.clear()
   }
 
-  const login = () => {
-    connectToWallet()
+  const login = async () => {
+    await connectToWallet()
   }
 
   const value = useMemo(
@@ -69,10 +59,9 @@ export const AuthProvider = ({ children }) => {
       role,
       setRole,
       logout,
-      login,
-      signature
+      login
     }),
-    [isConnected, role, setRole, login, logout, accountAddress, signature]
+    [isConnected, role, setRole, login, logout, accountAddress]
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

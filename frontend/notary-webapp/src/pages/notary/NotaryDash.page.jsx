@@ -26,6 +26,7 @@ export default () => {
           setIsSigned(false)
         }
       } catch (e) {
+        console.error(e)
         if (e.response.status === 404) {
           setIsSigned(false)
         }
