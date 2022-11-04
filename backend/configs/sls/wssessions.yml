@@ -94,3 +94,13 @@ Resources:
     Type: "AWS::SNS::Topic"
     Properties:
       TopicName: ${self:service}-${opt:stage, self:provider.stage}-wssessions
+
+  OrdersPrivateBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: ${self:service}-${opt:stage, self:provider.stage}-orders
+      CorsConfiguration:
+        CorsRules:
+          - AllowedHeaders: ['*']
+            AllowedOrigins: ['*']
+            AllowedMethods: [PUT, GET, HEAD]

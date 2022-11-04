@@ -2,6 +2,7 @@ package order
 
 import (
 	"encoding/json"
+	"fmt"
 
 	_pk "notarynearby/internal/pk"
 )
@@ -19,10 +20,16 @@ type Order struct {
 	Participants []_pk.PublicKey   `dynamo:"Participants" json:"participants" validate:"required"`
 	Witnesses    []_pk.PublicKey   `dynamo:"Witnesses" json:"witnesses" validate:"required"`
 	Widgets      []json.RawMessage `dynamo:"Widgets" json:"widgets"`
+	CreatedAt    string            `dynamo:"CreatedAt" json:"created_at"`
 
 	DocumentType string `dynamo:"DocumentType" json:"document_type" validate:"required"`
 
 	NotaryJoined       *Person                   `json:"notary_joined"`
 	ParticipantsJoined map[_pk.PublicKey]*Person `json:"participants_joined"`
 	WitnessesJoined    map[_pk.PublicKey]*Person `json:"witnesses_joined"`
+}
+
+//GetInFilePath returns S3 path for the uploaded file (ORIGINAL)
+func (_x *Order) GetInFilePath() string {
+	return fmt.Sprintf("%v/in.pdf", _x.ID)
 }

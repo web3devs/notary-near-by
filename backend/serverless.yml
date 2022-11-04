@@ -20,6 +20,7 @@ provider:
           - Ref: 'AWS::Region'
           - Ref: 'AWS::AccountId'
           - notarynearby-${self:provider.stage}-wssessions
+    S3_ORDERS: ${self:service}-${opt:stage, self:provider.stage}-orders
   iam:
     role:
       statements:
@@ -33,6 +34,12 @@ provider:
             - sns:*
           Resource:
             - arn:aws:sns:*:*:${self:service}-${self:provider.stage}-*
+        - Effect: Allow
+          Action:
+            - s3:*
+          Resource:
+            - arn:aws:s3:::${self:service}-${opt:stage, self:provider.stage}-orders
+            - arn:aws:s3:::${self:service}-${opt:stage, self:provider.stage}-orders/*
 
 # you can add statements to the Lambda function's IAM Role here
 #  iam:
