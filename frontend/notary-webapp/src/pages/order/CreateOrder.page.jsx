@@ -15,7 +15,7 @@ export default () => {
   const [type, setType] = useState(options[0])
   const [newAddress, setNewAddress] = useState('')
   const [showAddWitness, setShowAddWitness] = useState(false)
-  const [showAddParticipant, setSHowAddParticipant] = useState(false)
+  const [showAddParticipant, setShowAddParticipant] = useState(false)
   const [witnesses, setWitnesses] = useState([])
   const [participants, setParticipants] = useState([])
   const [isSubmiting, setIsSubmiting] = useState(false)
@@ -28,7 +28,8 @@ export default () => {
         participants,
         witnesses,
         documentType: type,
-        accountAddress
+        accountAddress,
+        file,
       })
       console.log(res)
     } catch (err) {
@@ -36,7 +37,7 @@ export default () => {
     } finally {
       setIsSubmiting(false)
     }
-  }, [accountAddress])
+  }, [accountAddress, participants, witnesses, type, file])
 
   const handleAddWitness = () => {
     setWitnesses((prev) => [...prev, newAddress])
@@ -46,7 +47,7 @@ export default () => {
   const handleAddParticipant = () => {
     setParticipants((prev) => [...prev, newAddress])
     setNewAddress('')
-    setSHowAddParticipant(false)
+    setShowAddParticipant(false)
   }
   const handleRemoveWitness = (witness) => {
     setWitnesses((prev) => [...prev.filter((w) => w !== witness)])
@@ -55,65 +56,72 @@ export default () => {
     setParticipants((prev) => [...prev.filter((w) => w !== participant)])
   }
   return (
-    <div className="flex flex-column justify-items-center align-items-start">
+    <div className="grid">
       <h1>Create order</h1>
 
-      <div className="text-lg text-300 mb-4">Document type</div>
-      <Dropdown
-        options={options}
-        value={type}
-        onChange={(e) => {
-          setType(e.value)
-        }}
-        className="mb-4"
-      />
-      <div className="text-lg text-300 mb-4">Witnesses</div>
-      {witnesses.map((w) => {
-        return (
-          <div
-            className="flex justify-content-between mb-2 w-5 align-items-center p2"
-            key={w}
-          >
-            <span className="mr-4">{w}</span>
-            <Button onClick={() => handleRemoveWitness(w)}>
-              <i className="pi pi-trash px-2"></i>
-            </Button>
-          </div>
-        )
-      })}
-      {witnesses.length === 0 && (
-        <div className="text-sm text-100 mb-4">No witnesses yet</div>
-      )}
-      <Button
-        label="Add witness"
-        onClick={() => setShowAddWitness(true)}
-        className="mb-2"
-      />
+      <div className="col-12">
+        <div className="text-lg text-300 mb-4">Document</div>
+        <Dropdown
+          options={options}
+          value={type}
+          onChange={(e) => {
+            setType(e.value)
+          }}
+          className="mb-4"
+        />
+        <FileUpload label="Document PDF" accept='.pdf' onFileChange={(e) => setFile(e[0])} disabled={isSubmiting} />
+      </div>
 
-      <div className="text-lg text-300 mb-4">Participants</div>
-      {participants.map((w) => {
-        return (
-          <div
-            className="flex justify-content-between mb-2 w-5 align-items-center border-round-xs"
-            key={w}
-          >
-            <span className="mr-4">{w}</span>
-            <Button onClick={() => handleRemoveParticipants(w)}>
-              <i className="pi pi-trash px-2"></i>
-            </Button>
-          </div>
-        )
-      })}
-      {participants.length === 0 && (
-        <div className="text-sm text-100 mb-4">No participants yet</div>
-      )}
-      <Button
-        label="Add participant"
-        className="mb-4"
-        onClick={() => setSHowAddParticipant(true)}
-      />
+      <div className="col-6">
+        <div className="text-lg text-300 mb-4">Participants</div>
+        {participants.map((w) => {
+          return (
+            <div
+              className="flex justify-content-between mb-2 w-5 align-items-center border-round-xs"
+              key={w}
+            >
+              <span className="mr-4">{w}</span>
+              <Button onClick={() => handleRemoveParticipants(w)}>
+                <i className="pi pi-trash px-2"></i>
+              </Button>
+            </div>
+          )
+        })}
+        {participants.length === 0 && (
+          <div className="text-sm text-100 mb-4">No participants yet</div>
+        )}
+        <Button
+          label="Add participant"
+          className="mb-4"
+          onClick={() => setShowAddParticipant(true)}
+        />
+      </div>
 
-      <FileUpload onFileChange={setFile} disabled={isSubmiting} />
+      <div className="col-6">
+        <div className="text-lg text-300 mb-4">Witnesses</div>
+        {witnesses.map((w) => {
+          return (
+            <div
+              className="flex justify-content-between mb-2 w-5 align-items-center p2"
+              key={w}
+            >
+              <span className="mr-4">{w}</span>
+              <Button onClick={() => handleRemoveWitness(w)}>
+                <i className="pi pi-trash px-2"></i>
+              </Button>
+            </div>
+          )
+        })}
+        {witnesses.length === 0 && (
+          <div className="text-sm text-100 mb-4">No witnesses yet</div>
+        )}
+        <Button
+          label="Add witness"
+          onClick={() => setShowAddWitness(true)}
+          className="mb-2"
+        />
+      </div>
+
       <Button label="Save" onClick={handleSubmit} />
       <Dialog
         visible={showAddWitness}

@@ -86,14 +86,28 @@ export const createOrer = async ({
   participants,
   witnesses,
   documentType,
-  accountAddress
+  accountAddress,
+  file,
 }) => {
   const { data } = await api.post('/orders', {
+    owner: accountAddress,
+    document_type: documentType,
     participants,
     witnesses,
-    document_type: documentType,
-    owner: accountAddress
+    file: {
+      name: file.name,
+      type: file.type,
+      size: file.size,
+    },
   })
+
+  if (data['upload_url']) {
+    const u = await api.put(data['upload_url'], file, {
+      headers: {
+        'x-amz-acl': 'private',
+      },
+    });
+  }
 
   return data
 }
