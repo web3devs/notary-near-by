@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { createOrer } from '../../api'
 import FileUpload from '../../components/FileUpload'
 import { useAuth } from '../../context'
+import { useNavigate } from 'react-router-dom'
 
 const options = [
   'Attestation of title',
@@ -11,6 +12,7 @@ const options = [
 ]
 export default () => {
   const { accountAddress } = useAuth()
+  const navigate = useNavigate();
 
   const [type, setType] = useState(options[0])
   const [newAddress, setNewAddress] = useState('')
@@ -32,6 +34,7 @@ export default () => {
         file,
       })
       console.log(res)
+      navigate('/participant');
     } catch (err) {
       console.error(err)
     } finally {
