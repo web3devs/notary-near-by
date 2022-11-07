@@ -4,6 +4,7 @@ import { createOrer } from '../../api'
 import FileUpload from '../../components/FileUpload'
 import { useAuth } from '../../context'
 import { useNavigate } from 'react-router-dom'
+import useForm from '../../utils'
 
 const options = [
   'Attestation of title',
@@ -12,72 +13,107 @@ const options = [
 ]
 export default () => {
   const { accountAddress } = useAuth()
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
-  const [type, setType] = useState(options[0])
+  // const [type, setType] = useState(options[0])
   const [newAddress, setNewAddress] = useState('')
   const [showAddWitness, setShowAddWitness] = useState(false)
   const [showAddParticipant, setShowAddParticipant] = useState(false)
-  const [witnesses, setWitnesses] = useState([])
-  const [participants, setParticipants] = useState([])
+  // const [witnesses, setWitnesses] = useState([])
+  // const [participants, setParticipants] = useState([])
   const [isSubmiting, setIsSubmiting] = useState(false)
-  const [file, setFile] = useState(null)
+  // const [file, setFile] = useState(null)
+  const { errors, formData, canSubmit, setFormField, submit } = useForm({
+    data: {
+      file: null,
+      participants: [],
+      witnesses: [],
+      accountAddress,
+      type: options[0]
+    },
+    constraints: {
+      file: {
+        presence: true
+      }
+    }
+  })
 
   const handleSubmit = useCallback(async () => {
     try {
       setIsSubmiting(true)
+      console.log(errors)
       const res = await createOrer({
-        participants,
-        witnesses,
-        documentType: type,
-        accountAddress,
-        file,
+        participants: formData.participants,
+        witnesess: formData.witnesses,
+        documentType: formData.type,
+        accountAddress: formData.accountAddress,
+        file: formData.file
       })
       console.log(res)
-      navigate('/participant');
+      navigate('/participant')
     } catch (err) {
       console.error(err)
     } finally {
       setIsSubmiting(false)
     }
-  }, [accountAddress, participants, witnesses, type, file])
+  }, [formData])
 
-  const handleAddWitness = () => {
-    setWitnesses((prev) => [...prev, newAddress])
+  const handleAddWitness = useCallback(() => {
+    setFormField('witnesses', [...formData.witnesses, newAddress])
     setNewAddress('')
     setShowAddWitness(false)
-  }
-  const handleAddParticipant = () => {
-    setParticipants((prev) => [...prev, newAddress])
+  }, [formData, newAddress])
+
+  const handleAddParticipant = useCallback(() => {
+    setFormField('participants', [...formData.participants, newAddress])
     setNewAddress('')
     setShowAddParticipant(false)
-  }
-  const handleRemoveWitness = (witness) => {
-    setWitnesses((prev) => [...prev.filter((w) => w !== witness)])
-  }
-  const handleRemoveParticipants = (participant) => {
-    setParticipants((prev) => [...prev.filter((w) => w !== participant)])
-  }
+  }, [formData, newAddress])
+
+  const handleRemoveWitness = useCallback(
+    (witness) => {
+      setFormField(
+        'witnesses',
+        formData.witnesses.filter((w) => w !== witness)
+      )
+    },
+    [formData]
+  )
+
+  const handleRemoveParticipants = useCallback(
+    (participant) => {
+      setFormField(
+        'participants',
+        formData.participants.filter((w) => w !== participant)
+      )
+    },
+    [formData]
+  )
   return (
     <div className="grid">
       <h1>Create order</h1>
-
       <div className="col-12">
         <div className="text-lg text-300 mb-4">Document</div>
         <Dropdown
           options={options}
-          value={type}
+          value={formData.type}
           onChange={(e) => {
-            setType(e.value)
+            setFormField('type', e.value)
           }}
           className="mb-4"
         />
-        <FileUpload label="Document PDF" accept='.pdf' onFileChange={(e) => setFile(e[0])} disabled={isSubmiting} />
+        <FileUpload
+          label="Document PDF"
+          error={errors?.file}
+          accept=".pdf"
+          onFileChange={(e) => setFormField('file', e[0])}
+          disabled={isSubmiting}
+        />
       </div>
 
-      <div className="col-6">
+      <div className="col-12">
         <div className="text-lg text-300 mb-4">Participants</div>
-        {participants.map((w) => {
+        {formData.participants.map((w) => {
           return (
             <div
               className="flex justify-content-between mb-2 w-5 align-items-center border-round-xs"
@@ -90,7 +126,7 @@ export default () => {
             </div>
           )
         })}
-        {participants.length === 0 && (
+        {formData.participants.length === 0 && (
           <div className="text-sm text-100 mb-4">No participants yet</div>
         )}
         <Button
@@ -100,9 +136,9 @@ export default () => {
         />
       </div>
 
-      <div className="col-6">
+      <div className="col-12">
         <div className="text-lg text-300 mb-4">Witnesses</div>
-        {witnesses.map((w) => {
+        {formData.witnesses.map((w) => {
           return (
             <div
               className="flex justify-content-between mb-2 w-5 align-items-center p2"
@@ -115,7 +151,7 @@ export default () => {
             </div>
           )
         })}
-        {witnesses.length === 0 && (
+        {formData.witnesses.length === 0 && (
           <div className="text-sm text-100 mb-4">No witnesses yet</div>
         )}
         <Button
@@ -124,8 +160,11 @@ export default () => {
           className="mb-2"
         />
       </div>
-
-      <Button label="Save" onClick={handleSubmit} />
+      <Button
+        label="Save"
+        onClick={(e) => submit(handleSubmit, e)}
+        disabled={!canSubmit}
+      />
       <Dialog
         visible={showAddWitness}
         onHide={() => setShowAddWitness(false)}
