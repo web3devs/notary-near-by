@@ -9,6 +9,8 @@ const api = axios.create({
   }
 })
 
+const s3 = axios.create()
+
 // api.interceptors.request.use(
 //   (config) => {
 //     let { data } = config
@@ -102,7 +104,7 @@ export const createOrer = async ({
   })
 
   if (data['upload_url']) {
-    const u = await api.put(data['upload_url'], file, {
+    const u = await s3.put(data['upload_url'], file, {
       headers: {
         'x-amz-acl': 'private',
       },
