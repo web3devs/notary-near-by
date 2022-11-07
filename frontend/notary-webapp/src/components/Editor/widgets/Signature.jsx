@@ -2,12 +2,16 @@ import { useState, useEffect } from 'react';
 import { Rnd } from 'react-rnd';
 import { Dialog } from 'primereact/dialog';
 import { Dropdown } from 'primereact/dropdown';
+import { useAuth } from '../../../context';
 
 export const SignatureWidget = ({ disabled, widget, order, updateWidget, deleteWidget }) => {
     let { x, y, value } = widget;
     const [valid, setValid] = useState(false);
     const [editMode, setEditMode] = useState(false);
+    const [signMode, setSignMode] = useState(false);
     const [v, setV] = useState({first_name: '', last_name: '', public_key: ''});
+
+    const { accountAddress } = useAuth();
 
     useEffect(() => {
         if (value) {
@@ -45,6 +49,10 @@ export const SignatureWidget = ({ disabled, widget, order, updateWidget, deleteW
 
     const toggleEdit = () => {
         setEditMode(!editMode);
+    }
+
+    const toggleSign = () => {
+        setSignMode(!signMode);
     }
 
     const selectParticipant = ({public_key, first_name, last_name}) => {
@@ -85,8 +93,21 @@ export const SignatureWidget = ({ disabled, widget, order, updateWidget, deleteW
                 </div>
             )}
 
+            {
+                accountAddress === widget.value.public_key && (
+                    <div className="sign-menu" onClick={() => { e.preventDefault(); e.stopPropagation(); }}>
+                        <i className="pi pi-file-edit" onClick={toggleSign} />
+                    </div>
+                )
+            }
+
             <Dialog header="Edit" visible={editMode} onHide={() => setEditMode(false)}>
                 <Dropdown optionLabel="label" value={v} options={participants} onChange={(e) => selectParticipant(e.value)} placeholder="Select Participant" />
+            </Dialog>
+
+            <Dialog header="Sign" visible={signMode} onHide={() => setSignMode(false)}>
+                TODO: SIGN form :)
+                {/* <Dropdown optionLabel="label" value={v} options={participants} onChange={(e) => selectParticipant(e.value)} placeholder="Select Participant" /> */}
             </Dialog>
         </Rnd>
     )

@@ -18,6 +18,7 @@ import {
 } from './widgets';
 import { Flow } from './Flow'
 import { Participants } from './Participants'
+import { Signatures } from './Signatures'
 
 const Editor = ({ order, downloadURL, publicKey, signature }) => {
   const [body, setBody] = useState('');
@@ -224,6 +225,10 @@ const Editor = ({ order, downloadURL, publicKey, signature }) => {
               ]
             },
           ]} />
+        )}
+
+        {order && (
+          <Signatures publicKey={publicKey} widgets={widgets} setPage={setPage} />
         )}
       </div>
       <div className="col-8">
