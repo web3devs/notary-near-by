@@ -10,7 +10,6 @@ import { v4 as uuidv4 } from 'uuid';
 import {
   useWS,
   useAuth,
-  useOrders,
 } from '../../context';
 import './editor.css';
 import {
@@ -19,10 +18,8 @@ import {
 } from './widgets';
 import { Flow } from './Flow'
 import { Participants } from './Participants'
-import { getOrder } from '../../api';
 
-const Editor = ({ orderID, publicKey, signature }) => {
-  const [order, setOrder] = useState(null);
+const Editor = ({ order, downloadURL, publicKey, signature }) => {
   const [body, setBody] = useState('');
   const [page, setPage] = useState(1);
   const [loaded, setLoaded] = useState(false);
@@ -32,7 +29,7 @@ const Editor = ({ orderID, publicKey, signature }) => {
   });
   const canvasRef = useRef(null);
   const { pdfDocument, pdfPage } = usePdf({
-    file: 'http://localhost:5173/sample.pdf',
+    file: downloadURL,
     page,
     canvasRef,
   });
@@ -50,6 +47,12 @@ const Editor = ({ orderID, publicKey, signature }) => {
   } = useAuth();
 
   useEffect(() => {
+    if (order) {
+      setWidgets([ ...order.widgets ]);
+    }
+  }, [order]);
+
+  useEffect(() => {
     if (!role) {
       toastError('Missing ROLE!') //TODO: Redirect
     }
@@ -57,17 +60,9 @@ const Editor = ({ orderID, publicKey, signature }) => {
 
   useEffect(() => {
     ; (async () => {
-      const o = await getOrder(orderID);
-      setWidgets([...o.widgets]);
-      setOrder({...o});
-    })()
-  }, []);
-
-  useEffect(() => {
-    ; (async () => {
       if (ws) {
-        await join(orderID, publicKey, signature, role);
-        // await ping(orderID); //XXX: why were we pinging in here?
+        await join(order.id, publicKey, signature, role);
+        // await ping(order.id); //XXX: why were we pinging in here?
       }
     })()
   }, [ws]);
@@ -79,13 +74,13 @@ const Editor = ({ orderID, publicKey, signature }) => {
           const a = JSON.parse(evt.data);
           if (a.action === 'update-order') {
             setWidgets([...a.data.widgets]);
-            setOrder({ ...a.data });
+            // setOrder({ ...a.data });
           }
         }
       });
 
       setInterval(() => {
-        ping(orderID);
+        ping(order.id);
       }, 60 * 1000)
     }
   }, [ws]);
@@ -108,7 +103,7 @@ const Editor = ({ orderID, publicKey, signature }) => {
       wdgts.push(widget);
       await ws.send(
         JSON.stringify({
-          order_id: orderID,
+          order_id: order.id,
           action: "update-widget",
           data: {
             data: widget,
@@ -123,7 +118,7 @@ const Editor = ({ orderID, publicKey, signature }) => {
     aw.push(widget);
     await ws.send(
       JSON.stringify({
-        order_id: orderID,
+        order_id: order.id,
         action: "add-widget",
         data: {
           data: widget,
@@ -138,7 +133,7 @@ const Editor = ({ orderID, publicKey, signature }) => {
     const wdgts = [...widgets].filter(w => w.id !== widget.id);
     await ws.send(
       JSON.stringify({
-        order_id: orderID,
+        order_id: order.id,
         action: "remove-widget",
         data: {
           data: widget,
@@ -198,9 +193,17 @@ const Editor = ({ orderID, publicKey, signature }) => {
     toast.current.show({ severity: 'error', summary: 'Error', detail: msg, life: 3000 })
   }
 
+  console.log('PDF Document: ', pdfDocument)
+  console.log('PDF Page: ', pdfPage);
+
   return (
     <div className="grid">
-      <div className="col-12">ROLE: {role}</div>
+      <div className="col-12">
+        ROLE: {role}<br />
+        Status: {order.status}<br />
+        DownloadURL: <input type="text" value={downloadURL} />
+      </div>
+
       <Toast ref={toast} />
       <div className="col-2">
         {
@@ -225,19 +228,14 @@ const Editor = ({ orderID, publicKey, signature }) => {
       </div>
       <div className="col-8">
         {(!pdfDocument || !loaded) && <ProgressSpinner />}
-        {
-          editorSize && (
-            <>
-              <div id="editor" style={{ width: editorSize.width, height: editorSize.height }}>
-                <div id="overlay">
-                  { widgets.map(w => renderWidget(w)) }
-                </div>
-                <canvas id="pdfviewer" ref={canvasRef} />
-              </div>
-              Sample PDF downloaded from <a href="https://file-examples.com/index.php/sample-documents-download/sample-pdf-download/">https://file-examples.com/index.php/sample-documents-download/sample-pdf-download/</a>
-            </>
-          )
-        }
+        <>
+          <div id="editor" style={{ width: editorSize.width, height: editorSize.height }}>
+            <div id="overlay">
+              { widgets.map(w => renderWidget(w)) }
+            </div>
+            <canvas id="pdfviewer" ref={canvasRef} />
+          </div>
+        </>
 
         {Boolean(pdfDocument && pdfDocument.numPages) && (
           <div className="p-buttonset">
@@ -256,7 +254,7 @@ const Editor = ({ orderID, publicKey, signature }) => {
           </ScrollPanel>
           <strong>Message:</strong><br />
           <textarea onChange={e => setBody(e.target.value)} defaultValue={body} /><br />
-          <button onClick={async () => await sendMessage(orderID, body)}>send</button>
+          <button onClick={async () => await sendMessage(order.id, body)}>send</button>
         </div>
 
         {widgets.length > 0 && (
