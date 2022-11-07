@@ -255,7 +255,7 @@ const Editor = ({ orderID, publicKey, signature }) => {
             </ul>
           </ScrollPanel>
           <strong>Message:</strong><br />
-          <textarea onChange={e => setBody(e.target.value)}>{body}</textarea><br />
+          <textarea onChange={e => setBody(e.target.value)} defaultValue={body} /><br />
           <button onClick={async () => await sendMessage(orderID, body)}>send</button>
         </div>
 

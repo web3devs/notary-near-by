@@ -9,11 +9,11 @@ export const Participants = ({ notary_joined, participants, participants_joined,
     const pjw = (
         <>
         {
-            participants.map(p => {
+            participants.map((p, idx) => {
                 if (pj[p]) {
-                    return <Chip label={`${pj[p].first_name} ${pj[p].last_name}`} icon="pi pi-check" className="bg-green-500" />
+                    return <Chip key={`participant-${idx}`} label={`${pj[p].first_name} ${pj[p].last_name}`} icon="pi pi-check" className="bg-green-500" />
                 }
-                return <Chip label={`${p}`} icon="pi pi-times" className="bg-orange-500" />
+                return <Chip key={`participant-${idx}`} label={`${p}`} icon="pi pi-times" className="bg-orange-500" />
             })
         }
         </>
@@ -22,11 +22,11 @@ export const Participants = ({ notary_joined, participants, participants_joined,
     const wjw = (
         <>
             {
-                witnesses.map(p => {
+                witnesses.map((p, idx) => {
                     if (wj[p]) {
-                        return <Chip label={`${wj[p].first_name} ${wj[p].last_name}`} icon="pi pi-check" className="bg-green-500" />
+                        return <Chip key={`witness-${idx}`} label={`${wj[p].first_name} ${wj[p].last_name}`} icon="pi pi-check" className="bg-green-500" />
                     }
-                    return <Chip label={`${p}`} icon="pi pi-times" className="bg-orange-500" />
+                    return <Chip key={`witness-${idx}`} label={`${p}`} icon="pi pi-times" className="bg-orange-500" />
                 })
             }
         </>

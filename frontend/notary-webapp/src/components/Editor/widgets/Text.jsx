@@ -65,7 +65,7 @@ export const TextWidget = ({ disabled, widget, updateWidget, deleteWidget }) => 
         >
             {v}
             { !disabled && (
-                <div className="context-menu" onClick={() => { e.preventDefault(); e.stopPropagation(); }}>
+                <div className="context-menu" onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}>
                     <i className="pi pi-file-edit" onClick={toggleEdit} />
                     <i className="pi pi-trash" onClick={removeWidget} />
                 </div>
