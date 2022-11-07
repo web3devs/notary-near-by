@@ -7,6 +7,13 @@ import (
 	_pk "notarynearby/internal/pk"
 )
 
+//Status represents order status, duh
+type Status string
+
+//StatusNew for new Orders
+const StatusNew Status = "new"
+
+//Person personal data
 type Person struct {
 	FirstName string `json:"first_name"`
 	LastName  string `json:"last_name"`
@@ -21,6 +28,7 @@ type Order struct {
 	Witnesses    []_pk.PublicKey   `dynamo:"Witnesses" json:"witnesses" validate:"required"`
 	Widgets      []json.RawMessage `dynamo:"Widgets" json:"widgets"`
 	CreatedAt    string            `dynamo:"CreatedAt" json:"created_at"`
+	Status       Status            `dynamo:"Status" json:"status"`
 
 	DocumentType string `dynamo:"DocumentType" json:"document_type" validate:"required"`
 
@@ -32,4 +40,9 @@ type Order struct {
 //GetInFilePath returns S3 path for the uploaded file (ORIGINAL)
 func (_x *Order) GetInFilePath() string {
 	return fmt.Sprintf("%v/in.pdf", _x.ID)
+}
+
+//GetSignedFilePath returns S3 path for the SIGNED file
+func (_x *Order) GetSignedFilePath() string {
+	return fmt.Sprintf("%v/signed.pdf", _x.ID)
 }

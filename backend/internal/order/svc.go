@@ -74,6 +74,7 @@ func (_x *Service) Create(_in *CreateInput) (*CreateOutput, error) {
 		Widgets:      []json.RawMessage{},
 		DocumentType: _in.DocumentType,
 		CreatedAt:    time.Now().Format(time.RFC3339),
+		Status:       StatusNew,
 	}
 	//TODO: Validate PublicKey and Signature
 	if err := _x.Writer.Create(s); err != nil {
