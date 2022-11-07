@@ -52,6 +52,32 @@ export const AuthProvider = ({ children }) => {
     await connectToWallet()
   }
 
+  const me = (order) => {
+    let first_name = '';
+    let last_name = '';
+    if (role === 'notary') {
+      first_name = order.notary_joined?.first_name;
+      last_name = order.notary_joined?.last_name;
+    }
+
+    if (role === 'participant') {
+      first_name = order.participants_joined[accountAddress]?.first_name;
+      last_name = order.participants_joined[accountAddress]?.last_name;
+    }
+
+    if (role === 'witness') {
+      first_name = order.witnesses_joined[accountAddress]?.first_name;
+      last_name = order.witnesses_joined[accountAddress]?.last_name;
+    }
+
+    return {
+      first_name: first_name,
+      last_name: last_name,
+      public_key: accountAddress,
+      role: role,
+    };
+  }
+
   const value = useMemo(
     () => ({
       isConnected,
@@ -59,7 +85,8 @@ export const AuthProvider = ({ children }) => {
       role,
       setRole,
       logout,
-      login
+      login,
+      me,
     }),
     [isConnected, role, setRole, login, logout, accountAddress]
   )

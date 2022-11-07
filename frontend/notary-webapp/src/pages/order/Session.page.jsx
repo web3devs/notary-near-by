@@ -5,11 +5,13 @@ import Editor from '../../components/Editor/Editor';
 import { useParams } from 'react-router-dom'
 import { useAuth } from '../../context'
 import { getOrder } from '../../api';
+import { JitsiMeeting } from '@jitsi/react-sdk';
 
 export default () => {
+  const [m, setM] = useState(null);
   const [order, setOrder] = useState(undefined);
   const [downloadURL, setDownloadURL] = useState(undefined);
-  const { accountAddress } = useAuth()
+  const { accountAddress, me } = useAuth()
   const pms = useParams();
 
   useEffect(() => {
@@ -18,6 +20,7 @@ export default () => {
         const { order, download_url } = await getOrder(pms.id);
         setOrder({ ...order });
         setDownloadURL(download_url);
+        setM(me({...order}));
       }
     })()
   }, [pms]);
@@ -28,7 +31,19 @@ export default () => {
       <div className="flex flex-column justify-content-center align-items-center mt-4">
         {!order && ('Loading....')}
         {order && (
-          <Editor order={order} downloadURL={downloadURL} publicKey={accountAddress} signature={'TODO'} />
+          <>
+            <JitsiMeeting
+              roomName={order.id}
+              userInfo={{
+                displayName: `${m.first_name} ${m.last_name}`
+              }}
+              getIFrameRef={node => {
+                node.style.width = '800px'
+                node.style.height = '600px'
+              }}
+            />
+            <Editor order={order} downloadURL={downloadURL} publicKey={accountAddress} signature={'TODO'} />
+          </>
         )}
 
         {/* {isWaiting ? (
