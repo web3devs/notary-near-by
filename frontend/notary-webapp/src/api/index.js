@@ -58,6 +58,21 @@ export const signUpParticipant = async (
   return data
 }
 
+export const signUpNotary = async (
+  address,
+  signature,
+  firstName,
+  lastName
+) => {
+  const { data } = await api.post(`/notaries`, {
+    public_key: address,
+    signature: signature,
+    first_name: firstName,
+    last_name: lastName
+  })
+  return data
+}
+
 export const getOwnersOrders = async (ownerAddress) => {
   const { data } = await api.get(`/orders-by-owner/${ownerAddress}`)
   return data || []

@@ -2,35 +2,48 @@ import { FileUpload, InputText } from 'primereact'
 import { Button } from 'primereact'
 import { useRef, useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { signUpNotary } from '../../contracts'
+import { signUpNotary } from '../../api';
+import { useAuth } from '../../context'
 
 export default () => {
   const [isSubmiting, setIsSubmiting] = useState(false)
-  const [companyName, setCompanyName] = useState('')
+  const [firstName, setFirstName] = useState('')
+  const [lastName, setLastName] = useState('')
   const [license, setLicense] = useState(null)
   const [stamp, setStamp] = useState(null)
   const licenseFileUploadRef = useRef()
   const stampFileUploadRef = useRef()
   const navigate = useNavigate()
+  const { accountAddress, signature } = useAuth()
 
   const handleSubmit = useCallback(async () => {
     setIsSubmiting(true)
-    await signUpNotary(companyName, license, stamp)
+    await signUpNotary(accountAddress, signature, firstName, lastName)
     setIsSubmiting(false)
     navigate('/notary')
-  }, [companyName, license, stamp])
+  }, [accountAddress, signature, firstName, lastName, license, stamp])
 
   return (
     <div>
       <h1>Sign up as a Notary</h1>
       <span className="p-float-label mb-2">
         <InputText
-          id="companyName"
+          id="firstName"
           disabled={isSubmiting}
-          value={companyName}
-          onChange={(e) => setCompanyName(e.target.value)}
+          value={firstName}
+          onChange={(e) => setFirstName(e.target.value)}
         />
-        <label htmlFor="companyName">Company name</label>
+        <label htmlFor="firstName">First name</label>
+      </span>
+
+      <span className="p-float-label mb-2">
+        <InputText
+          id="lastName"
+          disabled={isSubmiting}
+          value={lastName}
+          onChange={(e) => setLastName(e.target.value)}
+        />
+        <label htmlFor="lastName">Last name</label>
       </span>
       <div className="flex flex-start gap-2 mb-2">
         <Button
