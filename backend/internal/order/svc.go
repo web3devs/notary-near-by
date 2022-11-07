@@ -131,3 +131,23 @@ func (_x *Service) WitnessJoined(o *Order, pk _pk.PublicKey, p *Person) error {
 
 	return fmt.Errorf("witness not found")
 }
+
+//GetOne returns order with download URL
+func (_x *Service) GetOne(_in *GetOneInput) (*GetOneOutput, error) {
+	var r GetOneOutput
+
+	o, err := _x.Reader.GetOne(_in.OrderID)
+	if err != nil {
+		return nil, fmt.Errorf("could not find Order: %w", err)
+	}
+
+	downloadURL, err := _x.bucket.GetDownloadURL(o.GetInFilePath())
+	if err != nil {
+		return nil, fmt.Errorf("could not create download URL: %w", err)
+	}
+
+	r.Order = o
+	r.DownloadURL = downloadURL
+
+	return &r, nil
+}

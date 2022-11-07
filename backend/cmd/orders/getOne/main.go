@@ -16,7 +16,7 @@ import (
 
 //Handler lambda entrypoint
 func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-	os, err := ps.Reader.GetOne(request.PathParameters["order_id"])
+	os, err := ps.GetOne(&_os.GetOneInput{OrderID: request.PathParameters["order_id"]})
 	if err != nil {
 		return _api.ResponseNotFound(fmt.Errorf("Failed fetching Order: %w", err)), nil
 	}

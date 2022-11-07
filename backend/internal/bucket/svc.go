@@ -42,3 +42,17 @@ func (_x *Service) GetUploadURL(fileName string) (string, error) {
 
 	return url, nil
 }
+
+//GetDownloadURL returns download URL
+func (_x *Service) GetDownloadURL(fileName string) (string, error) {
+	req, _ := _x.s3c.GetObjectRequest(&s3.GetObjectInput{
+		Bucket: aws.String(_x.bucket),
+		Key:    aws.String(fileName),
+	})
+	urlStr, err := req.Presign(60 * time.Minute)
+	if err != nil {
+		return "", err
+	}
+
+	return urlStr, nil
+}

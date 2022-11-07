@@ -19,3 +19,14 @@ type CreateOutput struct {
 	Order     *Order `json:"order"`
 	UploadURL string `json:"upload_url"`
 }
+
+//GetOneInput input for getting Order with additional fields
+type GetOneInput struct {
+	OrderID string `json:"order_id"`
+}
+
+//GetOneOutput result of GetOneInput
+type GetOneOutput struct {
+	Order       *Order `json:"order"`
+	DownloadURL string `json:"download_url"`
+}
