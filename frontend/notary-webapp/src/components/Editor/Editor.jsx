@@ -19,6 +19,7 @@ import {
 import { Flow } from './Flow'
 import { Participants } from './Participants'
 import { Signatures } from './Signatures'
+import { Mint } from './Mint'
 
 const Editor = ({ order, downloadURL, publicKey, signature }) => {
   const [body, setBody] = useState('');
@@ -35,6 +36,8 @@ const Editor = ({ order, downloadURL, publicKey, signature }) => {
     canvasRef,
   });
   const [ widgets, setWidgets ] = useState([]);
+  const [ status, setStatus ] = useState(null);
+  const [participantsJoined, setParticipantsJoined] = useState([]);
   const toast = useRef(null);
   const {
     ws,
@@ -75,7 +78,8 @@ const Editor = ({ order, downloadURL, publicKey, signature }) => {
           const a = JSON.parse(evt.data);
           if (a.action === 'update-order') {
             setWidgets([...a.data.widgets]);
-            // setOrder({ ...a.data });
+            setStatus({ ...a.data }.status);
+            setParticipantsJoined({ ...a.data }.participants_joined);
           }
         }
       });
@@ -153,7 +157,7 @@ const Editor = ({ order, downloadURL, publicKey, signature }) => {
       case 'text':
         return <TextWidget order={order} disabled={role !== 'notary'} key={`widget-${widget.type}-${widget.id}`} widget={widget} updateWidget={upsertWidget} deleteWidget={deleteWidget} />
       case 'signature':
-        return <SignatureWidget order={order} disabled={role !== 'notary'} key={`widget-${widget.type}-${widget.id}`} widget={widget} updateWidget={upsertWidget} deleteWidget={deleteWidget} />
+        return <SignatureWidget status={status} participantsJoined={participantsJoined} disabled={role !== 'notary'} key={`widget-${widget.type}-${widget.id}`} widget={widget} updateWidget={upsertWidget} deleteWidget={deleteWidget} />
       default:
         break;
     }
@@ -194,14 +198,11 @@ const Editor = ({ order, downloadURL, publicKey, signature }) => {
     toast.current.show({ severity: 'error', summary: 'Error', detail: msg, life: 3000 })
   }
 
-  console.log('PDF Document: ', pdfDocument)
-  console.log('PDF Page: ', pdfPage);
-
   return (
     <div className="grid">
       <div className="col-12">
         ROLE: {role}<br />
-        Status: {order.status}<br />
+        Status: {status}<br />
         DownloadURL: <input type="text" value={downloadURL} />
       </div>
 
@@ -209,7 +210,7 @@ const Editor = ({ order, downloadURL, publicKey, signature }) => {
       <div className="col-2">
         {
           role === 'notary' && (
-            <Flow />
+            <Flow orderID={order.id} />
           )
         }
 
@@ -274,6 +275,12 @@ const Editor = ({ order, downloadURL, publicKey, signature }) => {
           <Participants {...order} />
         </div>
       )}
+
+      {
+        order && (
+          <Mint status={status} />
+        )
+      }
     </div>
   )};
 

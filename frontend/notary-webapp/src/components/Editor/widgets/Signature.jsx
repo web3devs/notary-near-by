@@ -3,15 +3,18 @@ import { Rnd } from 'react-rnd';
 import { Dialog } from 'primereact/dialog';
 import { Dropdown } from 'primereact/dropdown';
 import { useAuth } from '../../../context';
+import { StatusNew, StatusStarted } from '../../../order';
 
-export const SignatureWidget = ({ disabled, widget, order, updateWidget, deleteWidget }) => {
+export const SignatureWidget = ({ disabled, widget, status, participantsJoined, updateWidget, deleteWidget }) => {
     let { x, y, value } = widget;
+    const [participants, setParticipants] = useState([]);
     const [valid, setValid] = useState(false);
     const [editMode, setEditMode] = useState(false);
+    const [isSignable, setIsSignable] = useState(false);
     const [signMode, setSignMode] = useState(false);
     const [v, setV] = useState({first_name: '', last_name: '', public_key: ''});
 
-    const { accountAddress } = useAuth();
+    const { accountAddress, role } = useAuth();
 
     useEffect(() => {
         if (value) {
@@ -28,18 +31,23 @@ export const SignatureWidget = ({ disabled, widget, order, updateWidget, deleteW
         setValid(false);
     }, [v]);
 
-    const { participants_joined } = order;
-    let participants = [];
-    if (participants_joined) {
-        for (const [k, p] of Object.entries(participants_joined)) {
-            participants.push({
-                label: `${p.first_name} ${p.last_name}`,
-                public_key: k,
-                first_name: p.first_name,
-                last_name: p.last_name,
-            })
+    useEffect(() => {
+        if (participantsJoined) {
+            let pts = [];
+            if (participantsJoined) {
+                for (const [k, p] of Object.entries(participantsJoined)) {
+                    pts.push({
+                        label: `${p.first_name} ${p.last_name}`,
+                        public_key: k,
+                        first_name: p.first_name,
+                        last_name: p.last_name,
+                    })
+                }
+                setParticipants(pts);
+            }
+            setIsSignable(role === 'participant' && status === StatusStarted);
         }
-    }
+    }, [participantsJoined]);
 
     const removeWidget = (e) => {
         e.preventDefault();
@@ -94,7 +102,7 @@ export const SignatureWidget = ({ disabled, widget, order, updateWidget, deleteW
             )}
 
             {
-                accountAddress === widget.value.public_key && (
+                (isSignable && accountAddress === widget.value.public_key) && (
                     <div className="sign-menu" onClick={() => { e.preventDefault(); e.stopPropagation(); }}>
                         <i className="pi pi-file-edit" onClick={toggleSign} />
                     </div>

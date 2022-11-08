@@ -20,26 +20,4 @@ export const Signatures = ({ publicKey, widgets, setPage }) => {
             </div>
         </>
     )
-
-    console.log('Sigs: ', sigs);
-
-    return 'TODO: Signatures';
-    // const nj = notary_joined;
-
-    // return (
-    //     <>
-    //         <div className="mb-2">
-    //             <strong>Notary:</strong><br />
-    //             {nj && (
-    //                 <Chip label={`${nj.first_name} ${nj.last_name}`} icon="pi pi-check" className="bg-green-500" />
-    //             )}
-    //             {!nj && (
-    //                 <Chip label={`Waiting for Notary`} icon="pi pi-times" className="bg-orange-500" />
-    //             )}
-    //         </div>
-
-    //         <UsersList prefix="participant" label="Participants" required={participants} joined={participants_joined ? participants_joined : []} />
-    //         <UsersList prefix="witness" label="Witnesses" required={witnesses} joined={witnesses_joined ? witnesses_joined : []} />
-    //     </>
-    // )
 };

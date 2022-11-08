@@ -46,7 +46,7 @@ export const WSProvider = ({ children }) => {
     }, [ws]);
 
     const join = async (orderID, publicKey, signature, role) => {
-        ws.send(
+        await ws.send(
             JSON.stringify({
                 order_id: orderID,
                 action: 'join',
@@ -79,6 +79,19 @@ export const WSProvider = ({ children }) => {
         }));
     };
 
+    const ceremonyAction = async (orderID, publicKey, signature, action) => {
+        await ws.send(
+            JSON.stringify({
+                order_id: orderID,
+                action: `ceremony-${action}`,
+                data: {
+                    public_key: publicKey,
+                    signature: signature,
+                },
+            })
+        );
+    }
+
     const value = useMemo(
         () => ({
             ws,
@@ -86,6 +99,7 @@ export const WSProvider = ({ children }) => {
             join,
             sendMessage,
             ping,
+            ceremonyAction,
         }),
         [ws, msgs]
     )

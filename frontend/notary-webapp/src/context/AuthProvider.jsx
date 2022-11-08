@@ -28,14 +28,17 @@ export const AuthProvider = ({ children }) => {
   const [noProvider, setNoProvider] = useState(false)
   const [role, setRole] = useState(null)
   const [accountAddress, setAccountAddress] = useState(null)
+  const [signature, setSignature] = useState(null)
 
   useEffect(() => {
     registerCallback('auth', async () => {
       const addres = getAccountAddress()
       if (addres) {
         setAccountAddress(getAccountAddress())
+        setSignature(store.getSignature())
       } else {
         setAccountAddress(null)
+        setSignature(null)
         store.clear()
       }
     })
@@ -94,6 +97,8 @@ export const AuthProvider = ({ children }) => {
     () => ({
       isConnected,
       accountAddress,
+      publicKey: accountAddress,
+      signature,
       role,
       setRole,
       logout,
