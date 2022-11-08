@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	"os"
 
@@ -309,6 +310,32 @@ func Handler(context context.Context, records events.SNSEvent) error {
 			}
 
 			fmt.Println("len(widgets2): ", len(o.Widgets))
+			a, err := json.Marshal(struct {
+				Action string     `json:"action"`
+				Data   *_os.Order `json:"data"`
+			}{
+				Action: "update-order",
+				Data:   o,
+			})
+
+			postToConnections(cs, "", a)
+			break
+		case _ss.ActionCeremonyStart:
+			fallthrough
+		case _ss.ActionCeremonyFinish:
+			fallthrough
+		case _ss.ActionCeremonyCancel:
+			//TODO: Verify public key and signature
+			s := strings.ReplaceAll(string(m.Action.Action), "ceremony-", "") //a little hack
+			_, err := oss.CeremonyStatusChanged(&_os.CeremonyStatusChangedInput{
+				Order:  o,
+				Status: s,
+			})
+			if err != nil {
+				fmt.Println("ERROR: failed updating order status: ", err)
+				continue
+			}
+
 			a, err := json.Marshal(struct {
 				Action string     `json:"action"`
 				Data   *_os.Order `json:"data"`

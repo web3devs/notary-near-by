@@ -13,6 +13,15 @@ type Status string
 //StatusNew for new Orders
 const StatusNew Status = "new"
 
+//StatusStarted for started Orders
+const StatusStarted Status = "started"
+
+//StatusFinished for finished Orders
+const StatusFinished Status = "finished"
+
+//StatusCanceled for canceled Orders
+const StatusCanceled Status = "canceled"
+
 //Person personal data
 type Person struct {
 	FirstName string `json:"first_name"`

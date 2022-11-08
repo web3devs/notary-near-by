@@ -56,3 +56,12 @@ func (_x *Writer) WitnessJoined(i *Order) error {
 		Set("WitnessesJoined", i.WitnessesJoined).
 		Value(i)
 }
+
+//UpdateStatus update status in DB
+func (_x *Writer) UpdateStatus(i *Order) error {
+	return _x.svc.DB.Table(_x.svc.TableName).
+		Update("Owner", i.Owner).
+		Range("ID", i.ID).
+		Set("Status", i.Status).
+		Value(i)
+}

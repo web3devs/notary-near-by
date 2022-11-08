@@ -30,3 +30,14 @@ type GetOneOutput struct {
 	Order       *Order `json:"order"`
 	DownloadURL string `json:"download_url"`
 }
+
+//CeremonyStatusChangedInput input for changing status of ceremony
+type CeremonyStatusChangedInput struct {
+	Order  *Order `json:"order"`
+	Status string `json:"status"`
+}
+
+//CeremonyStatusChangedOutput result of CeremonyStatusChangedInput
+type CeremonyStatusChangedOutput struct {
+	Order *Order `json:"order"`
+}

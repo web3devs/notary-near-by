@@ -152,3 +152,25 @@ func (_x *Service) GetOne(_in *GetOneInput) (*GetOneOutput, error) {
 
 	return &r, nil
 }
+
+//CeremonyStatusChanged sets connected Witness
+func (_x *Service) CeremonyStatusChanged(_in *CeremonyStatusChangedInput) (*CeremonyStatusChangedOutput, error) {
+	s := StatusNew
+	switch _in.Status {
+	case "start":
+		s = StatusStarted
+	case "finish":
+		s = StatusFinished
+	case "cancel":
+		s = StatusCanceled
+	}
+
+	_in.Order.Status = s
+	if err := _x.Writer.UpdateStatus(_in.Order); err != nil {
+		return nil, fmt.Errorf("failed updating status: %w", err)
+	}
+
+	return &CeremonyStatusChangedOutput{
+		Order: _in.Order,
+	}, nil
+}

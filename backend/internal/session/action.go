@@ -20,6 +20,15 @@ const (
 
 	//ActionUpdateWidget for updating widgets
 	ActionUpdateWidget ActionType = "update-widget"
+
+	//ActionCeremonyStart for starting the ceremony
+	ActionCeremonyStart ActionType = "ceremony-start"
+
+	//ActionCeremonyFinish for finishing the ceremony
+	ActionCeremonyFinish ActionType = "ceremony-finish"
+
+	//ActionCeremonyCancel for canceling the ceremony
+	ActionCeremonyCancel ActionType = "ceremony-cancel"
 )
 
 //Action is our client action
