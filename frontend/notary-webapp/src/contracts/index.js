@@ -1,7 +1,7 @@
 import { ethers } from 'ethers'
 import { utils } from 'ethers'
 
-const provider = new ethers.providers.Web3Provider(window.ethereum, 'any')
+let provider = null
 let signer = null
 let accountAddress = null
 const callbacks = {}
@@ -44,8 +44,10 @@ export const connectToWallet = async () => {
   signer = provider.getSigner()
   return signer
 }
-;(async () => {
+
+export const initProvider = async () => {
   if (window.ethereum) {
+    provider = new ethers.providers.Web3Provider(window.ethereum, 'any')
     const accounts = await provider.listAccounts()
     if (accounts.length > 0) {
       signer = provider.getSigner()
@@ -60,9 +62,9 @@ export const connectToWallet = async () => {
       notifyCallbacks()
     })
   } else {
-    console.error('this brawser does not support ethereum')
+    throw new Error('this brawser does not support ethereum')
   }
-})()
+}
 
 export const signUpNotary = (companyName, notaryLicenseFile, stampFile) => {
   // add actual contract interaction here
