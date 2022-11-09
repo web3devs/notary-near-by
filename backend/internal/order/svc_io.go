@@ -41,3 +41,10 @@ type CeremonyStatusChangedInput struct {
 type CeremonyStatusChangedOutput struct {
 	Order *Order `json:"order"`
 }
+
+type GeneratePDFInput struct {
+	Order *Order `json:"order"`
+}
+type GeneratePDFOutput struct {
+	Order *Order `json:"order"`
+}

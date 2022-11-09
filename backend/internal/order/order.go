@@ -51,6 +51,11 @@ func (_x *Order) GetInFilePath() string {
 	return fmt.Sprintf("%v/in.pdf", _x.ID)
 }
 
+//GetOutFilePath returns S3 path for the uploaded file (WIDGETS APPLIED)
+func (_x *Order) GetOutFilePath() string {
+	return fmt.Sprintf("%v/out.pdf", _x.ID)
+}
+
 //GetSignedFilePath returns S3 path for the SIGNED file
 func (_x *Order) GetSignedFilePath() string {
 	return fmt.Sprintf("%v/signed.pdf", _x.ID)

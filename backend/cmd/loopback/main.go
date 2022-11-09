@@ -70,9 +70,7 @@ func handleActionJoin(m *_ss.DispatchActionInput, o *_os.Order, s *_ss.Session, 
 		Role      string        `json:"role"`
 	}
 	if err := json.Unmarshal(*m.Action.Data, &tmp); err != nil {
-		e := fmt.Errorf("failed unmarshaling action: %w", err)
-		fmt.Println("ERROR: ", e)
-		return e
+		return fmt.Errorf("failed unmarshaling action: %w", err)
 	}
 
 	switch tmp.Role {
@@ -80,9 +78,7 @@ func handleActionJoin(m *_ss.DispatchActionInput, o *_os.Order, s *_ss.Session, 
 		//Find registered user (Participant or Notary, notary takes precedence) and fill in Order details
 		n, err := ns.Reader.GetOne(tmp.PublicKey)
 		if err != nil {
-			e := fmt.Errorf("notary not found: %w", err)
-			fmt.Println("ERROR: ", e)
-			return e
+			return fmt.Errorf("notary not found: %w", err)
 		}
 
 		if n.PublicKey != "" {
@@ -90,45 +86,35 @@ func handleActionJoin(m *_ss.DispatchActionInput, o *_os.Order, s *_ss.Session, 
 				FirstName: n.FirstName,
 				LastName:  n.LastName,
 			}); err != nil {
-				e := fmt.Errorf("faild connecting notary: %w", err)
-				fmt.Println("ERROR: ", e)
-				return e
+				return fmt.Errorf("faild connecting notary: %w", err)
 			}
 		}
 		break
 	case "participant":
 		p, err := ps.Reader.GetOne(tmp.PublicKey)
 		if err != nil {
-			e := fmt.Errorf("participant not found: %w", err)
-			fmt.Println("ERROR: ", e)
-			return e
+			return fmt.Errorf("participant not found: %w", err)
 		}
 		if p.PublicKey != "" {
 			if err := oss.ParticipantJoined(o, tmp.PublicKey, &_os.Person{
 				FirstName: p.FirstName,
 				LastName:  p.LastName,
 			}); err != nil {
-				e := fmt.Errorf("faild connecting participant: %w", err)
-				fmt.Println("ERROR: ", e)
-				return e
+				return fmt.Errorf("faild connecting participant: %w", err)
 			}
 		}
 		break
 	case "witness":
 		p, err := ps.Reader.GetOne(tmp.PublicKey)
 		if err != nil {
-			e := fmt.Errorf("participant not found: %w", err)
-			fmt.Println("ERROR: ", e)
-			return e
+			return fmt.Errorf("participant not found: %w", err)
 		}
 		if p.PublicKey != "" {
 			if err := oss.WitnessJoined(o, tmp.PublicKey, &_os.Person{
 				FirstName: p.FirstName,
 				LastName:  p.LastName,
 			}); err != nil {
-				e := fmt.Errorf("faild connecting participant: %w", err)
-				fmt.Println("ERROR: ", e)
-				return e
+				return fmt.Errorf("faild connecting participant: %w", err)
 			}
 		}
 		break
@@ -139,9 +125,7 @@ func handleActionJoin(m *_ss.DispatchActionInput, o *_os.Order, s *_ss.Session, 
 	//if ok - update Session with provided OrderID
 	s.OrderID = m.Action.OrderID
 	if err := ss.Writer.JoinSession(s); err != nil {
-		e := fmt.Errorf("failed joining session: %w", err)
-		fmt.Println("ERROR: ", e)
-		return e
+		return fmt.Errorf("failed joining session: %w", err)
 	}
 
 	return notifyUpdateOrder(cs, o)
@@ -155,9 +139,7 @@ func handleActionUpdateWidget(m *_ss.DispatchActionInput, o *_os.Order, s *_ss.S
 	}
 	err := json.Unmarshal(*m.Action.Data, &tmp)
 	if err != nil {
-		e := fmt.Errorf("failed unmarshaling action: %w", err)
-		fmt.Println("ERROR: ", e)
-		return e
+		return fmt.Errorf("failed unmarshaling action: %w", err)
 	}
 
 	type wid struct {
@@ -167,25 +149,19 @@ func handleActionUpdateWidget(m *_ss.DispatchActionInput, o *_os.Order, s *_ss.S
 	widget := wid{}
 	err = json.Unmarshal(tmp.Widget, &widget)
 	if err != nil {
-		e := fmt.Errorf("failed unmarshaling incoming widget: %w", err)
-		fmt.Println("ERROR: ", e)
-		return e
+		return fmt.Errorf("failed unmarshaling incoming widget: %w", err)
 	}
 
 	for k, w := range o.Widgets {
 		wg := wid{}
 		err := json.Unmarshal(w, &wg)
 		if err != nil {
-			e := fmt.Errorf("failed unmarshaling widget: %w", err)
-			fmt.Println("ERROR: ", e)
-			return e
+			return fmt.Errorf("failed unmarshaling widget: %w", err)
 		}
 		if wg.ID == widget.ID {
 			o.Widgets[k] = tmp.Widget
 			if err := oss.Writer.UpdateWidgets(o); err != nil {
-				e := fmt.Errorf("failed updating widgets: %w", err)
-				fmt.Println("ERROR: ", e)
-				return e
+				return fmt.Errorf("failed updating widgets: %w", err)
 			}
 			break
 		}
@@ -202,9 +178,7 @@ func handleActionAddWidget(m *_ss.DispatchActionInput, o *_os.Order, s *_ss.Sess
 	}
 	err := json.Unmarshal(*m.Action.Data, &tmp)
 	if err != nil {
-		e := fmt.Errorf("failed unmarshaling action: %w", err)
-		fmt.Println("ERROR: ", e)
-		return e
+		return fmt.Errorf("failed unmarshaling action: %w", err)
 	}
 
 	type wid struct {
@@ -214,16 +188,12 @@ func handleActionAddWidget(m *_ss.DispatchActionInput, o *_os.Order, s *_ss.Sess
 	widget := wid{}
 	err = json.Unmarshal(tmp.Widget, &widget)
 	if err != nil {
-		e := fmt.Errorf("failed unmarshaling incoming widget: %w", err)
-		fmt.Println("ERROR: ", e)
-		return e
+		return fmt.Errorf("failed unmarshaling incoming widget: %w", err)
 	}
 
 	o.Widgets = append(o.Widgets, tmp.Widget)
 	if err := oss.Writer.UpdateWidgets(o); err != nil {
-		e := fmt.Errorf("failed updating widgets: %w", err)
-		fmt.Println("ERROR: ", e)
-		return e
+		return fmt.Errorf("failed updating widgets: %w", err)
 	}
 
 	return notifyUpdateOrder(cs, o)
@@ -237,9 +207,7 @@ func handleActionRemoveWidget(m *_ss.DispatchActionInput, o *_os.Order, s *_ss.S
 	}
 	err := json.Unmarshal(*m.Action.Data, &tmp)
 	if err != nil {
-		e := fmt.Errorf("failed unmarshaling action: %w", err)
-		fmt.Println("ERROR: ", e)
-		return e
+		return fmt.Errorf("failed unmarshaling action: %w", err)
 	}
 
 	type wid struct {
@@ -249,9 +217,7 @@ func handleActionRemoveWidget(m *_ss.DispatchActionInput, o *_os.Order, s *_ss.S
 	widget := wid{}
 	err = json.Unmarshal(tmp.Widget, &widget)
 	if err != nil {
-		e := fmt.Errorf("failed unmarshaling incoming widget: %w", err)
-		fmt.Println("ERROR: ", e)
-		return e
+		return fmt.Errorf("failed unmarshaling incoming widget: %w", err)
 	}
 
 	ws := []json.RawMessage{}
@@ -259,9 +225,7 @@ func handleActionRemoveWidget(m *_ss.DispatchActionInput, o *_os.Order, s *_ss.S
 		wg := wid{}
 		err := json.Unmarshal(w, &wg)
 		if err != nil {
-			e := fmt.Errorf("failed unmarshaling widget: %w", err)
-			fmt.Println("ERROR: ", e)
-			return e
+			return fmt.Errorf("failed unmarshaling widget: %w", err)
 		}
 		fmt.Println("Widget: ", wg.ID)
 		if wg.ID != widget.ID {
@@ -271,9 +235,7 @@ func handleActionRemoveWidget(m *_ss.DispatchActionInput, o *_os.Order, s *_ss.S
 
 	o.Widgets = ws
 	if err := oss.Writer.UpdateWidgets(o); err != nil {
-		e := fmt.Errorf("failed updating widgets: %w", err)
-		fmt.Println("ERROR: ", e)
-		return e
+		return fmt.Errorf("failed updating widgets: %w", err)
 	}
 
 	return notifyUpdateOrder(cs, o)
@@ -287,12 +249,21 @@ func handleActionCeremonyStatusChanged(m *_ss.DispatchActionInput, o *_os.Order,
 		Status: status,
 	})
 	if err != nil {
-		e := fmt.Errorf("failed updating order status: %w", err)
-		fmt.Println("ERROR: ", e)
-		return e
+		return fmt.Errorf("failed updating order status: %w", err)
 	}
 
 	return notifyUpdateOrder(cs, o)
+}
+
+func handleActionCeremonyFinish(m *_ss.DispatchActionInput, o *_os.Order, s *_ss.Session, cs []_ss.Session) error {
+	_, err := oss.GeneratePDF(&_os.GeneratePDFInput{
+		Order: o,
+	})
+	if err != nil {
+		return fmt.Errorf("failed generating PDF: %w", err)
+	}
+
+	return nil
 }
 
 // Handler is our lambda handler invoked by the `lambda.Start` function call
@@ -365,7 +336,10 @@ func Handler(context context.Context, records events.SNSEvent) error {
 				continue
 			}
 		case _ss.ActionCeremonyFinish:
-			fmt.Println("TODO: Generate document")
+			if err := handleActionCeremonyFinish(&m, o, &s, cs); err != nil {
+				fmt.Println("ERROR: ", err)
+				continue
+			}
 		}
 	}
 	return nil

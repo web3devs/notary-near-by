@@ -3,6 +3,7 @@ package order
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	_bucket "notarynearby/internal/bucket"
 	"notarynearby/internal/db"
 	_pk "notarynearby/internal/pk"
@@ -11,6 +12,8 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/gofrs/uuid"
+
+	_editor "notarynearby/internal/pdf"
 )
 
 //Service is the all in one entrypoint for managing Orders
@@ -171,6 +174,62 @@ func (_x *Service) CeremonyStatusChanged(_in *CeremonyStatusChangedInput) (*Cere
 	}
 
 	return &CeremonyStatusChangedOutput{
+		Order: _in.Order,
+	}, nil
+}
+
+//GeneratePDF applies _x.Widgets to Order's PDF IN file and stores it on S3
+func (_x *Service) GeneratePDF(_in *GeneratePDFInput) (*GeneratePDFOutput, error) {
+	fmt.Println("1. Fetch bytes from S3")
+	bts, err := _x.bucket.Download(_in.Order.GetInFilePath())
+	if err != nil {
+		return nil, fmt.Errorf("failed downloading file from S3: %w", err)
+	}
+	tmpFileIn := fmt.Sprintf("/tmp/%v-in.pdf", _in.Order.ID)
+	tmpFileOut := fmt.Sprintf("/tmp/%v-out.pdf", _in.Order.ID)
+
+	fmt.Println("2. Save bytes to /tmp/ORDER_ID-in.pdf")
+	if err := ioutil.WriteFile(tmpFileIn, bts, 0777); err != nil {
+		return nil, fmt.Errorf("failed writing IN.pdf to /tmp: %w", err)
+	}
+
+	fmt.Println("3. Init editor with the temp file and apply fields")
+	e := _editor.New(tmpFileIn)
+	if e == nil {
+		return nil, fmt.Errorf("failed initiating Editor")
+	}
+
+	j, err := json.Marshal(_in.Order.Widgets)
+	if err != nil {
+		return nil, fmt.Errorf("failed JSON marshaling Order.Widgets: %w", err)
+	}
+
+	if err := e.LoadWidgets([]byte(j)); err != nil {
+		return nil, fmt.Errorf("failed loading widgets to Editor: %w", err)
+	}
+
+	e.RenderFields()
+
+	fmt.Println("4. Save files to /tmp/orderID/out.pdf")
+	if err := e.SaveToFile(tmpFileOut); err != nil {
+		return nil, fmt.Errorf("failed saving OUT.pdf file to /tmp: %w", err)
+	}
+
+	fmt.Println("5. Send /tmp/orderID/out.pdf to S3 for signing")
+	f, err := os.Open(tmpFileOut)
+	if err != nil {
+		return nil, fmt.Errorf("failed opening OUT.pdf file: %w", err)
+	}
+
+	if err := _x.bucket.Upload(_in.Order.GetOutFilePath(), f); err != nil {
+		return nil, fmt.Errorf("failed uploading OUT.pdf to S3: %w", err)
+	}
+
+	fmt.Println("6. Remove directory and it's contents /tmp/orderID")
+	os.Remove(tmpFileIn)
+	os.Remove(tmpFileOut)
+
+	return &GeneratePDFOutput{
 		Order: _in.Order,
 	}, nil
 }

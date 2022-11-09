@@ -3,6 +3,8 @@ package pdf
 import (
 	"encoding/json"
 	"fmt"
+	"io"
+	"os"
 
 	"github.com/go-pdf/fpdf"
 	"github.com/go-pdf/fpdf/contrib/gofpdi"
@@ -16,16 +18,32 @@ type Editor struct {
 	templates  []int
 	textFields []TextField
 	dateFields []DateField
+	rs         *io.ReadSeeker
+	imp        *gofpdi.Importer
 }
 
 //New instantiates Editor with provided original PDF file
 func New(filePath string) *Editor {
-	pdf := fpdf.New("P", "pt", "A4", "")
+	var imp *gofpdi.Importer
+	var rs io.ReadSeeker
+	pdf := fpdf.New("P", "pt", "Letter", "")
+
 	pageSizes := map[int]map[string]map[string]float64{}
 
 	if filePath != "" {
-		gofpdi.ImportPage(pdf, filePath, 1, "/MediaBox")
-		pageSizes = gofpdi.GetPageSizes()
+		// gofpdi.ImportPage(pdf, filePath, 1, "/MediaBox")
+		// pageSizes = gofpdi.GetPageSizes()
+
+		f, err := os.Open(filePath)
+		if err != nil {
+			return nil
+		}
+		rs = io.ReadSeeker(f)
+
+		fmt.Println("F: ", f)
+		imp = gofpdi.NewImporter()
+		imp.ImportPageFromStream(pdf, &rs, 1, "/MediaBox")
+		pageSizes = imp.GetPageSizes()
 	}
 
 	editor := &Editor{
@@ -33,6 +51,8 @@ func New(filePath string) *Editor {
 		pdf:       pdf,
 		pageSizes: pageSizes,
 		templates: []int{},
+		rs:        &rs,
+		imp:       imp,
 	}
 
 	editor.LoadTemplates()
@@ -45,7 +65,8 @@ func (_x *Editor) LoadTemplates() {
 	ipagesLen := len(_x.pageSizes)
 	for p := 0; p < ipagesLen; p++ {
 		if p >= len(_x.templates) {
-			_x.templates = append(_x.templates, gofpdi.ImportPage(_x.pdf, _x.filePath, p+1, "/MediaBox"))
+			// _x.templates = append(_x.templates, gofpdi.ImportPage(_x.pdf, _x.filePath, p+1, "/MediaBox"))
+			_x.templates = append(_x.templates, _x.imp.ImportPageFromStream(_x.pdf, _x.rs, p+1, "/MediaBox"))
 		}
 	}
 }
@@ -53,7 +74,8 @@ func (_x *Editor) LoadTemplates() {
 //loadPage loads single page template
 func (_x *Editor) loadPage(p int) {
 	mbox := _x.pageSizes[p]["/MediaBox"]
-	gofpdi.UseImportedTemplate(_x.pdf, _x.templates[p], mbox["x"], mbox["y"], mbox["w"], mbox["h"])
+	// gofpdi.UseImportedTemplate(_x.pdf, _x.templates[p], mbox["x"], mbox["y"], mbox["w"], mbox["h"])
+	_x.imp.UseImportedTemplate(_x.pdf, _x.templates[p], mbox["x"], mbox["y"], mbox["w"], mbox["h"])
 }
 
 //RenderFields renders all defined fields to PDF
