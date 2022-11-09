@@ -136,8 +136,8 @@ functions:
           path: /orders-by-owner/{owner}
           method: get
 
-  ordersOnChange:
-    handler: bin/orders/onChange
+  # ordersOnChange:
+  #   handler: bin/orders/onChange
 
 
 #    The following are a few example events you can configure
