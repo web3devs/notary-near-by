@@ -15,14 +15,10 @@ export default () => {
   const { accountAddress } = useAuth()
   const navigate = useNavigate()
 
-  // const [type, setType] = useState(options[0])
   const [newAddress, setNewAddress] = useState('')
   const [showAddWitness, setShowAddWitness] = useState(false)
   const [showAddParticipant, setShowAddParticipant] = useState(false)
-  // const [witnesses, setWitnesses] = useState([])
-  // const [participants, setParticipants] = useState([])
   const [isSubmiting, setIsSubmiting] = useState(false)
-  // const [file, setFile] = useState(null)
   const { errors, formData, canSubmit, setFormField, submit } = useForm({
     data: {
       file: null,
@@ -185,7 +181,7 @@ export default () => {
       </Dialog>
       <Dialog
         visible={showAddParticipant}
-        onHide={() => showAddParticipant(false)}
+        onHide={() => setShowAddParticipant(false)}
         header="Add participant"
       >
         <div className="flex-column flex">
