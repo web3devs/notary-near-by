@@ -21,6 +21,7 @@ provider:
           - Ref: 'AWS::AccountId'
           - notarynearby-${self:provider.stage}-wssessions
     S3_ORDERS: ${self:service}-${opt:stage, self:provider.stage}-orders
+    S3_NOTARIES: ${self:service}-${opt:stage, self:provider.stage}-notaries
   iam:
     role:
       statements:
@@ -40,24 +41,8 @@ provider:
           Resource:
             - arn:aws:s3:::${self:service}-${opt:stage, self:provider.stage}-orders
             - arn:aws:s3:::${self:service}-${opt:stage, self:provider.stage}-orders/*
-
-# you can add statements to the Lambda function's IAM Role here
-#  iam:
-#    role:
-#      statements:
-#        - Effect: "Allow"
-#          Action:
-#            - "s3:ListBucket"
-#          Resource: { "Fn::Join" : ["", ["arn:aws:s3:::", { "Ref" : "ServerlessDeploymentBucket" } ] ]  }
-#        - Effect: "Allow"
-#          Action:
-#            - "s3:PutObject"
-#          Resource:
-#            Fn::Join:
-#              - ""
-#              - - "arn:aws:s3:::"
-#                - "Ref" : "ServerlessDeploymentBucket"
-#                - "/*"
+            - arn:aws:s3:::${self:service}-${opt:stage, self:provider.stage}-notaries
+            - arn:aws:s3:::${self:service}-${opt:stage, self:provider.stage}-notaries/*
 
 package:
   patterns:
@@ -75,6 +60,8 @@ functions:
 
   loopback:
     handler: bin/loopback
+    timeout: 900
+    memorySize: 2048
     events:
       - sns: 
           arn: !Ref WSSessionsTopic
@@ -139,59 +126,8 @@ functions:
   # ordersOnChange:
   #   handler: bin/orders/onChange
 
-
-#    The following are a few example events you can configure
-#    NOTE: Please make sure to change your handler code to work with those events
-#    Check the event documentation for details
-# events:
-#    events:
-#      - http:
-#          path: users/create
-#          method: get
-#      - websocket: $connect
-#      - s3: ${env:BUCKET}
-#      - schedule: rate(10 minutes)
-#      - sns: greeter-topic
-#      - stream: arn:aws:dynamodb:region:XXXXXX:table/foo/stream/1970-01-01T00:00:00.000
-#      - alexaSkill: amzn1.ask.skill.xx-xx-xx-xx
-#      - alexaSmartHome: amzn1.ask.skill.xx-xx-xx-xx
-#      - iot:
-#          sql: "SELECT * FROM 'some_topic'"
-#      - cloudwatchEvent:
-#          event:
-#            source:
-#              - "aws.ec2"
-#            detail-type:
-#              - "EC2 Instance State-change Notification"
-#            detail:
-#              state:
-#                - pending
-#      - cloudwatchLog: '/aws/lambda/hello'
-#      - cognitoUserPool:
-#          pool: MyUserPool
-#          trigger: PreSignUp
-#      - alb:
-#          listenerArn: arn:aws:elasticloadbalancing:us-east-1:XXXXXX:listener/app/my-load-balancer/50dc6c495c0c9188/
-#          priority: 1
-#          conditions:
-#            host: example.com
-#            path: /hello
-
-#    Define function environment variables here
-#    environment:
-#      variable2: value2
-
-# you can add CloudFormation resource templates here
-#resources:
-#  Resources:
-#    NewResource:
-#      Type: AWS::S3::Bucket
-#      Properties:
-#        BucketName: my-new-bucket
-#  Outputs:
-#     NewOutput:
-#       Description: "Description for the output"
-#       Value: "Some output value"
-
 resources:
-  - ${file(configs/sls/wssessions.yml)}
+  - ${file(configs/sls/notaries.yml)}
+  - ${file(configs/sls/participants.yml)}
+  - ${file(configs/sls/orders.yml)}
+  - ${file(configs/sls/sessions.yml)}
