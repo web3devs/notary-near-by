@@ -6,23 +6,8 @@ let signer = null
 let accountAddress = null
 const callbacks = {}
 
-export const signMessage = async (msg) => {
-  console.log('accountAddress', accountAddress)
-  const sig = await signer.signMessage('hello!')
-  // const hash = ethers.utils.keccak256(
-  //   '0x352aBe22d01AC782bbe79A042B79964f770B91e2'
-  // )
-  // console.log('rawHash', hash)
-  // console.log('hash', ethers.utils.arrayify(hash))
-  // const sig = await w.signMessage(ethers.utils.arrayify(hash))
-  // new ethers.utils.SigningKey()
-  console.log('sig', sig)
-  // const pk = ethers.utils.recoverPublicKey(hash, sig)
-  // console.log('pk', pk)
-
-  // const output = utils.verifyMessage(ethers.utils.arrayify(hash), sig)
-  // console.log(output)
-
+export const signMessage = async () => {
+  const sig = await signer.signMessage(accountAddress)
   return sig
 }
 
