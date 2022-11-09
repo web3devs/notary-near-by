@@ -21,7 +21,8 @@ import (
 	_ss "notarynearby/internal/session"
 )
 
-func postToConnections(sessions []_ss.Session, excludedConnectionID string, msg []byte) {
+func postToConnections(sessions []_ss.Session, excludedConnectionID string, msg []byte) error {
+	var errs []string
 	for _, c := range sessions {
 		if excludedConnectionID != "" && c.ConnectionID == excludedConnectionID {
 			continue
@@ -35,10 +36,263 @@ func postToConnections(sessions []_ss.Session, excludedConnectionID string, msg 
 		})
 		if err != nil {
 			fmt.Println("ERROR: failed posting to Connections: ", err)
+			errs = append(errs, fmt.Sprintf("failed posting to Connection %v: %v", c.ConnectionID, err))
 			continue
 		}
 	}
 
+	if len(errs) > 0 {
+		return fmt.Errorf("some errors: %v", strings.Join(errs, " | "))
+	}
+
+	return nil
+}
+
+func notifyUpdateOrder(cs []_ss.Session, o *_os.Order) error {
+	a, err := json.Marshal(struct {
+		Action string     `json:"action"`
+		Data   *_os.Order `json:"data"`
+	}{
+		Action: "update-order",
+		Data:   o,
+	})
+	if err != nil {
+		return fmt.Errorf("failed notifying about updated order: %w", err)
+	}
+
+	return postToConnections(cs, "", a)
+}
+
+func handleActionJoin(m *_ss.DispatchActionInput, o *_os.Order, s *_ss.Session, cs []_ss.Session) error {
+	var tmp struct {
+		PublicKey _pk.PublicKey `json:"public_key"`
+		Signature string        `json:"signature"`
+		Role      string        `json:"role"`
+	}
+	if err := json.Unmarshal(*m.Action.Data, &tmp); err != nil {
+		e := fmt.Errorf("failed unmarshaling action: %w", err)
+		fmt.Println("ERROR: ", e)
+		return e
+	}
+
+	switch tmp.Role {
+	case "notary":
+		//Find registered user (Participant or Notary, notary takes precedence) and fill in Order details
+		n, err := ns.Reader.GetOne(tmp.PublicKey)
+		if err != nil {
+			e := fmt.Errorf("notary not found: %w", err)
+			fmt.Println("ERROR: ", e)
+			return e
+		}
+
+		if n.PublicKey != "" {
+			if err := oss.NotaryJoined(o, &_os.Person{
+				FirstName: n.FirstName,
+				LastName:  n.LastName,
+			}); err != nil {
+				e := fmt.Errorf("faild connecting notary: %w", err)
+				fmt.Println("ERROR: ", e)
+				return e
+			}
+		}
+		break
+	case "participant":
+		p, err := ps.Reader.GetOne(tmp.PublicKey)
+		if err != nil {
+			e := fmt.Errorf("participant not found: %w", err)
+			fmt.Println("ERROR: ", e)
+			return e
+		}
+		if p.PublicKey != "" {
+			if err := oss.ParticipantJoined(o, tmp.PublicKey, &_os.Person{
+				FirstName: p.FirstName,
+				LastName:  p.LastName,
+			}); err != nil {
+				e := fmt.Errorf("faild connecting participant: %w", err)
+				fmt.Println("ERROR: ", e)
+				return e
+			}
+		}
+		break
+	case "witness":
+		p, err := ps.Reader.GetOne(tmp.PublicKey)
+		if err != nil {
+			e := fmt.Errorf("participant not found: %w", err)
+			fmt.Println("ERROR: ", e)
+			return e
+		}
+		if p.PublicKey != "" {
+			if err := oss.WitnessJoined(o, tmp.PublicKey, &_os.Person{
+				FirstName: p.FirstName,
+				LastName:  p.LastName,
+			}); err != nil {
+				e := fmt.Errorf("faild connecting participant: %w", err)
+				fmt.Println("ERROR: ", e)
+				return e
+			}
+		}
+		break
+	}
+
+	//TODO:
+	//verify signature/pubKey (see if pubKey matches signature AND pubKey exists in the Order!)
+	//if ok - update Session with provided OrderID
+	s.OrderID = m.Action.OrderID
+	if err := ss.Writer.JoinSession(s); err != nil {
+		e := fmt.Errorf("failed joining session: %w", err)
+		fmt.Println("ERROR: ", e)
+		return e
+	}
+
+	return notifyUpdateOrder(cs, o)
+}
+
+func handleActionUpdateWidget(m *_ss.DispatchActionInput, o *_os.Order, s *_ss.Session, cs []_ss.Session) error {
+	var tmp struct {
+		PublicKey string          `json:"public_key"`
+		Signature string          `json:"signature"`
+		Widget    json.RawMessage `json:"data"`
+	}
+	err := json.Unmarshal(*m.Action.Data, &tmp)
+	if err != nil {
+		e := fmt.Errorf("failed unmarshaling action: %w", err)
+		fmt.Println("ERROR: ", e)
+		return e
+	}
+
+	type wid struct {
+		ID string `json:"id"`
+	}
+
+	widget := wid{}
+	err = json.Unmarshal(tmp.Widget, &widget)
+	if err != nil {
+		e := fmt.Errorf("failed unmarshaling incoming widget: %w", err)
+		fmt.Println("ERROR: ", e)
+		return e
+	}
+
+	for k, w := range o.Widgets {
+		wg := wid{}
+		err := json.Unmarshal(w, &wg)
+		if err != nil {
+			e := fmt.Errorf("failed unmarshaling widget: %w", err)
+			fmt.Println("ERROR: ", e)
+			return e
+		}
+		if wg.ID == widget.ID {
+			o.Widgets[k] = tmp.Widget
+			if err := oss.Writer.UpdateWidgets(o); err != nil {
+				e := fmt.Errorf("failed updating widgets: %w", err)
+				fmt.Println("ERROR: ", e)
+				return e
+			}
+			break
+		}
+	}
+
+	return notifyUpdateOrder(cs, o)
+}
+
+func handleActionAddWidget(m *_ss.DispatchActionInput, o *_os.Order, s *_ss.Session, cs []_ss.Session) error {
+	var tmp struct {
+		PublicKey string          `json:"public_key"`
+		Signature string          `json:"signature"`
+		Widget    json.RawMessage `json:"data"`
+	}
+	err := json.Unmarshal(*m.Action.Data, &tmp)
+	if err != nil {
+		e := fmt.Errorf("failed unmarshaling action: %w", err)
+		fmt.Println("ERROR: ", e)
+		return e
+	}
+
+	type wid struct {
+		ID string `json:"id"`
+	}
+
+	widget := wid{}
+	err = json.Unmarshal(tmp.Widget, &widget)
+	if err != nil {
+		e := fmt.Errorf("failed unmarshaling incoming widget: %w", err)
+		fmt.Println("ERROR: ", e)
+		return e
+	}
+
+	o.Widgets = append(o.Widgets, tmp.Widget)
+	if err := oss.Writer.UpdateWidgets(o); err != nil {
+		e := fmt.Errorf("failed updating widgets: %w", err)
+		fmt.Println("ERROR: ", e)
+		return e
+	}
+
+	return notifyUpdateOrder(cs, o)
+}
+
+func handleActionRemoveWidget(m *_ss.DispatchActionInput, o *_os.Order, s *_ss.Session, cs []_ss.Session) error {
+	var tmp struct {
+		PublicKey string          `json:"public_key"`
+		Signature string          `json:"signature"`
+		Widget    json.RawMessage `json:"data"`
+	}
+	err := json.Unmarshal(*m.Action.Data, &tmp)
+	if err != nil {
+		e := fmt.Errorf("failed unmarshaling action: %w", err)
+		fmt.Println("ERROR: ", e)
+		return e
+	}
+
+	type wid struct {
+		ID string `json:"id"`
+	}
+
+	widget := wid{}
+	err = json.Unmarshal(tmp.Widget, &widget)
+	if err != nil {
+		e := fmt.Errorf("failed unmarshaling incoming widget: %w", err)
+		fmt.Println("ERROR: ", e)
+		return e
+	}
+
+	ws := []json.RawMessage{}
+	for _, w := range o.Widgets {
+		wg := wid{}
+		err := json.Unmarshal(w, &wg)
+		if err != nil {
+			e := fmt.Errorf("failed unmarshaling widget: %w", err)
+			fmt.Println("ERROR: ", e)
+			return e
+		}
+		fmt.Println("Widget: ", wg.ID)
+		if wg.ID != widget.ID {
+			ws = append(ws, w)
+		}
+	}
+
+	o.Widgets = ws
+	if err := oss.Writer.UpdateWidgets(o); err != nil {
+		e := fmt.Errorf("failed updating widgets: %w", err)
+		fmt.Println("ERROR: ", e)
+		return e
+	}
+
+	return notifyUpdateOrder(cs, o)
+}
+
+func handleActionCeremonyStatusChanged(m *_ss.DispatchActionInput, o *_os.Order, s *_ss.Session, cs []_ss.Session) error {
+	//TODO: Verify public key and signature
+	status := strings.ReplaceAll(string(m.Action.Action), "ceremony-", "") //a little hack
+	_, err := oss.CeremonyStatusChanged(&_os.CeremonyStatusChangedInput{
+		Order:  o,
+		Status: status,
+	})
+	if err != nil {
+		e := fmt.Errorf("failed updating order status: %w", err)
+		fmt.Println("ERROR: ", e)
+		return e
+	}
+
+	return notifyUpdateOrder(cs, o)
 }
 
 // Handler is our lambda handler invoked by the `lambda.Start` function call
@@ -75,94 +329,10 @@ func Handler(context context.Context, records events.SNSEvent) error {
 
 		switch m.Action.Action {
 		case _ss.ActionJoin:
-			var tmp struct {
-				PublicKey _pk.PublicKey `json:"public_key"`
-				Signature string        `json:"signature"`
-				Role      string        `json:"role"`
-			}
-			if err := json.Unmarshal(*m.Action.Data, &tmp); err != nil {
-				fmt.Println("ERROR: failed unmarshaling action: ", err)
+			if err := handleActionJoin(&m, o, &s, cs); err != nil {
+				fmt.Println("ERROR: ", err)
 				continue
 			}
-
-			switch tmp.Role {
-			case "notary":
-				//Find registered user (Participant or Notary, notary takes precedence) and fill in Order details
-				n, err := ns.Reader.GetOne(tmp.PublicKey)
-				if err != nil {
-					fmt.Println("WARNING: notary not found: ", err)
-					continue
-				}
-
-				if n.PublicKey != "" {
-					if err := oss.NotaryJoined(o, &_os.Person{
-						FirstName: n.FirstName,
-						LastName:  n.LastName,
-					}); err != nil {
-						fmt.Println("ERROR: faild connecting notary: ", err)
-						continue
-					}
-				}
-				break
-			case "participant":
-				p, err := ps.Reader.GetOne(tmp.PublicKey)
-				if err != nil {
-					fmt.Println("WARNING: participant not found: %", err)
-					continue
-				}
-				if p.PublicKey != "" {
-					if err := oss.ParticipantJoined(o, tmp.PublicKey, &_os.Person{
-						FirstName: p.FirstName,
-						LastName:  p.LastName,
-					}); err != nil {
-						fmt.Println("WARNING: faild connecting participant: ", err)
-						continue
-					}
-				}
-				break
-			case "witness":
-				p, err := ps.Reader.GetOne(tmp.PublicKey)
-				if err != nil {
-					fmt.Println("WARNING: participant not found: %", err)
-					continue
-				}
-				if p.PublicKey != "" {
-					if err := oss.WitnessJoined(o, tmp.PublicKey, &_os.Person{
-						FirstName: p.FirstName,
-						LastName:  p.LastName,
-					}); err != nil {
-						fmt.Println("WARNING: faild connecting participant: ", err)
-						continue
-					}
-				}
-				break
-			}
-
-			//TODO:
-			//verify signature/pubKey (see if pubKey matches signature AND pubKey exists in the Order!)
-			//if ok - update Session with provided OrderID
-			s.OrderID = m.Action.OrderID
-			if err := ss.Writer.JoinSession(&s); err != nil {
-				fmt.Println("ERROR: failed joining session: %", err)
-				continue
-			}
-
-			a, err := json.Marshal(struct {
-				Action string     `json:"action"`
-				Data   *_os.Order `json:"data"`
-			}{
-				Action: "update-order",
-				Data:   o,
-			})
-			if err != nil {
-				fmt.Println("ERROR: failed marshaling action: ", err)
-				continue
-			}
-
-			postToConnections(cs, "", a)
-
-			break
-
 		case _ss.ActionMessage:
 			a, err := json.Marshal(m.Action)
 			if err != nil {
@@ -173,179 +343,29 @@ func Handler(context context.Context, records events.SNSEvent) error {
 			postToConnections(cs, m.ConnectionID, a)
 			break
 		case _ss.ActionUpdateWidget:
-			var tmp struct {
-				PublicKey string          `json:"public_key"`
-				Signature string          `json:"signature"`
-				Widget    json.RawMessage `json:"data"`
-			}
-			err := json.Unmarshal(*m.Action.Data, &tmp)
-			if err != nil {
-				fmt.Println("ERROR: failed unmarshaling action: ", err)
+			if err := handleActionUpdateWidget(&m, o, &s, cs); err != nil {
+				fmt.Println("ERROR: ", err)
 				continue
 			}
-
-			type wid struct {
-				ID string `json:"id"`
-			}
-
-			widget := wid{}
-			err = json.Unmarshal(tmp.Widget, &widget)
-			if err != nil {
-				fmt.Println("ERROR: failed unmarshaling incoming widget: ", err)
-				continue
-			}
-
-			for k, w := range o.Widgets {
-				wg := wid{}
-				err := json.Unmarshal(w, &wg)
-				if err != nil {
-					fmt.Println("ERROR: failed unmarshaling widget: ", err)
-					continue
-				}
-				if wg.ID == widget.ID {
-					o.Widgets[k] = tmp.Widget
-					if err := oss.Writer.UpdateWidgets(o); err != nil {
-						fmt.Println("ERROR: failed updating widgets: ", err)
-						continue
-					}
-					break
-				}
-			}
-
-			a, err := json.Marshal(struct {
-				Action string     `json:"action"`
-				Data   *_os.Order `json:"data"`
-			}{
-				Action: "update-order",
-				Data:   o,
-			})
-
-			postToConnections(cs, "", a)
-			break
 		case _ss.ActionAddWidget:
-			var tmp struct {
-				PublicKey string          `json:"public_key"`
-				Signature string          `json:"signature"`
-				Widget    json.RawMessage `json:"data"`
-			}
-			err := json.Unmarshal(*m.Action.Data, &tmp)
-			if err != nil {
-				fmt.Println("ERROR: failed unmarshaling action: ", err)
+			if err := handleActionAddWidget(&m, o, &s, cs); err != nil {
+				fmt.Println("ERROR: ", err)
 				continue
 			}
-
-			type wid struct {
-				ID string `json:"id"`
-			}
-
-			widget := wid{}
-			err = json.Unmarshal(tmp.Widget, &widget)
-			if err != nil {
-				fmt.Println("ERROR: failed unmarshaling incoming widget: ", err)
-				continue
-			}
-
-			fmt.Println("widgets.pre: ", o.Widgets)
-			o.Widgets = append(o.Widgets, tmp.Widget)
-			fmt.Println("widgets.post: ", o.Widgets)
-			if err := oss.Writer.UpdateWidgets(o); err != nil {
-				fmt.Println("ERROR: failed updating widgets: ", err)
-				continue
-			}
-			fmt.Println("widgets.post2: ", o.Widgets)
-
-			a, err := json.Marshal(struct {
-				Action string     `json:"action"`
-				Data   *_os.Order `json:"data"`
-			}{
-				Action: "update-order",
-				Data:   o,
-			})
-			postToConnections(cs, "", a)
-			break
 		case _ss.ActionRemoveWidget:
-			var tmp struct {
-				PublicKey string          `json:"public_key"`
-				Signature string          `json:"signature"`
-				Widget    json.RawMessage `json:"data"`
-			}
-			err := json.Unmarshal(*m.Action.Data, &tmp)
-			if err != nil {
-				fmt.Println("ERROR: failed unmarshaling action: ", err)
+			if err := handleActionRemoveWidget(&m, o, &s, cs); err != nil {
+				fmt.Println("ERROR: ", err)
 				continue
 			}
-
-			type wid struct {
-				ID string `json:"id"`
-			}
-
-			widget := wid{}
-			err = json.Unmarshal(tmp.Widget, &widget)
-			if err != nil {
-				fmt.Println("ERROR: failed unmarshaling incoming widget: ", err)
-				continue
-			}
-
-			fmt.Println("Removing widget: ", widget.ID)
-			fmt.Println("len(widgets): ", len(o.Widgets))
-
-			ws := []json.RawMessage{}
-			for _, w := range o.Widgets {
-				wg := wid{}
-				err := json.Unmarshal(w, &wg)
-				if err != nil {
-					fmt.Println("ERROR: failed unmarshaling widget: ", err)
-					continue
-				}
-				fmt.Println("Widget: ", wg.ID)
-				if wg.ID != widget.ID {
-					ws = append(ws, w)
-				}
-			}
-			fmt.Println("len(ws): ", len(ws))
-			o.Widgets = ws
-			if err := oss.Writer.UpdateWidgets(o); err != nil {
-				fmt.Println("ERROR: failed updating widgets: ", err)
-				continue
-			}
-
-			fmt.Println("len(widgets2): ", len(o.Widgets))
-			a, err := json.Marshal(struct {
-				Action string     `json:"action"`
-				Data   *_os.Order `json:"data"`
-			}{
-				Action: "update-order",
-				Data:   o,
-			})
-
-			postToConnections(cs, "", a)
-			break
 		case _ss.ActionCeremonyStart:
 			fallthrough
-		case _ss.ActionCeremonyFinish:
-			fallthrough
 		case _ss.ActionCeremonyCancel:
-			//TODO: Verify public key and signature
-			s := strings.ReplaceAll(string(m.Action.Action), "ceremony-", "") //a little hack
-			_, err := oss.CeremonyStatusChanged(&_os.CeremonyStatusChangedInput{
-				Order:  o,
-				Status: s,
-			})
-			if err != nil {
-				fmt.Println("ERROR: failed updating order status: ", err)
+			if err := handleActionCeremonyStatusChanged(&m, o, &s, cs); err != nil {
+				fmt.Println("ERROR: ", err)
 				continue
 			}
-
-			a, err := json.Marshal(struct {
-				Action string     `json:"action"`
-				Data   *_os.Order `json:"data"`
-			}{
-				Action: "update-order",
-				Data:   o,
-			})
-
-			postToConnections(cs, "", a)
-			break
+		case _ss.ActionCeremonyFinish:
+			fmt.Println("TODO: Generate document")
 		}
 	}
 	return nil
