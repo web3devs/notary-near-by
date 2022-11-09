@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   connectToWallet,
+  disconnect,
   getAccountAddress,
   initProvider,
   registerCallback,
@@ -60,6 +61,7 @@ export const AuthProvider = ({ children }) => {
   }, [accountAddress])
 
   const logout = () => {
+    disconnect()
     store.clear()
   }
 

@@ -9,7 +9,6 @@ export default () => {
   const { isConnected, login } = useAuth()
   let from = location.state?.from?.pathname || '/'
   useEffect(() => {
-    console.log(isConnected, from)
     if (isConnected) {
       if (from) {
         navigate(from, { replace: true })
