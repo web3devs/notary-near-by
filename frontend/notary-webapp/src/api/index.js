@@ -11,32 +11,16 @@ const api = axios.create({
 
 const s3 = axios.create()
 
-// api.interceptors.request.use(
-//   (config) => {
-//     let { data } = config
-//     data = { ...data, public_key: 'eeee', signature: 'signature' }
-//     return { ...config, data }
-//   },
-//   (error) => {
-//     return Promise.reject(error)
-//   }
-// )
-
 api.interceptors.request.use(
   async (config) => {
-    let { data } = config
     let signature = store.getSignature()
-    console.log('signature', signature)
     if (!signature) {
       signature = await signMessage()
       store.saveSignature(signature)
     }
-    const sig = (data = {
-      ...data,
-      public_key: getAccountAddress(),
-      signature
-    })
-    return { ...config, data }
+    // config.headers['X-PublicKey'] = getAccountAddress()
+    // config.headers['X-Signature'] = store.getSignature()
+    return config
   },
   (error) => {
     return Promise.reject(error)
@@ -58,12 +42,7 @@ export const signUpParticipant = async (
   return data
 }
 
-export const signUpNotary = async (
-  address,
-  signature,
-  firstName,
-  lastName
-) => {
+export const signUpNotary = async (address, signature, firstName, lastName) => {
   const { data } = await api.post(`/notaries`, {
     public_key: address,
     signature: signature,
@@ -104,7 +83,7 @@ export const createOrer = async ({
   witnesses,
   documentType,
   accountAddress,
-  file,
+  file
 }) => {
   const { data } = await api.post('/orders', {
     owner: accountAddress,
@@ -114,16 +93,16 @@ export const createOrer = async ({
     file: {
       name: file.name,
       type: file.type,
-      size: file.size,
-    },
+      size: file.size
+    }
   })
 
   if (data['upload_url']) {
     const u = await s3.put(data['upload_url'], file, {
       headers: {
-        'x-amz-acl': 'private',
-      },
-    });
+        'x-amz-acl': 'private'
+      }
+    })
   }
 
   return data
