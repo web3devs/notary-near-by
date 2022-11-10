@@ -1,4 +1,6 @@
 import { ethers } from 'ethers'
+import contracts from '../settings/contracts.json'
+import NotaryContractABI from '../settings/Notary.json'
 
 let provider = null
 let signer = null
@@ -53,6 +55,22 @@ export const initProvider = async () => {
       notifyCallbacks()
     })
   } else {
-    throw new Error('this brawser does not support ethereum')
+    console.error('this browser does not support ethereum')
   }
+}
+
+/** See notaryMetadata.d.ts for the schema of NotaryMetadata **/
+export const signUpNotary = async notaryMetadata /* : NotaryMetadata */ => {
+  // TODO Save the metadata to IPFS
+  const metadataUrl = "foo"
+
+  const contractAddress = contracts.Notary
+  const abi = NotaryContractABI.abi
+  const contract = new ethers.Contract(contractAddress, abi, signer)
+  console.log('----contract')
+  const issueTokenReceipt = await contract.issueNotaryToken(accountAddress, notaryMetadata.notaryIdNumber, metadataUrl)
+  console.log(`---receipt`)
+  await issueTokenReceipt.wait()
+  console.log('=======done')
+
 }
