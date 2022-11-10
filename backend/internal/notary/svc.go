@@ -20,85 +20,6 @@ import (
 	"software.sslmate.com/src/go-pkcs12"
 )
 
-func genCert(template, parent *x509.Certificate, publicKey *rsa.PublicKey, privateKey *rsa.PrivateKey) (*x509.Certificate, []byte) {
-	certBytes, err := x509.CreateCertificate(rand.Reader, template, parent, publicKey, privateKey)
-	if err != nil {
-		panic("Failed to create certificate:" + err.Error())
-	}
-
-	cert, err := x509.ParseCertificate(certBytes)
-	if err != nil {
-		panic("Failed to parse certificate:" + err.Error())
-	}
-
-	b := pem.Block{Type: "CERTIFICATE", Bytes: certBytes}
-	certPEM := pem.EncodeToMemory(&b)
-
-	return cert, certPEM
-}
-
-func GenCARoot() (*x509.Certificate, []byte, *rsa.PrivateKey) {
-	var rootTemplate = x509.Certificate{
-		SerialNumber: big.NewInt(1),
-		Subject: pkix.Name{
-			Country:            []string{"US"},
-			Organization:       []string{"Web3devs Funny Notary Certs Co."},
-			OrganizationalUnit: []string{"Legal"},
-			Locality:           []string{"Archer"},
-			Province:           []string{"Florida"},
-			StreetAddress:      []string{"Sesame Streeet 123"},
-			PostalCode:         []string{"12345"},
-			CommonName:         "Root CA",
-		},
-		NotBefore:             time.Now().Add(-10 * time.Second),
-		NotAfter:              time.Now().AddDate(10, 0, 0),
-		KeyUsage:              x509.KeyUsageCertSign | x509.KeyUsageCRLSign,
-		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
-		BasicConstraintsValid: true,
-		IsCA:                  true,
-		MaxPathLen:            2,
-		// IPAddresses:           []net.IP{net.ParseIP("127.0.0.1")},
-	}
-	priv, err := rsa.GenerateKey(rand.Reader, 2048)
-	if err != nil {
-		panic(err)
-	}
-	rootCert, rootPEM := genCert(&rootTemplate, &rootTemplate, &priv.PublicKey, priv)
-	return rootCert, rootPEM, priv
-}
-
-func GenDCA(RootCert *x509.Certificate, RootKey *rsa.PrivateKey) (*x509.Certificate, []byte, *rsa.PrivateKey) {
-	priv, err := rsa.GenerateKey(rand.Reader, 2048)
-	if err != nil {
-		panic(err)
-	}
-
-	var DCATemplate = x509.Certificate{
-		SerialNumber: big.NewInt(1),
-		Subject: pkix.Name{
-			Country:            []string{"US"},
-			Organization:       []string{"Web3devs Funny Notary Certs Co."},
-			OrganizationalUnit: []string{"Legal"},
-			Locality:           []string{"Archer"},
-			Province:           []string{"Florida"},
-			StreetAddress:      []string{"Sesame Streeet 123"},
-			PostalCode:         []string{"12345"},
-			CommonName:         "DCA",
-		},
-		NotBefore:             time.Now().Add(-10 * time.Second),
-		NotAfter:              time.Now().AddDate(10, 0, 0),
-		KeyUsage:              x509.KeyUsageCertSign | x509.KeyUsageCRLSign,
-		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
-		BasicConstraintsValid: true,
-		IsCA:                  true,
-		MaxPathLenZero:        false,
-		MaxPathLen:            1,
-		// IPAddresses:           []net.IP{net.ParseIP("127.0.0.1")},
-	}
-	DCACert, DCAPEM := genCert(&DCATemplate, RootCert, &priv.PublicKey, RootKey)
-	return DCACert, DCAPEM, priv
-}
-
 //Service is the all in one entrypoint for managing Notaries
 type Service struct {
 	sess    *session.Session
@@ -142,6 +63,114 @@ func New(sess *session.Session) (*Service, error) {
 	return s, nil
 }
 
+func (_x *Service) genCert(template, parent *x509.Certificate, publicKey *rsa.PublicKey, privateKey *rsa.PrivateKey) (*x509.Certificate, []byte) {
+	certBytes, err := x509.CreateCertificate(rand.Reader, template, parent, publicKey, privateKey)
+	if err != nil {
+		panic("Failed to create certificate:" + err.Error())
+	}
+
+	cert, err := x509.ParseCertificate(certBytes)
+	if err != nil {
+		panic("Failed to parse certificate:" + err.Error())
+	}
+
+	b := pem.Block{Type: "CERTIFICATE", Bytes: certBytes}
+	certPEM := pem.EncodeToMemory(&b)
+
+	return cert, certPEM
+}
+
+func (_x *Service) genCARoot() (*x509.Certificate, []byte, *rsa.PrivateKey) {
+	var rootTemplate = x509.Certificate{
+		SerialNumber: big.NewInt(1),
+		Subject: pkix.Name{
+			Country:            []string{"US"},
+			Organization:       []string{"Web3devs Funny Notary Certs Co."},
+			OrganizationalUnit: []string{"Legal"},
+			Locality:           []string{"Archer"},
+			Province:           []string{"Florida"},
+			StreetAddress:      []string{"Sesame Streeet 123"},
+			PostalCode:         []string{"12345"},
+			CommonName:         "Root CA",
+		},
+		NotBefore:             time.Now().Add(-10 * time.Second),
+		NotAfter:              time.Now().AddDate(10, 0, 0),
+		KeyUsage:              x509.KeyUsageCertSign | x509.KeyUsageCRLSign,
+		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
+		BasicConstraintsValid: true,
+		IsCA:                  true,
+		MaxPathLen:            2,
+		// IPAddresses:           []net.IP{net.ParseIP("127.0.0.1")},
+	}
+	priv, err := rsa.GenerateKey(rand.Reader, 2048)
+	if err != nil {
+		panic(err)
+	}
+	rootCert, rootPEM := _x.genCert(&rootTemplate, &rootTemplate, &priv.PublicKey, priv)
+	return rootCert, rootPEM, priv
+}
+
+func (_x *Service) genDCA(RootCert *x509.Certificate, RootKey *rsa.PrivateKey) (*x509.Certificate, []byte, *rsa.PrivateKey) {
+	priv, err := rsa.GenerateKey(rand.Reader, 2048)
+	if err != nil {
+		panic(err)
+	}
+
+	var DCATemplate = x509.Certificate{
+		SerialNumber: big.NewInt(1),
+		Subject: pkix.Name{
+			Country:            []string{"US"},
+			Organization:       []string{"Web3devs Funny Notary Certs Co."},
+			OrganizationalUnit: []string{"Legal"},
+			Locality:           []string{"Archer"},
+			Province:           []string{"Florida"},
+			StreetAddress:      []string{"Sesame Streeet 123"},
+			PostalCode:         []string{"12345"},
+			CommonName:         "DCA",
+		},
+		NotBefore:             time.Now().Add(-10 * time.Second),
+		NotAfter:              time.Now().AddDate(10, 0, 0),
+		KeyUsage:              x509.KeyUsageCertSign | x509.KeyUsageCRLSign,
+		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
+		BasicConstraintsValid: true,
+		IsCA:                  true,
+		MaxPathLenZero:        false,
+		MaxPathLen:            1,
+		// IPAddresses:           []net.IP{net.ParseIP("127.0.0.1")},
+	}
+	DCACert, DCAPEM := _x.genCert(&DCATemplate, RootCert, &priv.PublicKey, RootKey)
+	return DCACert, DCAPEM, priv
+}
+
+func (_x *Service) getNotaryCert(n *Notary, DCACert *x509.Certificate, DCAKey *rsa.PrivateKey) (*x509.Certificate, []byte, *rsa.PrivateKey) {
+	priv, err := rsa.GenerateKey(rand.Reader, 2048)
+	if err != nil {
+		panic(err)
+	}
+
+	ServerTemplate := &x509.Certificate{
+		SerialNumber: big.NewInt(1),
+		Subject: pkix.Name{
+			Country:            []string{"EN"},
+			Organization:       []string{fmt.Sprintf("Notary %v %v", n.FirstName, n.LastName)},
+			OrganizationalUnit: []string{"Legal"},
+			Locality:           []string{"Under"},
+			Province:           []string{"Rock"},
+			StreetAddress:      []string{"Sesame Streeet 123"},
+			PostalCode:         []string{"12345"},
+			CommonName:         fmt.Sprintf("%v %v", n.FirstName, n.LastName),
+		},
+		IsCA:           false,
+		MaxPathLenZero: true,
+		NotBefore:      time.Now().AddDate(-1, 0, 0),
+		NotAfter:       time.Now().AddDate(1, 0, 0),
+		KeyUsage:       x509.KeyUsageDigitalSignature,
+	}
+
+	cert, pem := _x.genCert(ServerTemplate, DCACert, &priv.PublicKey, DCAKey)
+	return cert, pem, priv
+}
+
 func (_x *Service) lazyGenerateRootCerts() error {
 	var root []byte
 	var dca []byte
@@ -149,14 +178,14 @@ func (_x *Service) lazyGenerateRootCerts() error {
 	dca, dcaerr := _x.bucket.Download("dca.pfx")
 	if rooterr != nil || dcaerr != nil {
 		//root
-		rootCert, _, rootKey := GenCARoot()
+		rootCert, _, rootKey := _x.genCARoot()
 		rootPfx, err := pkcs12.Encode(rand.Reader, rootKey, rootCert, []*x509.Certificate{}, "")
 		if err != nil {
 			return fmt.Errorf("failed creating root.pfx: %w", err)
 		}
 
 		//dca
-		dcaCert, _, dcaKey := GenDCA(rootCert, rootKey)
+		dcaCert, _, dcaKey := _x.genDCA(rootCert, rootKey)
 		dcaPfx, err := pkcs12.Encode(rand.Reader, dcaKey, dcaCert, []*x509.Certificate{}, "")
 		if err != nil {
 			return fmt.Errorf("failed creating dca.pfx: %w", err)
@@ -183,7 +212,7 @@ func (_x *Service) lazyGenerateRootCerts() error {
 	return nil
 }
 
-//Create creates Participants
+//Create creates Notaries
 func (_x *Service) Create(_in *CreateInput) (*CreateOutput, error) {
 	s := &Notary{
 		PublicKey: _in.PublicKey,
@@ -195,7 +224,53 @@ func (_x *Service) Create(_in *CreateInput) (*CreateOutput, error) {
 		return nil, fmt.Errorf("failed saving Session in DB: %w", err)
 	}
 
+	root, err := _x.bucket.Download("root.pfx")
+	if err != nil {
+		return nil, fmt.Errorf("failed fetching root.pfx: %w", err)
+	}
+	dca, err := _x.bucket.Download("dca.pfx")
+	if err != nil {
+		return nil, fmt.Errorf("failed fetching dca.pfx: %w", err)
+	}
+
+	_, rootCert, err := pkcs12.Decode(root, "")
+	if err != nil {
+		return nil, fmt.Errorf("failed decoding root.pfx: %w", err)
+	}
+
+	dcaPriv, dcaCert, err := pkcs12.Decode(dca, "")
+	if err != nil {
+		return nil, fmt.Errorf("failed decoding dca.pfx: %w", err)
+	}
+	dcaRsa := dcaPriv.(*rsa.PrivateKey)
+
+	cert, _, priv := _x.getNotaryCert(s, dcaCert, dcaRsa)
+
+	notaryPfx, err := pkcs12.Encode(rand.Reader, priv, cert, []*x509.Certificate{
+		rootCert,
+		dcaCert,
+	}, "")
+	if err != nil {
+		return nil, fmt.Errorf("failed creating notary.pfx: %w", err)
+	}
+
+	if err := _x.bucket.Upload(s.GetCertificatePath(), ioutil.NopCloser(bytes.NewReader(notaryPfx))); err != nil {
+		return nil, fmt.Errorf("failed uploading notary.pfx to S3: %w", err)
+	}
+
 	return &CreateOutput{
 		Notary: s,
+	}, nil
+}
+
+//GetOne returns a Notary
+func (_x *Service) GetOne(_in *GetOneInput) (*GetOneOutput, error) {
+	n, err := _x.Reader.GetOne(_in.PublicKey)
+	if err != nil {
+		return nil, fmt.Errorf("failed saving Session in DB: %w", err)
+	}
+
+	return &GetOneOutput{
+		Notary: &n,
 	}, nil
 }
