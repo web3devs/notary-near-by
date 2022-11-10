@@ -52,7 +52,10 @@ const Editor = ({ order, downloadURL, publicKey, signature }) => {
 
   useEffect(() => {
     if (order) {
-      setWidgets([ ...order.widgets ]);
+      const o = { ...order };
+      setWidgets([ ...o.widgets ]);
+      setStatus({ ...o }.status);
+      setParticipantsJoined({ ...o }.participants_joined);
     }
   }, [order]);
 
