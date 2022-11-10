@@ -17,7 +17,7 @@ import (
 
 //Handler lambda entrypoint
 func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-	os, err := ps.Reader.GetOne(_pk.PublicKey(request.PathParameters["notary"]))
+	os, err := ps.GetOne(&_ns.GetOneInput{PublicKey: _pk.PublicKey(request.PathParameters["notary"])})
 	if err != nil {
 		return _api.ResponseNotFound(fmt.Errorf("Failed fetching Order: %w", err)), nil
 	}

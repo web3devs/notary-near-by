@@ -14,3 +14,13 @@ type CreateInput struct {
 type CreateOutput struct {
 	Notary *Notary `json:"notary"`
 }
+
+//GetOneInput input for fetching Notary
+type GetOneInput struct {
+	PublicKey _pk.PublicKey `json:"public_key"`
+}
+
+//GetOneOutput output for fetching Notary
+type GetOneOutput struct {
+	Notary *Notary `json:"notary"`
+}
