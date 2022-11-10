@@ -8,6 +8,7 @@ import (
 	"notarynearby/internal/db"
 	_pk "notarynearby/internal/pk"
 	"os"
+	"os/exec"
 	"time"
 
 	"github.com/aws/aws-sdk-go/aws/session"
@@ -230,6 +231,53 @@ func (_x *Service) GeneratePDF(_in *GeneratePDFInput) (*GeneratePDFOutput, error
 	os.Remove(tmpFileOut)
 
 	return &GeneratePDFOutput{
+		Order: _in.Order,
+	}, nil
+}
+
+//SignPDF signs PDF with provided Notary's PFX Digital Certificate
+func (_x *Service) SignPDF(_in *SignPDFInput) (*SignPDFOutput, error) {
+	pfx := fmt.Sprintf("/tmp/%v.pfx", _in.Order.ID)
+	pdf := fmt.Sprintf("/tmp/%v.pdf", _in.Order.ID)
+	signed := fmt.Sprintf("/tmp/%v.signed.pdf", _in.Order.ID)
+
+	//Create PDF file
+	bts, err := _x.bucket.Download(_in.Order.GetOutFilePath())
+	if err != nil {
+		return nil, fmt.Errorf("failed downloading file from S3: %w", err)
+	}
+
+	if err := ioutil.WriteFile(pdf, bts, 0777); err != nil {
+		return nil, fmt.Errorf("failed writing .pdf to /tmp: %w", err)
+	}
+
+	//Create PFX file
+	if err := ioutil.WriteFile(pfx, _in.PFX, 0777); err != nil {
+		return nil, fmt.Errorf("failed writing .pfx to /tmp: %w", err)
+	}
+
+	//Run scripts
+	cmd := exec.Command(
+		"node",
+		"/opt/index.js",
+		fmt.Sprintf(`{"pfx":"%s","pdf":"%s"}`, pfx, pdf),
+	)
+	out, err := cmd.CombinedOutput()
+	if err != nil {
+		return nil, fmt.Errorf("running command failed: %s %s", err, string(out))
+	}
+
+	//We should have the file, now let's push it to S3
+	f, err := os.Open(signed)
+	if err != nil {
+		return nil, fmt.Errorf("failed opening signed.pdf file: %w", err)
+	}
+
+	if err := _x.bucket.Upload(_in.Order.GetSignedFilePath(), f); err != nil {
+		return nil, fmt.Errorf("failed uploading OUT.pdf to S3: %w", err)
+	}
+
+	return &SignPDFOutput{
 		Order: _in.Order,
 	}, nil
 }

@@ -264,10 +264,28 @@ func (_x *Service) Create(_in *CreateInput) (*CreateOutput, error) {
 func (_x *Service) GetOne(_in *GetOneInput) (*GetOneOutput, error) {
 	n, err := _x.Reader.GetOne(_in.PublicKey)
 	if err != nil {
-		return nil, fmt.Errorf("failed saving Session in DB: %w", err)
+		return nil, fmt.Errorf("failed fetching Notary: %w", err)
 	}
 
 	return &GetOneOutput{
 		Notary: &n,
+	}, nil
+}
+
+//GetPFX returns a Notary's PFX file
+func (_x *Service) GetPFX(_in *GetPFXInput) (*GetPFXOutput, error) {
+	n, err := _x.Reader.GetOne(_in.PublicKey)
+	if err != nil {
+		return nil, fmt.Errorf("failed fetching Notary: %w", err)
+	}
+
+	pfx, err := _x.bucket.Download(n.GetCertificatePath())
+	if err != nil {
+		return nil, fmt.Errorf("failed downloading PFX file: %w", err)
+	}
+
+	return &GetPFXOutput{
+		Notary: &n,
+		PFX:    pfx,
 	}, nil
 }

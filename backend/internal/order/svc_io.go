@@ -48,3 +48,11 @@ type GeneratePDFInput struct {
 type GeneratePDFOutput struct {
 	Order *Order `json:"order"`
 }
+
+type SignPDFInput struct {
+	Order *Order `json:"order"`
+	PFX   []byte
+}
+type SignPDFOutput struct {
+	Order *Order `json:"order"`
+}

@@ -44,6 +44,24 @@ provider:
             - arn:aws:s3:::${self:service}-${opt:stage, self:provider.stage}-notaries
             - arn:aws:s3:::${self:service}-${opt:stage, self:provider.stage}-notaries/*
 
+layers:
+  node:
+    path: ./layers/node
+    name: ${self:service}-${opt:stage, self:provider.stage}-node
+    description: Node runtime
+    package:
+      include:
+        - ./**
+        - ./layers/node/**
+  scripts:
+    path: ./layers/scripts
+    name: ${self:service}-${opt:stage, self:provider.stage}-scripts
+    description: Scripts to run with node
+    package:
+      include:
+        - ./**
+        - ./layers/scripts/**
+
 package:
   patterns:
     - '!./**'
@@ -125,6 +143,22 @@ functions:
 
   # ordersOnChange:
   #   handler: bin/orders/onChange
+
+  ordersSignDocument:
+    handler: bin/orders/signDocument
+    timeout: 900
+    memorySize: 2048
+    events:
+      - s3:
+          bucket: ${self:service}-${opt:stage, self:provider.stage}-orders
+          event: s3:ObjectCreated:*
+          rules:
+            - suffix: out.pdf
+          existing: true
+          forceDeploy: true
+    layers:
+      - { Ref: NodeLambdaLayer }
+      - { Ref: ScriptsLambdaLayer }
 
 resources:
   - ${file(configs/sls/notaries.yml)}

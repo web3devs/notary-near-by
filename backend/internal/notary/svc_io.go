@@ -24,3 +24,14 @@ type GetOneInput struct {
 type GetOneOutput struct {
 	Notary *Notary `json:"notary"`
 }
+
+//GetPFXInput input for fetching Notary's PFX file
+type GetPFXInput struct {
+	PublicKey _pk.PublicKey `json:"public_key"`
+}
+
+//GetPFXOutput output for fetching Notary's PFX file
+type GetPFXOutput struct {
+	Notary *Notary `json:"notary"`
+	PFX    []byte  `json:"pfx"`
+}
