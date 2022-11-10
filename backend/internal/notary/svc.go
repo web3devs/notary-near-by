@@ -206,9 +206,6 @@ func (_x *Service) lazyGenerateRootCerts() error {
 		return fmt.Errorf("failed obtaining and generating root/dca PFX files")
 	}
 
-	fmt.Println("root: ", root)
-	fmt.Println("dca: ", dca)
-
 	return nil
 }
 

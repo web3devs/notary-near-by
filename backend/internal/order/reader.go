@@ -45,7 +45,7 @@ func (_x *Reader) GetAll() ([]Order, error) {
 func (_x *Reader) GetByOwner(owner _pk.PublicKey) ([]Order, error) {
 	var r []Order
 
-	err := _x.table().Get("Owner", string(owner)).All(&r)
+	err := _x.table().Get("Owner", owner.String()).All(&r)
 
 	return r, err
 }

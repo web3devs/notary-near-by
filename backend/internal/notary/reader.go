@@ -27,7 +27,7 @@ func (_x *Reader) table() dynamo.Table {
 func (_x *Reader) GetOne(id _pk.PublicKey) (Notary, error) {
 	var r Notary
 
-	err := _x.table().Get("PublicKey", id).One(&r)
+	err := _x.table().Get("PublicKey", id.String()).One(&r)
 
 	return r, err
 }
