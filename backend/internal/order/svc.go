@@ -15,6 +15,7 @@ import (
 	"github.com/gofrs/uuid"
 
 	_editor "notarynearby/internal/pdf"
+	_nft "notarynearby/pkg/nftstorage"
 )
 
 //Service is the all in one entrypoint for managing Orders
@@ -23,6 +24,7 @@ type Service struct {
 	Reader *Reader
 	Writer *Writer
 	bucket *_bucket.Service
+	nft    *_nft.API
 }
 
 //New instantiates Service
@@ -44,11 +46,17 @@ func New(sess *session.Session) (*Service, error) {
 		return nil, fmt.Errorf("failed initiating Bucket: %w", err)
 	}
 
+	nft, err := _nft.New(os.Getenv("NFT_STORAGE_API_KEY"))
+	if err != nil {
+		return nil, fmt.Errorf("failed initiating NFT Storage client: %w", err)
+	}
+
 	return &Service{
 		sess:   sess,
 		Reader: r,
 		Writer: w,
 		bucket: bucket,
+		nft:    nft,
 	}, nil
 }
 
@@ -275,6 +283,34 @@ func (_x *Service) SignPDF(_in *SignPDFInput) (*SignPDFOutput, error) {
 
 	if err := _x.bucket.Upload(_in.Order.GetSignedFilePath(), f); err != nil {
 		return nil, fmt.Errorf("failed uploading OUT.pdf to S3: %w", err)
+	}
+
+	//Now we can send the file to IPFS and persist IPFS CID within the order
+	sbts, err := os.ReadFile(signed) //XXX: Don't have the brainpower to look for os.File => []byte
+	if err != nil {
+		return nil, fmt.Errorf("failed reading signed.pdf: %w", err)
+	}
+
+	m := _nft.Metadata{
+		Name:        fmt.Sprintf("Notarial act %v", _in.Order.ID),
+		Description: fmt.Sprintf("TODO: Some notarial act description"),
+	}
+	mbts, err := json.Marshal(m)
+	if err != nil {
+		return nil, fmt.Errorf("failed marshaling metadata.json: %w", err)
+	}
+
+	o, err := _x.nft.Upload(&_nft.UploadInput{
+		SignedFile:   sbts,
+		MetadataFile: mbts,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed uploading files to IPFS: %w", err)
+	}
+
+	_in.Order.CID = o.Value.CID
+	if err := _x.Writer.UpdateCID(_in.Order); err != nil {
+		return nil, fmt.Errorf("failed saving CID: %w", err)
 	}
 
 	return &SignPDFOutput{

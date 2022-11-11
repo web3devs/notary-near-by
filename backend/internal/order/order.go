@@ -38,6 +38,7 @@ type Order struct {
 	Widgets      []json.RawMessage `dynamo:"Widgets" json:"widgets"`
 	CreatedAt    string            `dynamo:"CreatedAt" json:"created_at"`
 	Status       Status            `dynamo:"Status" json:"status"`
+	CID          string            `dynamo:"CID" json:"cid"`
 
 	DocumentType string `dynamo:"DocumentType" json:"document_type" validate:"required"`
 
