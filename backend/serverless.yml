@@ -22,6 +22,7 @@ provider:
           - notarynearby-${self:provider.stage}-wssessions
     S3_ORDERS: ${self:service}-${opt:stage, self:provider.stage}-orders
     S3_NOTARIES: ${self:service}-${opt:stage, self:provider.stage}-notaries
+    NFT_STORAGE_API_KEY: ${env:NFT_STORAGE_API_KEY}
   iam:
     role:
       statements:
@@ -63,9 +64,11 @@ layers:
         - ./layers/scripts/**
 
 package:
-  patterns:
-    - '!./**'
-    - ./bin/**
+  individually: true
+  # patterns:
+  #   - '!./**'
+    # - '!./**'
+    # - ./bin/**
 
 functions:
   api:
@@ -75,6 +78,11 @@ functions:
           route: $connect
       - websocket:
           route: $disconnect
+    package:
+      individually: true
+      patterns:
+        - '!./**'
+        - ./bin/socket
 
   loopback:
     handler: bin/loopback
@@ -84,6 +92,11 @@ functions:
       - sns: 
           arn: !Ref WSSessionsTopic
           topicName: ${self:service}-${opt:stage, self:provider.stage}-wssessions
+    package:
+      individually: true
+      patterns:
+        - '!./**'
+        - ./bin/loopback
 
   participantsCreate:
     handler: bin/participants/create
@@ -91,6 +104,11 @@ functions:
       - httpApi:
           path: /participants
           method: post
+    package:
+      individually: true
+      patterns:
+        - '!./**'
+        - ./bin/participants/create
 
   participantsGetOne:
     handler: bin/participants/getOne
@@ -98,6 +116,11 @@ functions:
       - httpApi:
           path: /participants/{participant}
           method: get
+    package:
+      individually: true
+      patterns:
+        - '!./**'
+        - ./bin/participants/getOne
 
   notariesCreate:
     handler: bin/notaries/create
@@ -105,6 +128,11 @@ functions:
       - httpApi:
           path: /notaries
           method: post
+    package:
+      individually: true
+      patterns:
+        - '!./**'
+        - ./bin/notaries/create
 
   notariesGetOne:
     handler: bin/notaries/getOne
@@ -112,6 +140,11 @@ functions:
       - httpApi:
           path: /notaries/{notary}
           method: get
+    package:
+      individually: true
+      patterns:
+        - '!./**'
+        - ./bin/notaries/getOne
 
   ordersCreate:
     handler: bin/orders/create
@@ -119,6 +152,11 @@ functions:
       - httpApi:
           path: /orders
           method: post
+    package:
+      individually: true
+      patterns:
+        - '!./**'
+        - ./bin/orders/create
 
   ordersGetAll:
     handler: bin/orders/getAll
@@ -126,6 +164,11 @@ functions:
       - httpApi:
           path: /orders
           method: get
+    package:
+      individually: true
+      patterns:
+        - '!./**'
+        - ./bin/orders/getAll
 
   ordersGetOne:
     handler: bin/orders/getOne
@@ -133,6 +176,11 @@ functions:
       - httpApi:
           path: /orders/{order_id}
           method: get
+    package:
+      individually: true
+      patterns:
+        - '!./**'
+        - ./bin/orders/getOne
 
   ordersGetByOwner:
     handler: bin/orders/getByOwner
@@ -140,6 +188,11 @@ functions:
       - httpApi:
           path: /orders-by-owner/{owner}
           method: get
+    package:
+      individually: true
+      patterns:
+        - '!./**'
+        - ./bin/orders/getByOwner
 
   # ordersOnChange:
   #   handler: bin/orders/onChange
@@ -159,6 +212,11 @@ functions:
     layers:
       - { Ref: NodeLambdaLayer }
       - { Ref: ScriptsLambdaLayer }
+    package:
+      individually: true
+      patterns:
+        - '!./**'
+        - ./bin/orders/signDocument
 
 resources:
   - ${file(configs/sls/notaries.yml)}
