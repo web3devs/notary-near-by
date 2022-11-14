@@ -20,29 +20,37 @@ export default () => {
         const { order, download_url } = await getOrder(pms.id);
         setOrder({ ...order });
         setDownloadURL(download_url);
-        setM(me({...order}));
       }
     })()
   }, [pms]);
+
+  useEffect(() => {
+    if (order) {
+      setM(me({...order}))
+    }
+  }, [order])
 
   return (
     <div>
       <h1>Notarial ceremony</h1>
       <div className="flex flex-column justify-content-center align-items-center mt-4">
         {!order && ('Loading....')}
+        <pre>{JSON.stringify(m)}</pre>
         {order && (
           <>
-            <JitsiMeeting
-              roomName={order.id}
-              userInfo={{
-                displayName: `${m.first_name} ${m.last_name}`
-              }}
-              getIFrameRef={node => {
-                node.style.width = '800px'
-                node.style.height = '600px'
-              }}
-            />
-            <Editor order={order} downloadURL={downloadURL} publicKey={accountAddress} signature={'TODO'} />
+            {m && (
+              <JitsiMeeting
+                roomName={order.id}
+                userInfo={{
+                  displayName: `${m.first_name} ${m.last_name}`
+                }}
+                getIFrameRef={node => {
+                  node.style.width = '800px'
+                  node.style.height = '600px'
+                }}
+              />
+            )}
+            <Editor order={order} setOrder={setOrder} downloadURL={downloadURL} publicKey={accountAddress} signature={'TODO'} />
           </>
         )}
 

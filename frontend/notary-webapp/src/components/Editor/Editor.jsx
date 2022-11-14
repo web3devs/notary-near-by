@@ -21,7 +21,7 @@ import { Participants } from './Participants'
 import { Signatures } from './Signatures'
 import { Mint } from './Mint'
 
-const Editor = ({ order, downloadURL, publicKey, signature }) => {
+const Editor = ({ order, setOrder, downloadURL, publicKey, signature }) => {
   const [body, setBody] = useState('');
   const [page, setPage] = useState(1);
   const [loaded, setLoaded] = useState(false);
@@ -83,6 +83,7 @@ const Editor = ({ order, downloadURL, publicKey, signature }) => {
             setWidgets([...a.data.widgets]);
             setStatus({ ...a.data }.status);
             setParticipantsJoined({ ...a.data }.participants_joined);
+            setOrder({ ...a.data })
           }
         }
       });
@@ -275,7 +276,7 @@ const Editor = ({ order, downloadURL, publicKey, signature }) => {
 
       { order && (
         <div className="col-2">
-          <Participants {...order} />
+          <Participants {...order} participants_joined={participantsJoined} />
         </div>
       )}
 
