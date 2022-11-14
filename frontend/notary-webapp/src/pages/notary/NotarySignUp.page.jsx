@@ -50,71 +50,86 @@ export default () => {
   }, [formData])
 
   return (
-    <div>
-      <h1>Sign up as a Notary</h1>
-      <span className="p-float-label mb-2">
-        <InputText
-          id="firstName"
-          disabled={isSubmiting}
-          value={formData.firstName || ''}
-          onChange={(e) => setFormField('firstName', e.target.value || null)}
-        />
-        <label htmlFor="firstName">First name</label>
-      </span>
+    <div className="flex flex-column align-items-center">
+      <div className="flex flex-column align-items-center mb-4" style={{ maxWidth: '400px' }}>
+        <h1>New Notary</h1>
+        <div className="text-500 text-center">lorem dolorem lorem dolorem lorem dolorem lorem dolorem lorem dolorem lorem dolorem lorem dolorem lorem dolorem lorem dolorem lorem dolorem </div>
+      </div>
 
-      {errors?.firstName && <div className="p-error">{errors.firstName}</div>}
-      <span className="p-float-label mb-2">
-        <InputText
-          id="lastName"
-          disabled={isSubmiting}
-          value={formData.lastName || ''}
-          onChange={(e) => setFormField('lastName', e.target.value)}
-        />
-        <label htmlFor="lastName">Last name</label>
-      </span>
-      {errors?.lastName && <div className="p-error">{errors.lastName}</div>}
-      <div className="flex flex-start gap-2 mb-2">
-        <Button
-          disabled={isSubmiting}
-          onClick={() => {
-            licenseFileUploadRef?.current?.click()
-          }}
-          className="p-button-outlined"
-        >
-          Notary license
-        </Button>
-        <input
-          type="file"
-          ref={licenseFileUploadRef}
-          onChange={(e) => setFormField('license', e.target.files)}
-          style={{ display: 'none' }}
-        />
+      <div className="flex justify-content-center align-items-top h-screen" style={{ width: '400px' }}>
+        <div className="flex-column w-full">
+          <div className="field mb-3">
+            <label htmlFor="firstName" className="block">First name</label>
+            <InputText
+              id="firstName"
+              disabled={isSubmiting}
+              value={formData.firstName || ''}
+              onChange={(e) => setFormField('firstName', e.target.value || null)}
+              className="w-full"
+            />
+            {errors?.firstName && <div className="p-error">{errors.firstName}</div>}
+          </div>
+
+          <div className="field mb-3">
+            <label htmlFor="lastName" className="block">Last name</label>
+            <InputText
+              id="lastName"
+              disabled={isSubmiting}
+              value={formData.lastName || ''}
+              onChange={(e) => setFormField('lastName', e.target.value)}
+              className="w-full"
+            />
+            {errors?.lastName && <div className="p-error">{errors.lastName}</div>}
+          </div>
+
+          <div className="flex flex-start flex-column align-items-start gap-2 mb-3">
+            <Button
+              disabled={isSubmiting}
+              onClick={() => {
+                licenseFileUploadRef?.current?.click()
+              }}
+              className="p-button-outlined"
+            >
+              Notary license
+            </Button>
+            <input
+              type="file"
+              ref={licenseFileUploadRef}
+              onChange={(e) => setFormField('license', e.target.files)}
+              style={{ display: 'none' }}
+            />
+            {errors?.license && <div className="p-error">{errors.license}</div>}
+          </div>
+
+          <div className="flex flex-start flex-column align-items-start gap-2 mb-3">
+            <Button
+              disabled={isSubmiting}
+              onClick={() => {
+                stampFileUploadRef?.current?.click()
+              }}
+              className="p-button-outlined"
+            >
+              Stamp
+            </Button>
+            <input
+              type="file"
+              ref={stampFileUploadRef}
+              onChange={(e) => setFormField('stamp', e.target.files)}
+              style={{ display: 'none' }}
+            />
+            {errors?.stamp && <div className="p-error">{errors.stamp}</div>}
+          </div>
+
+          <Button
+            label="Sign up"
+            loading={isSubmiting}
+            disabled={!canSubmit}
+            onClick={(e) => submit(handleSubmit, e)}
+            className="w-full"
+            iconPos="right"
+          />
+        </div>
       </div>
-      {errors?.license && <div className="p-error">{errors.license}</div>}
-      <div className="flex flex-start gap-2 mb-2">
-        <Button
-          disabled={isSubmiting}
-          onClick={() => {
-            stampFileUploadRef?.current?.click()
-          }}
-          className="p-button-outlined"
-        >
-          Stamp
-        </Button>
-        <input
-          type="file"
-          ref={stampFileUploadRef}
-          onChange={(e) => setFormField('stamp', e.target.files)}
-          style={{ display: 'none' }}
-        />
-      </div>
-      {errors?.stamp && <div className="p-error">{errors.stamp}</div>}
-      <Button
-        label="Sign up"
-        loading={isSubmiting}
-        disabled={!canSubmit}
-        onClick={(e) => submit(handleSubmit, e)}
-      />
     </div>
   )
 }
