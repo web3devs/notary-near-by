@@ -128,6 +128,8 @@ func handleActionJoin(m *_ss.DispatchActionInput, o *_os.Order, s *_ss.Session, 
 		return fmt.Errorf("failed joining session: %w", err)
 	}
 
+	cs = append(cs, *s)
+
 	return notifyUpdateOrder(cs, o)
 }
 
