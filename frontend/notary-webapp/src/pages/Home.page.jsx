@@ -1,12 +1,55 @@
+import { useEffect, useState } from 'react'
 import { Button } from 'primereact'
 import { useAuth } from '../context/AuthProvider'
 import { useNavigate, Link } from 'react-router-dom'
 import { Card } from 'primereact/card';
 import Logo from '../assets/logo.svg'
+import { getParticipantProfile, getNotaryProfile } from '../api'
 
 export default () => {
-  const { isConnected, login, setRole } = useAuth()
+  const [participant, setParticipant] = useState(null)
+  const [notary, setNotary] = useState(null)
+  const [isLoading, setIsLoading] = useState(false)
+  const { isConnected, login, setRole, accountAddress } = useAuth()
   const navigate = useNavigate()
+
+  useEffect(() => {
+    ; (async () => {
+      if (isConnected) {
+        setIsLoading(true)
+        try {
+          const p = await getParticipantProfile(accountAddress)
+          setParticipant({...p})
+        } catch (e) {
+          console.log(e)
+          if (e.response.status === 404) {
+            setParticipant(null)
+          }
+        } finally {
+          setIsLoading(false)
+        }
+      }
+    })()
+  }, [isConnected])
+
+  useEffect(() => {
+    ; (async () => {
+      if (isConnected) {
+        setIsLoading(true)
+        try {
+          const n = await getNotaryProfile(accountAddress)
+          setNotary({ ...n })
+        } catch (e) {
+          console.log(e)
+          if (e.response.status === 404) {
+            setNotary(null)
+          }
+        } finally {
+          setIsLoading(false)
+        }
+      }
+    })()
+  }, [isConnected])
 
   const icon = (icon, label) => (
     <Button icon={`pi ${icon}`} className="p-button-rounded" aria-label={label} />
@@ -16,9 +59,26 @@ export default () => {
     return (<Button label={label} icon="pi pi-arrow-right" onClick={callback} className="p-button-text pl-0 pr-0" iconPos="right" style={{ width: '100%', textAlign: 'justify'}} />)
   }
 
-  const imParticipant = () => { setRole('participant'); navigate('/participant') }
-  const imNotary = () => { setRole('notary'); navigate('/notary') }
-  const imWitness = () => { setRole('witness'); navigate('/participant') }
+  const imParticipant = () => {
+    setRole('participant')
+    if (participant) return navigate('/participant')
+
+    return navigate('/participant/sign-up')
+  }
+  const imNotary = () => {
+    setRole('notary')
+    if (notary) return navigate('/notary')
+
+    return navigate('/notary/sign-up')
+  }
+
+  const imWitness = () => {
+    setRole('witness')
+
+    if (participant) return navigate('/participant')
+
+    return navigate('/participant/sign-up')
+  }
 
   return (
     <div className="flex justify-content-center align-items-center h-screen">
@@ -40,6 +100,7 @@ export default () => {
             label="Connect wallet"
             className="p-button-primary mt-6"
             onClick={() => {
+              setIsLoading(true)
               login()
             }}
           />
