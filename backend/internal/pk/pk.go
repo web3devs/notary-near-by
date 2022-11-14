@@ -11,5 +11,10 @@ func (x PublicKey) String() string {
 	return strings.ToLower(string(x))
 }
 
+//Equals tests if two PublicKeys are equal
+func (x PublicKey) Equals(y PublicKey) bool {
+	return x.String() == y.String()
+}
+
 //Signature is a PublicKey signed with associated PrivateKey
 type Signature string

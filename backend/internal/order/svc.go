@@ -75,14 +75,24 @@ func (_x *Service) Create(_in *CreateInput) (*CreateOutput, error) {
 		}
 	}
 	if addOwner {
-		_in.Participants = append(_in.Participants, _in.Owner)
+		_in.Participants = append(_in.Participants, _pk.PublicKey(_in.Owner.String()))
+	}
+
+	pts := []_pk.PublicKey{}
+	for _, p := range _in.Participants {
+		pts = append(pts, _pk.PublicKey(p.String()))
+	}
+
+	wts := []_pk.PublicKey{}
+	for _, p := range _in.Witnesses {
+		pts = append(pts, _pk.PublicKey(p.String()))
 	}
 
 	s := &Order{
-		Owner:        _in.Owner,
+		Owner:        _pk.PublicKey(_in.Owner.String()),
 		ID:           id.String(),
-		Participants: _in.Participants,
-		Witnesses:    _in.Witnesses,
+		Participants: pts,
+		Witnesses:    wts,
 		Widgets:      []json.RawMessage{},
 		DocumentType: _in.DocumentType,
 		CreatedAt:    time.Now().Format(time.RFC3339),
@@ -118,8 +128,8 @@ func (_x *Service) ParticipantJoined(o *Order, pk _pk.PublicKey, p *Person) erro
 	}
 
 	for _, x := range o.Participants {
-		if pk == x {
-			o.ParticipantsJoined[pk] = p
+		if pk.Equals(x) {
+			o.ParticipantsJoined[_pk.PublicKey(pk.String())] = p
 
 			return _x.Writer.ParticipantJoined(o)
 		}
@@ -135,8 +145,8 @@ func (_x *Service) WitnessJoined(o *Order, pk _pk.PublicKey, p *Person) error {
 	}
 
 	for _, x := range o.Witnesses {
-		if pk == x {
-			o.WitnessesJoined[pk] = p
+		if pk.Equals(x) {
+			o.WitnessesJoined[_pk.PublicKey(pk.String())] = p
 
 			return _x.Writer.WitnessJoined(o)
 		}

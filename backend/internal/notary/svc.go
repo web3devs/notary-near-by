@@ -11,6 +11,7 @@ import (
 	"io/ioutil"
 	"math/big"
 	"notarynearby/internal/db"
+	"notarynearby/internal/pk"
 	"os"
 	"time"
 
@@ -212,7 +213,7 @@ func (_x *Service) lazyGenerateRootCerts() error {
 //Create creates Notaries
 func (_x *Service) Create(_in *CreateInput) (*CreateOutput, error) {
 	s := &Notary{
-		PublicKey: _in.PublicKey,
+		PublicKey: pk.PublicKey(_in.PublicKey.String()),
 		FirstName: _in.FirstName,
 		LastName:  _in.LastName,
 	}

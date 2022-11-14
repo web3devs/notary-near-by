@@ -3,6 +3,7 @@ package participant
 import (
 	"fmt"
 	"notarynearby/internal/db"
+	"notarynearby/internal/pk"
 	"os"
 
 	"github.com/aws/aws-sdk-go/aws/session"
@@ -39,7 +40,7 @@ func New(sess *session.Session) (*Service, error) {
 //Create creates Participants
 func (_x *Service) Create(_in *CreateInput) (*CreateOutput, error) {
 	s := &Participant{
-		PublicKey: _in.PublicKey,
+		PublicKey: pk.PublicKey(_in.PublicKey.String()),
 		FirstName: _in.FirstName,
 		LastName:  _in.LastName,
 	}
