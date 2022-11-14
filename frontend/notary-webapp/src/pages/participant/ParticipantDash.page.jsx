@@ -2,14 +2,16 @@ import { ProgressSpinner } from 'primereact'
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Button } from 'primereact'
-import ListItem from '../../components/dash/ListItem'
 import { useAuth } from '../../context'
 import { getParticipantProfile, getOwnersOrders } from '../../api'
 import { Card } from 'primereact/card';
+import { Chip } from 'primereact/chip';
 import NoOrdersImage from '../../assets/no-orders.svg'
 
-const  NoOrders = () => {
+const  NoOrders = ({ orders }) => {
   const navigate = useNavigate()
+
+  if (orders && orders.length > 0) return
 
   return (
     <div className="flex flex-column align-items align-items-center justify-content-center mt-8 mb-8">
@@ -25,6 +27,50 @@ const  NoOrders = () => {
       <div className="mt-3">
         <Button label="Create Order" onClick={() => navigate('/participant/create-order')} />
       </div>
+    </div>
+  )
+}
+
+const List = ({ orders }) => {
+  const navigate = useNavigate()
+
+  const join = (o) => navigate('/orders/' + o.id)
+
+  if (!orders || orders.length === 0) return
+
+  return (
+    <div>
+      {
+        orders.map((o, idx) => {
+          const lastItem = orders.length === idx + 1 ? '' : 'border-bottom-1 border-600 mb-4 pb-4';
+
+          return (
+            <div key={`order-${o.id}`} className={`text-color flex align-items-center justify-content-between ${lastItem}`}>
+              <div className="flex align-items-center">
+                <i className="pi pi-file ml-4 mr-4" />
+                <div>
+                  <h3>
+                    {o.document_type}
+                  </h3>
+                  <div className="text-500">
+                    Order ID: {o.id}
+                  </div>
+                </div>
+              </div>
+              <div className="flex flex-column">
+                <div className="flex gap-2 mb-2">
+                  <Button label="Join" onClick={() => join(o)} />
+                  <Button label="Foo" className="p-button-secondary" />
+                  <Button label="Foo" className="p-button-danger" />
+                </div>
+                <div className="flex justify-content-center">
+                  <Chip label={o.status} className="bg-primary text-white" />
+                </div>
+              </div>
+            </div>
+          )
+        })
+      }
     </div>
   )
 }
@@ -77,21 +123,8 @@ export default () => {
 
         {(isSigned && !isLoading) && (
           <>
-            {orders.length === 0 && (
-              <NoOrders />
-            )}
-
-            {orders.map((o, idx) => {
-              return (
-                <ListItem
-                  data={o}
-                  key={o.id}
-                  onClick={() => {
-                    navigate('/orders/' + o.id)
-                  }}
-                />
-              )
-            })}
+            <NoOrders orders={orders} />
+            <List orders={orders} />
           </>
         )}
 
