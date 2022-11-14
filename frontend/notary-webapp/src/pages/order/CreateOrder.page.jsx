@@ -86,81 +86,92 @@ export default () => {
     [formData]
   )
   return (
-    <div className="grid">
-      <h1>Create order</h1>
-      <div className="col-12">
-        <div className="text-lg text-300 mb-4">Document</div>
-        <Dropdown
-          options={options}
-          value={formData.type}
-          onChange={(e) => {
-            setFormField('type', e.value)
-          }}
-          className="mb-4"
-        />
-        <FileUpload
-          label="Document PDF"
-          error={errors?.file}
-          accept=".pdf"
-          onFileChange={(e) => setFormField('file', e[0])}
-          disabled={isSubmiting}
-        />
+    <div className="flex flex-column align-items-center">
+      <div className="flex flex-column align-items-center mb-4" style={{ maxWidth: '400px' }}>
+        <h1>Create Order</h1>
+        <div className="text-500 text-center">lorem dolorem lorem dolorem lorem dolorem lorem dolorem lorem dolorem lorem dolorem lorem dolorem lorem dolorem lorem dolorem lorem dolorem </div>
       </div>
 
-      <div className="col-12">
-        <div className="text-lg text-300 mb-4">Participants</div>
-        {formData.participants.map((w) => {
-          return (
-            <div
-              className="flex justify-content-between mb-2 w-5 align-items-center border-round-xs"
-              key={w}
-            >
-              <span className="mr-4">{w}</span>
-              <Button onClick={() => handleRemoveParticipants(w)}>
-                <i className="pi pi-trash px-2"></i>
-              </Button>
-            </div>
-          )
-        })}
-        {formData.participants.length === 0 && (
-          <div className="text-sm text-100 mb-4">No participants yet</div>
-        )}
-        <Button
-          label="Add participant"
-          className="mb-4"
-          onClick={() => setShowAddParticipant(true)}
-        />
+      <div className="flex justify-content-center align-items-top h-screen" style={{ width: '400px' }}>
+        <div className="flex-column w-full">
+
+          <div className="field mb-3">
+            <div className="text-lg text-300 mb-4">Document</div>
+            <Dropdown
+              options={options}
+              value={formData.type}
+              onChange={(e) => {
+                setFormField('type', e.value)
+              }}
+              className="w-full mb-2"
+            />
+            <FileUpload
+              label="Document PDF"
+              error={errors?.file}
+              accept=".pdf"
+              onFileChange={(e) => setFormField('file', e[0])}
+              disabled={isSubmiting}
+            />
+          </div>
+
+          <div className="field mb-3">
+            <div className="text-lg text-300 mb-4">Participants</div>
+            {formData.participants.map((w) => {
+              return (
+                <div
+                  className="flex justify-content-between mb-2 w-5 align-items-center border-round-xs"
+                  key={w}
+                >
+                  <span className="mr-4">{w}</span>
+                  <Button onClick={() => handleRemoveParticipants(w)} icon="pi pi-trash px-2" className="p-button-sm p-button-danger text-white" />
+                </div>
+              )
+            })}
+            {formData.participants.length === 0 && (
+              <div className="text-sm text-100 mb-4">No participants yet</div>
+            )}
+            <Button
+              label="Add participant"
+              className="w-full p-button-sm"
+              onClick={() => setShowAddParticipant(true)}
+            />
+          </div>
+
+
+          <div className="field mb-3">
+            <div className="text-lg text-300 mb-4">Witnesses</div>
+            {formData.witnesses.map((w) => {
+              return (
+                <div
+                  className="flex justify-content-between mb-2 w-5 align-items-center p2"
+                  key={w}
+                >
+                  <span className="mr-4">{w}</span>
+                  <Button onClick={() => handleRemoveWitness(w)} icon="pi pi-trash px-2" className="p-button-sm p-button-danger text-white" />
+                </div>
+              )
+            })}
+            {formData.witnesses.length === 0 && (
+              <div className="text-sm text-100 mb-4">No witnesses yet</div>
+            )}
+            <Button
+              label="Add witness"
+              onClick={() => setShowAddWitness(true)}
+              className="w-full p-button-sm"
+            />
+          </div>
+
+          <Button
+            label="Save"
+            onClick={(e) => submit(handleSubmit, e)}
+            disabled={!canSubmit}
+            loading={isSubmiting}
+            className="w-full p-button-success text-white"
+            iconPos="right"
+          />
+        </div>
       </div>
 
-      <div className="col-12">
-        <div className="text-lg text-300 mb-4">Witnesses</div>
-        {formData.witnesses.map((w) => {
-          return (
-            <div
-              className="flex justify-content-between mb-2 w-5 align-items-center p2"
-              key={w}
-            >
-              <span className="mr-4">{w}</span>
-              <Button onClick={() => handleRemoveWitness(w)}>
-                <i className="pi pi-trash px-2"></i>
-              </Button>
-            </div>
-          )
-        })}
-        {formData.witnesses.length === 0 && (
-          <div className="text-sm text-100 mb-4">No witnesses yet</div>
-        )}
-        <Button
-          label="Add witness"
-          onClick={() => setShowAddWitness(true)}
-          className="mb-2"
-        />
-      </div>
-      <Button
-        label="Save"
-        onClick={(e) => submit(handleSubmit, e)}
-        disabled={!canSubmit}
-      />
       <Dialog
         visible={showAddWitness}
         onHide={() => setShowAddWitness(false)}
