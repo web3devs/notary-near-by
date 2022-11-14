@@ -36,6 +36,7 @@ export default () => {
       <div className="flex justify-content-between">
         <h1 className="flex align-items-center justify-content-center">Notarial Ceremony</h1>
       </div>
+      <pre>{JSON.stringify(m)}</pre>
       <Card className="bg-white">
         {!order && (
           <div className="flex flex-column align-items align-items-center justify-content-center mt-8 mb-8">
@@ -45,7 +46,7 @@ export default () => {
 
         {order && (
           <div className="flex flex-column align-items-center">
-            {m && (
+            {(m && m.first_name) && (
               <JitsiMeeting
                 roomName={order.id}
                 userInfo={{
