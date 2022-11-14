@@ -3,7 +3,6 @@ import validate from 'validate.js'
 
 const useForm = ({ constraints, data }) => {
   const [errors, setErrors] = useState()
-  const [isTouched, setIsTouched] = useState(false)
   const [initFormData, setInitFormData] = useState(data)
   const [formData, setFormData] = useState(data)
   const [formDirty, setFormDirty] = useState(false)
@@ -14,14 +13,11 @@ const useForm = ({ constraints, data }) => {
   }, [initFormData])
 
   useEffect(() => {
-    if (!isTouched) {
-      return
-    }
     const e = validate(formData, constraints)
     const valid = e === undefined
     setIsFormValid(valid)
     setErrors(e)
-  }, [JSON.stringify(formData), isTouched, JSON.stringify(constraints)])
+  }, [JSON.stringify(formData), JSON.stringify(constraints)])
 
   useEffect(() => {
     if (JSON.stringify(initFormData) === JSON.stringify(formData)) {
@@ -43,25 +39,19 @@ const useForm = ({ constraints, data }) => {
   const submit = useCallback(
     (onSubmit, ev) => {
       ev.preventDefault()
-      console.log('is touched')
-      if (!isTouched) {
-        setIsTouched(true)
-        return
-      }
+
       if (!isFormValid) {
         return
       }
+
       onSubmit?.()
     },
-    [isTouched, isFormValid]
+    [isFormValid]
   )
 
   const canSubmit = useMemo(() => {
-    if (!isTouched) {
-      return true
-    }
     return isFormValid
-  }, [isTouched, isFormValid])
+  }, [isFormValid])
 
   return {
     formData,
@@ -72,7 +62,6 @@ const useForm = ({ constraints, data }) => {
     resetForm,
     errors,
     isFormValid,
-    isTouched,
     submit,
     canSubmit
   }
