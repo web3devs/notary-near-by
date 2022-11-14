@@ -90,8 +90,8 @@ export default () => {
         {isConnected && (
           <div className="mt-6 flex gap-3">
             <Card onClick={imParticipant} title={icon('pi-user', 'Participant')} style={{ width: '15em', cursor: 'pointer' }} footer={cta(imParticipant, 'Participant')} className="bg-white"  />
-            <Card onClick={imNotary} title={icon('pi-user', 'Participant')} style={{ width: '15em', cursor: 'pointer' }} footer={cta(imNotary, 'Notary')} className="bg-white" />
-            <Card onClick={imWitness} title={icon('pi-user', 'Participant')} style={{ width: '15em', cursor: 'pointer' }} footer={cta(imWitness, 'Witness')} className="bg-white" />
+            <Card onClick={imNotary} title={icon('pi-user-edit', 'Participant')} style={{ width: '15em', cursor: 'pointer' }} footer={cta(imNotary, 'Notary')} className="bg-white" />
+            <Card onClick={imWitness} title={icon('pi-eye', 'Participant')} style={{ width: '15em', cursor: 'pointer' }} footer={cta(imWitness, 'Witness')} className="bg-white" />
           </div>
         )}
 
