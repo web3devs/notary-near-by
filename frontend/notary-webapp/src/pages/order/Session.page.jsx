@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
-// import { Button, Dialog, ProgressSpinner } from 'primereact'
+import { ProgressSpinner } from 'primereact/progressspinner'
 // import Mint from '../../components/order-participant/Mint'
+import { Card } from 'primereact/card';
 import Editor from '../../components/Editor/Editor';
 import { useParams } from 'react-router-dom'
 import { useAuth } from '../../context'
@@ -31,13 +32,19 @@ export default () => {
   }, [order])
 
   return (
-    <div>
-      <h1>Notarial ceremony</h1>
-      <div className="flex flex-column justify-content-center align-items-center mt-4">
-        {!order && ('Loading....')}
-        <pre>{JSON.stringify(m)}</pre>
+    <div className="flex flex-column align-items justify-content-center">
+      <div className="flex justify-content-between">
+        <h1 className="flex align-items-center justify-content-center">Notarial Ceremony</h1>
+      </div>
+      <Card className="bg-white">
+        {!order && (
+          <div className="flex flex-column align-items align-items-center justify-content-center mt-8 mb-8">
+            <ProgressSpinner />
+          </div>
+        )}
+
         {order && (
-          <>
+          <div className="flex flex-column align-items-center">
             {m && (
               <JitsiMeeting
                 roomName={order.id}
@@ -45,27 +52,15 @@ export default () => {
                   displayName: `${m.first_name} ${m.last_name}`
                 }}
                 getIFrameRef={node => {
-                  node.style.width = '800px'
+                  node.style.width = '100%'
                   node.style.height = '600px'
                 }}
               />
             )}
             <Editor order={order} setOrder={setOrder} downloadURL={downloadURL} publicKey={accountAddress} signature={'TODO'} />
-          </>
+          </div>
         )}
-
-        {/* {isWaiting ? (
-          <>
-            <ProgressSpinner />
-            <div>Waiting for Notary</div>
-          </>
-        ) : (
-          <div>Order content</div>
-        )} */}
-      </div>
-      {/* <Dialog visible={showDialog} showHeader={false}>
-        <Mint />
-      </Dialog> */}
+      </Card>
     </div>
   )
 }

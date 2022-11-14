@@ -70,19 +70,20 @@ export const AuthProvider = ({ children }) => {
   }
 
   const me = (order) => {
+    console.log('ME.order: ', order)
     let first_name = ''
     let last_name = ''
-    if (role === 'notary') {
+    if (role === 'notary' && order.notary_joined) {
       first_name = order.notary_joined?.first_name
       last_name = order.notary_joined?.last_name
     }
 
-    if (role === 'participant') {
+    if (role === 'participant' && order.participants_joined) {
       first_name = order.participants_joined[accountAddress]?.first_name
       last_name = order.participants_joined[accountAddress]?.last_name
     }
 
-    if (role === 'witness') {
+    if (role === 'witness' && order.witnesses_joined) {
       first_name = order.witnesses_joined[accountAddress]?.first_name
       last_name = order.witnesses_joined[accountAddress]?.last_name
     }

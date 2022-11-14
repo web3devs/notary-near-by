@@ -69,7 +69,6 @@ const Editor = ({ order, setOrder, downloadURL, publicKey, signature }) => {
     ; (async () => {
       if (ws) {
         await join(order.id, publicKey, signature, role);
-        // await ping(order.id); //XXX: why were we pinging in here?
       }
     })()
   }, [ws]);
@@ -204,7 +203,7 @@ const Editor = ({ order, setOrder, downloadURL, publicKey, signature }) => {
 
   return (
     <div className="grid">
-      <div className="col-12">
+      <div className="col-12 text-color">
         ROLE: {role}<br />
         Status: {status}<br />
         DownloadURL: <input type="text" value={downloadURL} />
