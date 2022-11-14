@@ -20,7 +20,7 @@ const notifyCallbacks = () => {
   Object.values(callbacks).map((fn) => fn())
 }
 
-export const getAccountAddress = () => accountAddress
+export const getAccountAddress = () => accountAddress.toLowerCase()
 
 export const connectToWallet = async () => {
   await provider.send('eth_requestAccounts', [])
