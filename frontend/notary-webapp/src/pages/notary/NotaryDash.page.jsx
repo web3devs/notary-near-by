@@ -54,12 +54,10 @@ const List = ({ orders }) => {
               </div>
               <div className="flex flex-column">
                 <div className="flex gap-2 mb-2">
-                  <Button label="Join" onClick={() => join(o)} />
-                  <Button label="Foo" className="p-button-secondary" />
-                  <Button label="Foo" className="p-button-danger" />
-                </div>
-                <div className="flex justify-content-center">
-                  <Chip label={o.status} className="bg-primary text-white" />
+                  <Chip label={o.status} className="bg-yellow-500 text-white" />
+                  <Button label="Join" onClick={() => join(o)} tooltipOptions={{ position: 'bottom' }} tooltip="Join Ceremony" />
+                  <Button label="Foo" className="p-button-secondary" tooltipOptions={{ position: 'bottom' }} tooltip="Something" />
+                  <Button label="Foo" className="p-button-danger" tooltipOptions={{ position: 'bottom' }} tooltip="Something else" />
                 </div>
               </div>
             </div>
