@@ -20,14 +20,10 @@ export default () => {
       license: {
         presence: true
       },
-      stamp: {
-        presence: true
-      }
     },
     data: {
       fullName: null,
       license: null,
-      stamp: null
     }
   })
 
