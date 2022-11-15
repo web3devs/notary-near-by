@@ -16,6 +16,7 @@ import {
   TextWidget,
   DateWidget,
   SignatureWidget,
+  NotaryStampWidget,
 } from './widgets';
 import { Flow } from './Flow'
 import { Participants } from './Participants'
@@ -39,6 +40,7 @@ const Editor = ({ order, setOrder, downloadURL, publicKey, signature }) => {
   const [ widgets, setWidgets ] = useState([]);
   const [ status, setStatus ] = useState(null);
   const [participantsJoined, setParticipantsJoined] = useState([]);
+  const [notary, setNotary] = useState({full_name: ''})
   const toast = useRef(null);
   const {
     ws,
@@ -57,6 +59,7 @@ const Editor = ({ order, setOrder, downloadURL, publicKey, signature }) => {
       setWidgets([ ...o.widgets ]);
       setStatus({ ...o }.status);
       setParticipantsJoined({ ...o }.participants_joined);
+      setNotary({ ...o }.notary_joined);
     }
   }, [order]);
 
@@ -83,6 +86,7 @@ const Editor = ({ order, setOrder, downloadURL, publicKey, signature }) => {
             setWidgets([...a.data.widgets]);
             setStatus({ ...a.data }.status);
             setParticipantsJoined({ ...a.data }.participants_joined);
+            setNotary({ ...a.data }.notary_joined);
             setOrder({ ...a.data })
           }
         }
@@ -164,6 +168,8 @@ const Editor = ({ order, setOrder, downloadURL, publicKey, signature }) => {
         return <DateWidget order={order} disabled={role !== 'notary'} key={`widget-${widget.type}-${widget.id}`} widget={widget} updateWidget={upsertWidget} deleteWidget={deleteWidget} />
       case 'signature':
         return <SignatureWidget status={status} participantsJoined={participantsJoined} disabled={role !== 'notary'} key={`widget-${widget.type}-${widget.id}`} widget={widget} updateWidget={upsertWidget} deleteWidget={deleteWidget} />
+      case 'notary-stamp':
+        return <NotaryStampWidget status={status} participantsJoined={participantsJoined} disabled={role !== 'notary'} key={`widget-${widget.type}-${widget.id}`} widget={widget} updateWidget={upsertWidget} deleteWidget={deleteWidget} />
       default:
         break;
     }
@@ -196,12 +202,24 @@ const Editor = ({ order, setOrder, downloadURL, publicKey, signature }) => {
   };
 
   const addSignatureWidget = () => {
-    console.log('add signature')
     upsertWidget({
       id: uuidv4(),
       type: 'signature',
       page: page,
       value: '',
+      x: 0,
+      y: 0,
+      w: 250,
+      h: 15,
+    })
+  };
+
+  const addNotaryStampWidget = () => {
+    upsertWidget({
+      id: uuidv4(),
+      type: 'notary-stamp',
+      page: page,
+      value: notary,
       x: 0,
       y: 0,
       w: 250,
@@ -241,7 +259,7 @@ const Editor = ({ order, setOrder, downloadURL, publicKey, signature }) => {
                 {label: 'Text', icon: 'pi pi-book', command: addTextWidget},
                 {label: 'Date', icon: 'pi pi-calendar', command: addDateWidget },
                 {label: 'Signature', icon: 'pi pi-pencil', command: addSignatureWidget},
-                {label: 'Notary Seal', icon: 'pi pi-check-square', command: () => todoWidget('Notary Seal')},
+                {label: 'Notary Stamp', icon: 'pi pi-check-square', command: addNotaryStampWidget},
               ]
             },
           ]} />
