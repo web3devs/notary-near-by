@@ -9,6 +9,7 @@ import (
 type Notary struct {
 	PublicKey _pk.PublicKey `dynamo:"PublicKey" json:"public_key"`
 	FullName  string        `dynamo:"FullName" json:"full_name"`
+	CID       string        `dynamo:"CID" json:"cid"`
 }
 
 //GetCertificatePath returns Key for Notary's PFX (Digital Certificate)

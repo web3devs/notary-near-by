@@ -20,3 +20,11 @@ func NewWriter(svc *db.Service) (*Writer, error) {
 func (_x *Writer) Create(i *Notary) error {
 	return _x.svc.DB.Table(_x.svc.TableName).Put(i).If("attribute_not_exists(PublicKey)").Run()
 }
+
+//UpdateCID update CID in DB
+func (_x *Writer) UpdateCID(i *Notary) error {
+	return _x.svc.DB.Table(_x.svc.TableName).
+		Update("PublicKey", i.PublicKey).
+		Set("CID", i.CID).
+		Value(i)
+}

@@ -6,6 +6,7 @@ import (
 	"crypto/rsa"
 	"crypto/x509"
 	"crypto/x509/pkix"
+	"encoding/json"
 	"encoding/pem"
 	"fmt"
 	"io/ioutil"
@@ -16,6 +17,7 @@ import (
 	"time"
 
 	_bucket "notarynearby/internal/bucket"
+	_nft "notarynearby/pkg/nftstorage"
 
 	"github.com/aws/aws-sdk-go/aws/session"
 	"software.sslmate.com/src/go-pkcs12"
@@ -27,6 +29,7 @@ type Service struct {
 	Reader  *Reader
 	Writer  *Writer
 	bucket  *_bucket.Service
+	nft     *_nft.API
 	rootPFX []byte
 	dcaPFX  []byte
 }
@@ -50,11 +53,17 @@ func New(sess *session.Session) (*Service, error) {
 		return nil, fmt.Errorf("failed initiating Bucket: %w", err)
 	}
 
+	nft, err := _nft.New(os.Getenv("NFT_STORAGE_API_KEY"))
+	if err != nil {
+		return nil, fmt.Errorf("failed initiating NFT Storage client: %w", err)
+	}
+
 	s := &Service{
 		sess:   sess,
 		Reader: r,
 		Writer: w,
 		bucket: bucket,
+		nft:    nft,
 	}
 
 	if err := s.lazyGenerateRootCerts(); err != nil {
@@ -253,6 +262,32 @@ func (_x *Service) Create(_in *CreateInput) (*CreateOutput, error) {
 
 	if err := _x.bucket.Upload(s.GetCertificatePath(), ioutil.NopCloser(bytes.NewReader(notaryPfx))); err != nil {
 		return nil, fmt.Errorf("failed uploading notary.pfx to S3: %w", err)
+	}
+
+	//Store metadata.json for Notary
+	m := _nft.Metadata{
+		Name:        fmt.Sprintf("Name: %v", s.FullName),
+		Description: fmt.Sprintf("Notary Public"),
+		Properties: map[string]string{
+			"PublicKey": s.PublicKey.String(),
+			"CreatedAt": time.Now().Format(time.RFC3339),
+		},
+	}
+	mbts, err := json.Marshal(m)
+	if err != nil {
+		return nil, fmt.Errorf("failed marshaling metadata.json: %w", err)
+	}
+
+	o, err := _x.nft.Upload(&_nft.UploadInput{
+		MetadataFile: mbts,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed uploading files to IPFS: %w", err)
+	}
+
+	s.CID = o.Value.CID
+	if err := _x.Writer.UpdateCID(s); err != nil {
+		return nil, fmt.Errorf("failed setting CID: %w", err)
 	}
 
 	return &CreateOutput{
