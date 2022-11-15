@@ -65,11 +65,7 @@ export default () => {
 
     const handleSubmit = useCallback(async () => {
         setIsSubmiting(true)
-        await signUpNotary(
-            accountAddress,
-            signature,
-            formData.fullName,
-        )
+        await signUpNotary(formData)
         setIsSubmiting(false)
         navigate('/notary')
     }, [formData])
