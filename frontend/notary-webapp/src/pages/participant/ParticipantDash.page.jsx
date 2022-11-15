@@ -1,12 +1,11 @@
 import { useEffect, useState } from 'react'
 import { ProgressSpinner } from 'primereact'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { Button } from 'primereact'
 import { useAuth } from '../../context'
 import { getParticipantProfile, getOwnersOrders } from '../../api'
 import { Card } from 'primereact/card';
 import { Chip } from 'primereact/chip';
-import { Tag } from 'primereact/tag';
 import NoOrdersImage from '../../assets/no-orders.svg'
 
 const  NoOrders = ({ orders }) => {
@@ -101,6 +100,8 @@ export default () => {
     })()
   }, [])
 
+  if (!isSigned && !isLoading) return navigate('/participant/sign-up')
+
   return (
     <div className="flex flex-column align-items justify-content-center">
       <div className="flex justify-content-between">
@@ -127,7 +128,7 @@ export default () => {
           </>
         )}
 
-        {(!isSigned && !isLoading) && (
+        {/* {(!isSigned && !isLoading) && (
           <>
             <div className="mb-4">
               You are not registered as a Participant yet.
@@ -136,7 +137,7 @@ export default () => {
               <Button label="Sign up " />
             </Link>
           </>
-        )}
+        )} */}
       </Card>
     </div>
   )

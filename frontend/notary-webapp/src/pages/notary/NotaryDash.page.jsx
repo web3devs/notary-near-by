@@ -1,7 +1,7 @@
 import { ProgressSpinner } from 'primereact'
 import { Button } from 'primereact'
 import { useEffect, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { getAllOrders, getNotaryProfile } from '../../api'
 import { useAuth } from '../../context'
 import { Card } from 'primereact/card';
@@ -73,6 +73,7 @@ export default () => {
   const [orders, setOrders] = useState([])
   const [isLoading, setIsLoading] = useState(false)
   const [isSigned, setIsSigned] = useState(false)
+  const navigate = useNavigate()
 
   useEffect(() => {
     ;(async () => {
@@ -97,6 +98,8 @@ export default () => {
     })()
   }, [accountAddress])
 
+  if (!isSigned && !isLoading) return navigate('/notary/sign-up')
+
   return (
     <div className="flex flex-column align-items justify-content-center">
       <div className="flex justify-content-between">
@@ -117,7 +120,7 @@ export default () => {
           </>
         )}
 
-        {(!isSigned && !isLoading) && (
+        {/* {(!isSigned && !isLoading) && (
           <>
             <div className="mb-4">
               You are not registered as a Notary yet.
@@ -126,7 +129,7 @@ export default () => {
               <Button label="Sign up " />
             </Link>
           </>
-        )}
+        )} */}
       </Card>
     </div>
   )
