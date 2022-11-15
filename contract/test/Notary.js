@@ -33,13 +33,20 @@ describe("Notary contract", function () {
         })
     })
     describe('Notary token', () => {
-        it("admin should be able to issue a notary token", async () => {
+        it("should issue notary token", async () => {
             const {notaryContract, notaryNft, owner, notary} = await loadFixture(deployFixture)
             await expect(
                 () => notaryContract.connect(owner).issueNotaryToken(notary.address, "123ABC", "ftp://beepboop")
             ).to.changeTokenBalance(notaryNft, notary, 1)
         })
-        it("should prevent a non-admin issuing a notary token", async () => {
+        // TODO For the hacakthon, anyone can issue a notary token
+        it("should allow anyone to issue a notary token", async () => {
+            const {notaryContract, notaryNft, mallory, notary} = await loadFixture(deployFixture)
+            await expect(
+                () => notaryContract.connect(mallory).issueNotaryToken(notary.address, "123ABC", "ftp://beepboop")
+            ).to.changeTokenBalance(notaryNft, notary, 1)
+        })
+        it.skip("should prevent a non-admin issuing a notary token", async () => {
             const {notaryContract, mallory, notary} = await loadFixture(deployFixture)
             await expect(
                 notaryContract.connect(mallory).issueNotaryToken(notary.address, "123ABC", "ftp://beepboop")

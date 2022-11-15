@@ -10,7 +10,7 @@ async function deployContract(contractName, deployerWallet) {
     return contractInstance
 }
 
-const registerContractAddressGasLimit = 3_000_000;
+const registerContractAddressGasLimit = 1_000_000;
 const transferOwnershipGasLimit = 3_000_000;
 
 async function deployNotarizedDocumentNftContractAndInitialize(wallet, notaryContract) {

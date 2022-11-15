@@ -17,9 +17,29 @@ contract NotaryNft is ERC721URIStorage, Ownable {
     mapping(string => uint256) public tokenByNotaryId;
     mapping(uint256 => bool) public isActive;
 
-    constructor() ERC721("NotaryNft", "NOT") {}
+    error OnlyOneTokenAllowedPerAddress(address to);
+    error OnlyOneTokenAllowedPerNotaryId(string notaryId);
 
-    function mint(address to, string memory notaryId, string memory _metadataUri) external onlyOwner returns (uint256 tokenId) {
+    modifier onlyOnePerAddress(address to) {
+        if (balanceOf(to) != 0) {
+            revert  OnlyOneTokenAllowedPerAddress(to);
+        }
+        _;
+    }
+
+    modifier onlyOnePerId(string memory notaryId) {
+        if (tokenByNotaryId[notaryId] != 0) {
+            revert OnlyOneTokenAllowedPerNotaryId(notaryId);
+        }
+        _;
+    }
+
+    constructor() ERC721("Notary Verification Nft", "Verified Notary") {}
+
+    // TODO For the hackathon, anyone can mint, add onlyOwner modifier before MVP
+    function mint(
+        address to, string memory notaryId, string memory _metadataUri
+    ) external /*onlyOwner*/ onlyOnePerAddress(to) onlyOnePerId(notaryId) returns (uint256 tokenId) {
         tokenId = _tokensCount + 1;
         tokenByNotaryId[notaryId] = tokenId;
         isActive[tokenId] = true;
