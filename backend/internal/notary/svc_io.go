@@ -6,8 +6,7 @@ import _pk "notarynearby/internal/pk"
 type CreateInput struct {
 	PublicKey _pk.PublicKey `json:"public_key"`
 	Signature _pk.Signature `json:"signature"`
-	FirstName string        `json:"first_name"`
-	LastName  string        `json:"last_name"`
+	FullName  string        `json:"full_name"`
 }
 
 //CreateOutput result of Connect

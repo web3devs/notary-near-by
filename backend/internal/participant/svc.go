@@ -41,8 +41,7 @@ func New(sess *session.Session) (*Service, error) {
 func (_x *Service) Create(_in *CreateInput) (*CreateOutput, error) {
 	s := &Participant{
 		PublicKey: pk.PublicKey(_in.PublicKey.String()),
-		FirstName: _in.FirstName,
-		LastName:  _in.LastName,
+		FullName:  _in.FullName,
 	}
 	//TODO: Validate PublicKey and Signature
 	if err := _x.Writer.Create(s); err != nil {

@@ -7,6 +7,5 @@ import (
 //Participant entity
 type Participant struct {
 	PublicKey _pk.PublicKey `dynamo:"PublicKey" json:"public_key"`
-	FirstName string        `dynamo:"FirstName" json:"first_name"`
-	LastName  string        `dynamo:"LastName" json:"last_name"`
+	FullName  string        `dynamo:"FullName" json:"full_name"`
 }

@@ -153,13 +153,13 @@ func (_x *Service) getNotaryCert(n *Notary, DCACert *x509.Certificate, DCAKey *r
 		SerialNumber: big.NewInt(1),
 		Subject: pkix.Name{
 			Country:            []string{"EN"},
-			Organization:       []string{fmt.Sprintf("Notary %v %v", n.FirstName, n.LastName)},
+			Organization:       []string{fmt.Sprintf("Notary %v", n.FullName)},
 			OrganizationalUnit: []string{"Legal"},
 			Locality:           []string{"Under"},
 			Province:           []string{"Rock"},
 			StreetAddress:      []string{"Sesame Streeet 123"},
 			PostalCode:         []string{"12345"},
-			CommonName:         fmt.Sprintf("%v %v", n.FirstName, n.LastName),
+			CommonName:         n.FullName,
 		},
 		IsCA:           false,
 		MaxPathLenZero: true,
@@ -214,8 +214,7 @@ func (_x *Service) lazyGenerateRootCerts() error {
 func (_x *Service) Create(_in *CreateInput) (*CreateOutput, error) {
 	s := &Notary{
 		PublicKey: pk.PublicKey(_in.PublicKey.String()),
-		FirstName: _in.FirstName,
-		LastName:  _in.LastName,
+		FullName:  _in.FullName,
 	}
 	//TODO: Validate PublicKey and Signature
 	if err := _x.Writer.Create(s); err != nil {

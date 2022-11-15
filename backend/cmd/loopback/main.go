@@ -83,8 +83,7 @@ func handleActionJoin(m *_ss.DispatchActionInput, o *_os.Order, s *_ss.Session, 
 
 		if n.PublicKey != "" {
 			if err := oss.NotaryJoined(o, &_os.Person{
-				FirstName: n.FirstName,
-				LastName:  n.LastName,
+				FullName: n.FullName,
 			}); err != nil {
 				return fmt.Errorf("faild connecting notary: %w", err)
 			}
@@ -97,8 +96,7 @@ func handleActionJoin(m *_ss.DispatchActionInput, o *_os.Order, s *_ss.Session, 
 		}
 		if p.PublicKey != "" {
 			if err := oss.ParticipantJoined(o, tmp.PublicKey, &_os.Person{
-				FirstName: p.FirstName,
-				LastName:  p.LastName,
+				FullName: p.FullName,
 			}); err != nil {
 				return fmt.Errorf("faild connecting participant: %w", err)
 			}
@@ -111,8 +109,7 @@ func handleActionJoin(m *_ss.DispatchActionInput, o *_os.Order, s *_ss.Session, 
 		}
 		if p.PublicKey != "" {
 			if err := oss.WitnessJoined(o, tmp.PublicKey, &_os.Person{
-				FirstName: p.FirstName,
-				LastName:  p.LastName,
+				FullName: p.FullName,
 			}); err != nil {
 				return fmt.Errorf("faild connecting participant: %w", err)
 			}
