@@ -14,6 +14,7 @@ import {
 import './editor.css';
 import {
   TextWidget,
+  DateWidget,
   SignatureWidget,
 } from './widgets';
 import { Flow } from './Flow'
@@ -159,6 +160,8 @@ const Editor = ({ order, setOrder, downloadURL, publicKey, signature }) => {
     switch (widget.type) {
       case 'text':
         return <TextWidget order={order} disabled={role !== 'notary'} key={`widget-${widget.type}-${widget.id}`} widget={widget} updateWidget={upsertWidget} deleteWidget={deleteWidget} />
+      case 'date':
+        return <DateWidget order={order} disabled={role !== 'notary'} key={`widget-${widget.type}-${widget.id}`} widget={widget} updateWidget={upsertWidget} deleteWidget={deleteWidget} />
       case 'signature':
         return <SignatureWidget status={status} participantsJoined={participantsJoined} disabled={role !== 'notary'} key={`widget-${widget.type}-${widget.id}`} widget={widget} updateWidget={upsertWidget} deleteWidget={deleteWidget} />
       default:
@@ -170,6 +173,19 @@ const Editor = ({ order, setOrder, downloadURL, publicKey, signature }) => {
     upsertWidget({
       id: uuidv4(),
       type: 'text',
+      page: page,
+      value: '',
+      x: 0,
+      y: 0,
+      w: 250,
+      h: 15,
+    })
+  };
+
+  const addDateWidget = () => {
+    upsertWidget({
+      id: uuidv4(),
+      type: 'date',
       page: page,
       value: '',
       x: 0,
@@ -223,7 +239,7 @@ const Editor = ({ order, setOrder, downloadURL, publicKey, signature }) => {
               label: 'Editor',
               items: [
                 {label: 'Text', icon: 'pi pi-book', command: addTextWidget},
-                {label: 'Date', icon: 'pi pi-calendar', command: () => todoWidget('Date')},
+                {label: 'Date', icon: 'pi pi-calendar', command: addDateWidget },
                 {label: 'Signature', icon: 'pi pi-pencil', command: addSignatureWidget},
                 {label: 'Notary Seal', icon: 'pi pi-check-square', command: () => todoWidget('Notary Seal')},
               ]
