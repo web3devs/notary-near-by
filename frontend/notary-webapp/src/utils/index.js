@@ -14,12 +14,13 @@ const useForm = ({ constraints, data }) => {
       // The value is guaranteed not to be null or undefined but otherwise it
       // could be anything.
       parse: function(value, options) {
-        return +moment.utc(value);
+        const date = new Date(value.getFullYear(), value.getMonth(), value.getDate(), 0, 0, 0);
+        return date
       },
       // Input is a unix timestamp
       format: function(value, options) {
-        var format = options.dateOnly ? "YYYY-MM-DD" : "YYYY-MM-DD hh:mm:ss";
-        return moment.utc(value).format(format);
+        var format = options.dateOnly ? "l" : "MM-DD-YYYY hh:mm:ss";
+        return moment.format(value);
       }
     });
 

@@ -25,13 +25,15 @@ export default () => {
             notaryIdNumber: {
                 presence: true
             },
-            // TODO make this not break validation
-            // commissionExpirationDate: {
-            //   date: {
-            //     earliest: moment.utc().add(1, 'day'),
-            //     message: "must be in the future"
-            //   }
-            // },
+            commissionExpirationDate: {
+                // TODO Using date instead of datetime breaks this due to timezone stuff
+                datetime: true
+                // FIXME It should verify that the date is in the future
+                // datetime: {
+                //   earliest: moment.utc().add(1, 'day'),
+                //   message: "must be in the future"
+                // }
+            },
             license: {
                 presence: true
             },
@@ -112,7 +114,10 @@ export default () => {
                             id="notaryIdNumber"
                             disabled={isSubmiting}
                             value={formData.notaryIdNumber || ''}
-                            onChange={(e) => setFormField('notaryIdNumber', e.target.value)}
+                            onChange={(e) =>
+                                setFormField('notaryIdNumber', e.target.value)
+                            }
+                            className="mb-4"
                         />
                         {errors?.notaryIdNumber && <div className="p-error">{errors.notaryIdNumber}</div>}
                     </div>
@@ -123,7 +128,12 @@ export default () => {
                             id="commissionExpirationDate"
                             disabled={isSubmiting}
                             value={formData.commissionExpirationDate || ''}
-                            onChange={(e) => setFormField('commissionExpirationDate', e.value)}
+                            onChange={(e) => setFormField(
+                                'commissionExpirationDate',
+                                e.value)
+                            }
+                            showIcon={true}
+                            dateFormat='m/d/yy'
                         />
                         {errors?.commissionExpirationDate &&
                         <div className="p-error">

@@ -67,10 +67,6 @@ export const signUpNotary = async notaryMetadata /* : NotaryMetadata */ => {
   const contractAddress = contracts.Notary
   const abi = NotaryContractABI.abi
   const contract = new ethers.Contract(contractAddress, abi, signer)
-  console.log('----contract')
   const issueTokenReceipt = await contract.issueNotaryToken(accountAddress, notaryMetadata.notaryIdNumber, metadataUrl)
-  console.log(`---receipt`)
   await issueTokenReceipt.wait()
-  console.log('=======done')
-
 }
