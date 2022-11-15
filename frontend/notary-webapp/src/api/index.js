@@ -30,24 +30,21 @@ api.interceptors.request.use(
 export const signUpParticipant = async (
   address,
   signature,
-  firstName,
-  lastName
+  fullName,
 ) => {
   const { data } = await api.post(`/participants`, {
     public_key: address,
     signature: signature,
-    first_name: firstName,
-    last_name: lastName
+    full_name: fullName,
   })
   return data
 }
 
-export const signUpNotary = async (address, signature, firstName, lastName) => {
+export const signUpNotary = async (address, signature, fullName) => {
   const { data } = await api.post(`/notaries`, {
     public_key: address,
     signature: signature,
-    first_name: firstName,
-    last_name: lastName
+    full_name: fullName,
   })
   return data
 }

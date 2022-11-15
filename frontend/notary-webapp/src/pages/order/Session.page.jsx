@@ -46,11 +46,11 @@ export default () => {
 
         {order && (
           <div className="flex flex-column align-items-center">
-            {(m && m.first_name) && (
+            {(m && m.full_name) && (
               <JitsiMeeting
                 roomName={order.id}
                 userInfo={{
-                  displayName: `${m.first_name} ${m.last_name}`
+                  displayName: `${m.full_name}`
                 }}
                 getIFrameRef={node => {
                   node.style.width = '100%'

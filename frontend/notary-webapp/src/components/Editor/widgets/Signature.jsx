@@ -12,7 +12,7 @@ export const SignatureWidget = ({ disabled, widget, status, participantsJoined, 
     const [editMode, setEditMode] = useState(false);
     const [isSignable, setIsSignable] = useState(false);
     const [signMode, setSignMode] = useState(false);
-    const [v, setV] = useState({first_name: '', last_name: '', public_key: ''});
+    const [v, setV] = useState({full_name: '', public_key: ''});
 
     const { accountAddress, role } = useAuth();
 
@@ -23,8 +23,8 @@ export const SignatureWidget = ({ disabled, widget, status, participantsJoined, 
     }, [value])
 
     useEffect(() => {
-        const { first_name, last_name, public_key } = v;
-        if (first_name !== '', last_name !== '', public_key !== '') {
+        const { full_name, public_key } = v;
+        if (full_name !== '', public_key !== '') {
             setValid(true);
             return;
         }
@@ -37,10 +37,9 @@ export const SignatureWidget = ({ disabled, widget, status, participantsJoined, 
             if (participantsJoined) {
                 for (const [k, p] of Object.entries(participantsJoined)) {
                     pts.push({
-                        label: `${p.first_name} ${p.last_name}`,
+                        label: `${p.full_name}`,
                         public_key: k,
-                        first_name: p.first_name,
-                        last_name: p.last_name,
+                        full_name: p.full_name,
                     })
                 }
                 setParticipants(pts);
@@ -63,8 +62,8 @@ export const SignatureWidget = ({ disabled, widget, status, participantsJoined, 
         setSignMode(!signMode);
     }
 
-    const selectParticipant = ({public_key, first_name, last_name}) => {
-        const n = { label: `${first_name} ${last_name}`, public_key, first_name, last_name };
+    const selectParticipant = ({public_key, full_name}) => {
+        const n = { label: `${full_name}`, public_key, full_name };
         setV(n)
         updateWidget({...widget, value: n})
     }
@@ -93,7 +92,7 @@ export const SignatureWidget = ({ disabled, widget, status, participantsJoined, 
                 updateWidget({ ...widget, x: d.x, y: d.y })
             }}
         >
-            {`${v.first_name} ${v.last_name}`}
+            {`${v.full_name}`}
             { !disabled && (
                 <div className="context-menu" onClick={() => { e.preventDefault(); e.stopPropagation(); }}>
                     <i className="pi pi-file-edit" onClick={toggleEdit} />

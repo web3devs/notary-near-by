@@ -16,7 +16,7 @@ export const Signatures = ({ publicKey, widgets, setPage }) => {
         <>
             <div className="mb-2">
                 <strong>Signatures:</strong>
-                {sigs.map((s, idx) => <Button key={`sig-idx`} label={`${s.value.first_name} ${s.value.last_name} / Page: ${s.page}`} onClick={() => setPage(s.page)} />)}
+                {sigs.map((s, idx) => <Button key={`sig-idx`} label={`${s.value.full_name} / Page: ${s.page}`} onClick={() => setPage(s.page)} />)}
             </div>
         </>
     )

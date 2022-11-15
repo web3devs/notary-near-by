@@ -12,7 +12,7 @@ const UsersList = ({ prefix, label, required, joined }) => {
             {
                 required.map((p, idx) => {
                     if (joined[p]) {
-                        return <Chip key={`${prefix}-${idx}`} label={`${joined[p].first_name} ${joined[p].last_name}`} icon="pi pi-check" className="bg-green-500" />
+                        return <Chip key={`${prefix}-${idx}`} label={`${joined[p].full_name}`} icon="pi pi-check" className="bg-green-500" />
                     }
                     return <Chip key={`${prefix}-${idx}`} label={`${p}`} icon="pi pi-times" className="bg-orange-500" />
                 })
@@ -29,7 +29,7 @@ export const Participants = ({ notary_joined, participants, participants_joined,
             <div className="mb-2">
                 <strong>Notary:</strong><br />
                 {nj && (
-                    <Chip label={`${nj.first_name} ${nj.last_name}`} icon="pi pi-check" className="bg-green-500" />
+                    <Chip label={`${nj.full_name}`} icon="pi pi-check" className="bg-green-500" />
                 )}
                 {!nj && (
                     <Chip label={`Waiting for Notary`} icon="pi pi-times" className="bg-orange-500" />

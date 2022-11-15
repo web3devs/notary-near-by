@@ -16,10 +16,7 @@ export default () => {
 
   const { submit, setFormField, errors, formData, canSubmit } = useForm({
     constraints: {
-      firstName: {
-        presence: true
-      },
-      lastName: {
+      fullName: {
         presence: true
       },
       license: {
@@ -30,8 +27,7 @@ export default () => {
       }
     },
     data: {
-      firstName: null,
-      lastName: null,
+      fullName: null,
       license: null,
       stamp: null
     }
@@ -42,8 +38,7 @@ export default () => {
     await signUpNotary(
       accountAddress,
       signature,
-      formData.firstName,
-      formData.lastName
+      formData.fullName,
     )
     setIsSubmiting(false)
     navigate('/notary')
@@ -59,27 +54,15 @@ export default () => {
       <div className="flex justify-content-center align-items-top h-screen" style={{ width: '400px' }}>
         <div className="flex-column w-full">
           <div className="field mb-3">
-            <label htmlFor="firstName" className="block">First name</label>
+            <label htmlFor="fullName" className="block">Full name</label>
             <InputText
-              id="firstName"
+              id="fullName"
               disabled={isSubmiting}
-              value={formData.firstName || ''}
-              onChange={(e) => setFormField('firstName', e.target.value || null)}
+              value={formData.fullName || ''}
+              onChange={(e) => setFormField('fullName', e.target.value || null)}
               className="w-full"
             />
-            {errors?.firstName && <div className="p-error">{errors.firstName}</div>}
-          </div>
-
-          <div className="field mb-3">
-            <label htmlFor="lastName" className="block">Last name</label>
-            <InputText
-              id="lastName"
-              disabled={isSubmiting}
-              value={formData.lastName || ''}
-              onChange={(e) => setFormField('lastName', e.target.value)}
-              className="w-full"
-            />
-            {errors?.lastName && <div className="p-error">{errors.lastName}</div>}
+            {errors?.fullName && <div className="p-error">{errors.fullName}</div>}
           </div>
 
           <div className="flex flex-start flex-column align-items-start gap-2 mb-3">
