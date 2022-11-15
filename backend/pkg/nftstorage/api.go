@@ -59,11 +59,17 @@ type UploadOutput struct {
 
 //Upload uploads files to IPFS
 func (_x *API) Upload(_in *UploadInput) (*UploadOutput, error) {
-	r, err := _x.c.R().
-		SetHeader("Authorization", "Bearer "+_x.apiKey).
-		SetFileReader("file", "signed.pdf", bytes.NewReader(_in.SignedFile)).
-		SetFileReader("file", "metadata.json", bytes.NewReader(_in.MetadataFile)).
-		Post(_x.url + "/upload")
+	rsty := _x.c.R().SetHeader("Authorization", "Bearer "+_x.apiKey)
+
+	if len(_in.SignedFile) > 0 {
+		rsty.SetFileReader("file", "signed.pdf", bytes.NewReader(_in.SignedFile))
+	}
+
+	if len(_in.MetadataFile) > 0 {
+		rsty.SetFileReader("file", "metadata.json", bytes.NewReader(_in.MetadataFile))
+	}
+
+	r, err := rsty.Post(_x.url + "/upload")
 	if err != nil {
 		return nil, fmt.Errorf("failed uploading file: %w", err)
 	}
