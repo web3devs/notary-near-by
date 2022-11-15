@@ -35,6 +35,22 @@ func TestAddMapping(t *testing.T) {
     "y": 354,
     "w": 250,
     "h": 15
+  },
+  {
+    "id": "asdasdasd-1",
+    "type": "notary-stamp",
+    "page": 1,
+    "value": "Judas Priest",
+    "x": 166,
+    "y": 354
+  },
+  {
+    "id": "asdasdasd-2",
+    "type": "date",
+    "page": 1,
+    "value": "2022-11-15T12:22:34Z",
+    "x": 266,
+    "y": 254
   }
 ]`
 	e := New("")
@@ -44,7 +60,15 @@ func TestAddMapping(t *testing.T) {
 		t.Errorf("unexpected error: %v", err)
 	}
 
-	if p := len(e.textFields); p != 3 {
-		t.Errorf("Expected # of fields: %v. Provided: %v", 1, p)
+	if p := len(e.textWidgets); p != 3 {
+		t.Errorf("Expected # of widgets: %v. Provided: %v", 3, p)
+	}
+
+	if p := len(e.dateWidgets); p != 1 {
+		t.Errorf("Expected # of widgets: %v. Provided: %v", 1, p)
+	}
+
+	if p := len(e.notaryStampWidgets); p != 1 {
+		t.Errorf("Expected # of widgets: %v. Provided: %v", 1, p)
 	}
 }

@@ -12,14 +12,15 @@ import (
 
 //Editor edits PDF document
 type Editor struct {
-	filePath   string
-	pdf        *fpdf.Fpdf
-	pageSizes  map[int]map[string]map[string]float64
-	templates  []int
-	textFields []TextField
-	dateFields []DateField
-	rs         *io.ReadSeeker
-	imp        *gofpdi.Importer
+	filePath           string
+	pdf                *fpdf.Fpdf
+	pageSizes          map[int]map[string]map[string]float64
+	templates          []int
+	textWidgets        []TextWidget
+	dateWidgets        []DateWidget
+	notaryStampWidgets []NotaryStampWidget
+	rs                 *io.ReadSeeker
+	imp                *gofpdi.Importer
 }
 
 //New instantiates Editor with provided original PDF file
@@ -78,24 +79,31 @@ func (_x *Editor) loadPage(p int) {
 	_x.imp.UseImportedTemplate(_x.pdf, _x.templates[p], mbox["x"], mbox["y"], mbox["w"], mbox["h"])
 }
 
-//RenderFields renders all defined fields to PDF
-func (_x *Editor) RenderFields() {
+//RenderWidgets renders all defined widgets to PDF
+func (_x *Editor) RenderWidgets() {
 	_x.pdf.AddLayer("Widgets", false)
 
 	ps := len(_x.pageSizes)
 	for p := 0; p < ps; p++ {
 		_x.pdf.AddPage()
 		_x.loadPage(p)
-		//TextFields
-		for _, t := range _x.textFields {
+		//Text
+		for _, t := range _x.textWidgets {
 			if t.Page == p {
 				t.Render(_x.pdf)
 			}
 		}
 
-		//DateFields
-		for _, t := range _x.dateFields {
-			if t.page == p {
+		//Date
+		for _, t := range _x.dateWidgets {
+			if t.Page == p {
+				t.Render(_x.pdf)
+			}
+		}
+
+		//Notary stamps
+		for _, t := range _x.notaryStampWidgets {
+			if t.Page == p {
 				t.Render(_x.pdf)
 			}
 		}
@@ -124,14 +132,31 @@ func (_x *Editor) LoadWidgets(j []byte) error {
 			return fmt.Errorf("widget parsing mapping: %w", err)
 		}
 
-		if wt.Type == "text" {
-			var w TextField
+		switch wt.Type {
+		case "text":
+			var w TextWidget
 			err := json.Unmarshal(f, &w)
 			if err != nil {
 				return fmt.Errorf("widget parsing mapping: %w", err)
 			}
 
-			_x.AddTextField(w.Page-1, w.Value, w.X, w.Y, w.W, w.H)
+			_x.AddTextWidget(w.Page-1, w.Value, w.X, w.Y, w.W, w.H)
+		case "date":
+			var w DateWidget
+			err := json.Unmarshal(f, &w)
+			if err != nil {
+				return fmt.Errorf("widget parsing mapping: %w", err)
+			}
+
+			_x.AddDateWidget(w.Page-1, w.Value, w.X, w.Y, w.W, w.H)
+		case "notary-stamp":
+			var w NotaryStampWidget
+			err := json.Unmarshal(f, &w)
+			if err != nil {
+				return fmt.Errorf("widget parsing mapping: %w", err)
+			}
+
+			_x.AddNotaryStampWidget(w.Page-1, w.Value, w.X, w.Y)
 		}
 	}
 

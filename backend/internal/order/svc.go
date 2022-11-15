@@ -227,7 +227,7 @@ func (_x *Service) GeneratePDF(_in *GeneratePDFInput) (*GeneratePDFOutput, error
 		return nil, fmt.Errorf("failed loading widgets to Editor: %w", err)
 	}
 
-	e.RenderFields()
+	e.RenderWidgets()
 
 	fmt.Println("4. Save files to /tmp/orderID/out.pdf")
 	if err := e.SaveToFile(tmpFileOut); err != nil {

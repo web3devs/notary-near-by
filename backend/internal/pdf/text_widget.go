@@ -4,8 +4,8 @@ import (
 	"github.com/go-pdf/fpdf"
 )
 
-//TextField representing basic text field
-type TextField struct {
+//TextWidget representing basic text widget
+type TextWidget struct {
 	ID    string  `json:"id"`
 	Page  int     `json:"page"`
 	X     float64 `json:"x"`
@@ -15,8 +15,8 @@ type TextField struct {
 	Value string  `json:"value"`
 }
 
-//Render renders the text field to PDF
-func (_x TextField) Render(pdf *fpdf.Fpdf) {
+//Render renders the text widget to PDF
+func (_x TextWidget) Render(pdf *fpdf.Fpdf) {
 	fontSize := 10.0
 	margin := 0.0
 	pdf.SetFont("Arial", "", fontSize)
@@ -30,9 +30,9 @@ func (_x TextField) Render(pdf *fpdf.Fpdf) {
 	pdf.CellFormat(_x.W, fontSize+2*margin, _x.Value, "1", 0, "LT", true, 0, "")
 }
 
-//AddTextField adds text field to Editor / PDF
-func (_x *Editor) AddTextField(page int, text string, x, y, w, h float64) {
-	_x.textFields = append(_x.textFields, TextField{
+//AddTextWidget adds text widget to Editor / PDF
+func (_x *Editor) AddTextWidget(page int, text string, x, y, w, h float64) {
+	_x.textWidgets = append(_x.textWidgets, TextWidget{
 		Page:  page,
 		X:     x,
 		Y:     y,
