@@ -29,7 +29,7 @@ func (_x DateWidget) Render(pdf *fpdf.Fpdf) {
 	pdf.SetFillColor(35, 186, 156)
 	pdf.SetLineWidth(0.1)
 
-	v := _x.Value.Format(time.UnixDate)
+	v := _x.Value.Format(time.RFC3339Nano)
 
 	pdf.CellFormat(_x.W, fontSize+2*margin, v, "1", 0, "LT", true, 0, "")
 }
