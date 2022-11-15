@@ -2,14 +2,12 @@ import {Button, Dropdown, InputText, Calendar} from 'primereact'
 import {useState, useCallback} from 'react'
 import {useNavigate} from 'react-router-dom'
 import {signUpNotary} from '../../contracts'
-import {useAuth} from '../../context'
 import FileUpload from '../../components/FileUpload'
 import useForm from '../../utils'
 
 export default () => {
     const [isSubmiting, setIsSubmiting] = useState(false)
     const navigate = useNavigate()
-    const {accountAddress, signature} = useAuth()
 
     const {submit, setFormField, errors, formData, canSubmit} = useForm({
         constraints: {
@@ -37,9 +35,6 @@ export default () => {
             license: {
                 presence: true
             },
-      stamp: {
-        presence: true
-      }
         },
         data: {
             firstName: null,
@@ -48,7 +43,6 @@ export default () => {
             notaryIdNumber: null,
             commissionExpirationDate: null,
             license: null,
-            stamp: null
         }
     })
 
@@ -144,15 +138,6 @@ export default () => {
                             error={errors?.license}
                             accept=".png,.jpg,.jpeg"
                             onFileChange={(e) => setFormField('license', e[0])}
-                            disabled={isSubmiting}
-                        />
-                    </div>
-                    <div className="flex flex-start flex-column align-items-start gap-2 mb-3">
-                        <FileUpload
-                            label="Stamp"
-                            error={errors?.stamp}
-                            accept=".png,.jpg,.jpeg"
-                            onFileChange={(e) => setFormField('stamp', e[0])}
                             disabled={isSubmiting}
                         />
                     </div>
