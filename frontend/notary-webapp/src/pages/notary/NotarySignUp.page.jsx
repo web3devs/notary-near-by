@@ -70,16 +70,7 @@ export default () => {
               accept=".doc,.pdf,.png,.jpg,.jpeg"
               onFileChange={(e) => setFormField('license', e[0])}
               disabled={isSubmiting}
-            />
-          </div>
-
-          <div className="flex flex-start flex-column align-items-start gap-2 mb-3">
-            <FileUpload
-              label="Stamp"
-              error={errors?.stamp}
-              accept=".png,.jpg,.jpeg"
-              onFileChange={(e) => setFormField('stamp', e[0])}
-              disabled={isSubmiting}
+              helper="Use whatever - we're not storing this file. In production we would verify you really are a Notary."
             />
           </div>
 
