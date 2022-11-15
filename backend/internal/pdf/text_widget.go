@@ -17,7 +17,7 @@ type TextWidget struct {
 
 //Render renders the text widget to PDF
 func (_x TextWidget) Render(pdf *fpdf.Fpdf) {
-	fontSize := 10.0
+	fontSize := 14.0
 	margin := 0.0
 	pdf.SetFont("Arial", "", fontSize)
 	pdf.SetXY(_x.X, _x.Y)
