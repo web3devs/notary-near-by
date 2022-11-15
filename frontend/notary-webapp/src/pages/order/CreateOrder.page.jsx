@@ -131,8 +131,10 @@ export default () => {
               <div className="text-sm text-100 mb-4">No participants yet</div>
             )}
             <Button
-              label="Add participant"
-              className="w-full p-button-sm"
+              label="Add"
+              iconPos="right"
+              icon="pi pi-plus"
+              className="p-button-sm"
               onClick={() => setShowAddParticipant(true)}
             />
           </div>
@@ -155,9 +157,11 @@ export default () => {
               <div className="text-sm text-100 mb-4">No witnesses yet</div>
             )}
             <Button
-              label="Add witness"
+              label="Add"
+              iconPos="right"
+              icon="pi pi-plus"
               onClick={() => setShowAddWitness(true)}
-              className="w-full p-button-sm"
+              className="p-button-sm"
             />
           </div>
 
@@ -166,7 +170,7 @@ export default () => {
             onClick={(e) => submit(handleSubmit, e)}
             disabled={!canSubmit}
             loading={isSubmiting}
-            className="w-full p-button-success text-white"
+            className="w-full text-white"
             iconPos="right"
           />
         </div>
