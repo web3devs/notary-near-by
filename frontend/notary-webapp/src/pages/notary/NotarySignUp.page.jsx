@@ -1,16 +1,14 @@
-import { FileUpload, InputText } from 'primereact'
+import { InputText } from 'primereact'
 import { Button } from 'primereact'
-import { useRef, useState, useCallback } from 'react'
+import { useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { signUpNotary } from '../../api'
 import { useAuth } from '../../context'
-
+import FileUpload from '../../components/FileUpload'
 import useForm from '../../utils'
 
 export default () => {
   const [isSubmiting, setIsSubmiting] = useState(false)
-  const licenseFileUploadRef = useRef()
-  const stampFileUploadRef = useRef()
   const navigate = useNavigate()
   const { accountAddress, signature } = useAuth()
 
@@ -66,41 +64,23 @@ export default () => {
           </div>
 
           <div className="flex flex-start flex-column align-items-start gap-2 mb-3">
-            <Button
+            <FileUpload
+              label="Notary license"
+              error={errors?.license}
+              accept=".doc,.pdf,.png,.jpg,.jpeg"
+              onFileChange={(e) => setFormField('license', e[0])}
               disabled={isSubmiting}
-              onClick={() => {
-                licenseFileUploadRef?.current?.click()
-              }}
-              className="p-button-outlined"
-            >
-              Notary license
-            </Button>
-            <input
-              type="file"
-              ref={licenseFileUploadRef}
-              onChange={(e) => setFormField('license', e.target.files)}
-              style={{ display: 'none' }}
             />
-            {errors?.license && <div className="p-error">{errors.license}</div>}
           </div>
 
           <div className="flex flex-start flex-column align-items-start gap-2 mb-3">
-            <Button
+            <FileUpload
+              label="Stamp"
+              error={errors?.stamp}
+              accept=".png,.jpg,.jpeg"
+              onFileChange={(e) => setFormField('stamp', e[0])}
               disabled={isSubmiting}
-              onClick={() => {
-                stampFileUploadRef?.current?.click()
-              }}
-              className="p-button-outlined"
-            >
-              Stamp
-            </Button>
-            <input
-              type="file"
-              ref={stampFileUploadRef}
-              onChange={(e) => setFormField('stamp', e.target.files)}
-              style={{ display: 'none' }}
             />
-            {errors?.stamp && <div className="p-error">{errors.stamp}</div>}
           </div>
 
           <Button

@@ -1,10 +1,10 @@
 import { InputText } from 'primereact'
 import { Button } from 'primereact'
 import { useEffect } from 'react'
-import { useRef, useState, useCallback } from 'react'
+import { useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { signUpParticipant } from '../../api'
-import { Card } from 'primereact/card';
+import FileUpload from '../../components/FileUpload'
 import { useAuth } from '../../context'
 import useForm from '../../utils'
 
@@ -27,7 +27,6 @@ export default () => {
       }
     }
   })
-  const idFileUploadRef = useRef()
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -69,21 +68,12 @@ export default () => {
           </div>
 
           <div className="flex flex-start flex-column align-items-start gap-2 mb-3">
-            <Button
+            <FileUpload
+              label="ID / Passport"
+              error={errors?.ID}
+              accept=".png,.jpg,.jpeg"
+              onFileChange={(e) => setFormField('ID', e[0])}
               disabled={isSubmiting}
-              onClick={() => {
-                idFileUploadRef?.current?.click()
-              }}
-              className="p-button-outlined"
-            >
-              ID / Passport
-            </Button>
-            {errors?.ID && <div className="p-error">{errors.ID}</div>}
-            <input
-              type="file"
-              ref={idFileUploadRef}
-              onChange={(e) => setFormField('ID', e.target.files)}
-              style={{ display: 'none' }}
             />
           </div>
 
