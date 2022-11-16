@@ -74,6 +74,7 @@ export default () => {
               accept=".png,.jpg,.jpeg"
               onFileChange={(e) => setFormField('ID', e[0])}
               disabled={isSubmiting}
+              helper="Use whatever - we're not storing this file. In production a Notary would verify your ID (compare the face in the video to the one on the ID)."
             />
           </div>
 
