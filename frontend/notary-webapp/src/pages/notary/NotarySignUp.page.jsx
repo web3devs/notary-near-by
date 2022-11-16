@@ -1,12 +1,15 @@
 import {Button, Dropdown, InputText, Calendar} from 'primereact'
 import {useState, useCallback} from 'react'
 import {useNavigate} from 'react-router-dom'
-import {signUpNotary} from '../../contracts'
+import { signUpNotary as cSignupNotary } from '../../contracts'
+import { signUpNotary } from '../../api'
 import FileUpload from '../../components/FileUpload'
 import useForm from '../../utils'
+import { useAuth } from '../../context'
 
 export default () => {
     const [isSubmiting, setIsSubmiting] = useState(false)
+    const { publicKey, signature } = useAuth()
     const navigate = useNavigate()
 
     const {submit, setFormField, errors, formData, canSubmit} = useForm({
@@ -14,16 +17,18 @@ export default () => {
             fullName: {
                 presence: true
             },
-            commissionAuthority: {
+            state: {
+                presence: true,
                 inclusion: {
                     within: {"FL": "Florida", "WA": "Washington", "TX": "Texas"},
                     message: "^We don't currently support notaries from %{value}"
                 }
             },
-            notaryIdNumber: {
+            idNumber: {
                 presence: true
             },
             commissionExpirationDate: {
+                presence: true,
                 // TODO Using date instead of datetime breaks this due to timezone stuff
                 datetime: true
                 // FIXME It should verify that the date is in the future
@@ -37,16 +42,15 @@ export default () => {
             },
         },
         data: {
-            firstName: null,
-            lastName: null,
-            commissionAuthority: null,
-            notaryIdNumber: null,
+            fullName: null,
+            state: null,
+            idNumber: null,
             commissionExpirationDate: null,
             license: null,
         }
     })
 
-    const commissionAuthorityOptions = [{
+    const stateOptions = [{
         label: "Washington",
         value: "WA",
     }, {
@@ -59,7 +63,15 @@ export default () => {
 
     const handleSubmit = useCallback(async () => {
         setIsSubmiting(true)
-        await signUpNotary(formData)
+        const n = await signUpNotary({
+            ...formData,
+            publicKey,
+            signature,
+        })
+        await cSignupNotary({
+            idNumber: n.id_number,
+            metadataURL: `https://ipfs.io/ipfs/${n.cid}/metadata.json`
+        })
         setIsSubmiting(false)
         navigate('/notary')
     }, [formData])
@@ -67,7 +79,7 @@ export default () => {
     return (
         <div className="flex flex-column align-items-center">
             <div className="flex flex-column align-items-center mb-4" style={{maxWidth: '400px'}}>
-                <h1>Sign up as a Notary</h1>
+                <h1>New Notary</h1>
                 <div className="text-500 text-center">lorem dolorem lorem dolorem lorem dolorem lorem dolorem lorem
                     dolorem lorem dolorem lorem dolorem lorem dolorem lorem dolorem lorem dolorem
                 </div>
@@ -75,7 +87,7 @@ export default () => {
             <div className="flex justify-content-center align-items-top h-screen" style={{width: '400px'}}>
                 <div className="flex-column w-full">
                     <div className="field mb-3">
-                        <label htmlFor="firstName">First name</label>
+                        <label htmlFor="fullName">Full name</label>
                         <InputText
                             id="fullName"
                             disabled={isSubmiting}
@@ -87,29 +99,30 @@ export default () => {
                     </div>
 
                     <div className="field mb-3">
-                        <label htmlFor="commissionAuthority">Where are you commissioned?</label>
+                        <label htmlFor="state">Where are you commissioned?</label>
                         <Dropdown
-                            id="commissionAuthority"
+                            id="state"
                             disabled={isSubmiting}
-                            options={commissionAuthorityOptions}
-                            value={formData.commissionAuthority || ''}
-                            onChange={(e) => setFormField('commissionAuthority', e.value)}
+                            options={stateOptions}
+                            value={formData.state || ''}
+                            onChange={(e) => setFormField('state', e.value)}
+                            className="w-full"
                         />
-                        {errors?.commissionAuthority && <div className="p-error">{errors.commissionAuthority}</div>}
+                        {errors?.state && <div className="p-error">{errors.state}</div>}
                     </div>
 
                     <div className="field mb-3">
-                        <label htmlFor="notaryIdNumber">ID Number</label>
+                        <label htmlFor="idNumber">ID Number</label>
                         <InputText
-                            id="notaryIdNumber"
+                            id="idNumber"
                             disabled={isSubmiting}
-                            value={formData.notaryIdNumber || ''}
+                            value={formData.idNumber || ''}
                             onChange={(e) =>
-                                setFormField('notaryIdNumber', e.target.value)
+                                setFormField('idNumber', e.target.value)
                             }
-                            className="mb-4"
+                            className="w-full"
                         />
-                        {errors?.notaryIdNumber && <div className="p-error">{errors.notaryIdNumber}</div>}
+                        {errors?.idNumber && <div className="p-error">{errors.idNumber}</div>}
                     </div>
 
                     <div className="field mb-3">
@@ -124,6 +137,7 @@ export default () => {
                             }
                             showIcon={true}
                             dateFormat='m/d/yy'
+                            className="w-full"
                         />
                         {errors?.commissionExpirationDate &&
                         <div className="p-error">
@@ -139,6 +153,7 @@ export default () => {
                             accept=".png,.jpg,.jpeg"
                             onFileChange={(e) => setFormField('license', e[0])}
                             disabled={isSubmiting}
+                            helper="Use whatever - we're not storing this file. In production we would verify you really are a Notary."
                         />
                     </div>
                     <Button

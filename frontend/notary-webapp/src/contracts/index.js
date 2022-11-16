@@ -59,14 +59,11 @@ export const initProvider = async () => {
   }
 }
 
-/** See notaryMetadata.d.ts for the schema of NotaryMetadata **/
-export const signUpNotary = async notaryMetadata /* : NotaryMetadata */ => {
-  // TODO Save the metadata to IPFS
-  const metadataUrl = "foo"
-
+export const signUpNotary = async ({ idNumber, metadataURL }) => {
   const contractAddress = contracts.Notary
   const abi = NotaryContractABI.abi
   const contract = new ethers.Contract(contractAddress, abi, signer)
-  const issueTokenReceipt = await contract.issueNotaryToken(accountAddress, notaryMetadata.notaryIdNumber, metadataUrl)
+  const issueTokenReceipt = await contract.issueNotaryToken(accountAddress, idNumber, metadataURL)
+
   await issueTokenReceipt.wait()
 }
