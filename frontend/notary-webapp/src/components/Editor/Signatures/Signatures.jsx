@@ -1,4 +1,5 @@
 import { Button } from 'primereact/button';
+import { Menu } from 'primereact/menu';
 import './style.css';
 
 export const Signatures = ({ publicKey, widgets, setPage }) => {
@@ -13,11 +14,11 @@ export const Signatures = ({ publicKey, widgets, setPage }) => {
     if (sigs.length === 0) return null;
 
     return (
-        <>
-            <div className="mb-2">
-                <strong>Signatures:</strong>
-                {sigs.map((s, idx) => <Button key={`sig-idx`} label={`${s.value.full_name} / Page: ${s.page}`} onClick={() => setPage(s.page)} />)}
-            </div>
-        </>
+        <Menu model={[
+            {
+              label: 'Signatures',
+              items: sigs.map((s) => ({label: `${s.value.full_name} / p. ${s.page}`, icon: 'pi pi-book', command: () => setPage(s.page) }))
+            },
+        ]} className="w-full" />
     )
 };

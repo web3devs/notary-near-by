@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react'
 import { ProgressSpinner } from 'primereact/progressspinner'
 // import Mint from '../../components/order-participant/Mint'
+import { Panel } from 'primereact/panel';
 import { Card } from 'primereact/card';
+import { Button } from 'primereact/button';
 import Editor from '../../components/Editor/Editor';
 import { useParams } from 'react-router-dom'
 import { useAuth } from '../../context'
@@ -9,10 +11,11 @@ import { getOrder } from '../../api';
 import { JitsiMeeting } from '@jitsi/react-sdk';
 
 export default () => {
+  const [debug, setDebug] = useState(false)
   const [m, setM] = useState(null);
   const [order, setOrder] = useState(undefined);
   const [downloadURL, setDownloadURL] = useState(undefined);
-  const { accountAddress, me } = useAuth()
+  const { accountAddress, me, role } = useAuth()
   const pms = useParams();
 
   useEffect(() => {
@@ -35,8 +38,27 @@ export default () => {
     <div className="flex flex-column align-items justify-content-center">
       <div className="flex justify-content-between">
         <h1 className="flex align-items-center justify-content-center">Notarial Ceremony</h1>
+
+        <span className="flex align-items-center justify-content-center">
+          <Button label={`Debug ${debug ? 'OFF' : 'ON'}`} onClick={() => setDebug(!debug)} className="p-button-warning text-white" />
+        </span>
       </div>
-      <pre>{JSON.stringify(m)}</pre>
+
+      {
+        debug && (
+          <>
+            <div className="text-color">
+              Role: {role}<br />
+              Status: {order.status}<br />
+              Profile: <pre>{JSON.stringify(m)}</pre>
+            </div>
+            <Panel header="Widgets JSON" toggleable collapsed={true}>
+              <pre>{JSON.stringify(order.widgets, ' ', '  ')}</pre>
+            </Panel>
+          </>
+        )
+      }
+
       <Card className="bg-white">
         {!order && (
           <div className="flex flex-column align-items align-items-center justify-content-center mt-8 mb-8">

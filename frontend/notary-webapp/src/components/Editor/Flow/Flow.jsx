@@ -29,7 +29,7 @@ export const Flow = ({ orderID }) => {
     }
 
     return (
-        <Menu className="mb-2" model={[
+        <Menu className="mb-2 w-full" model={[
             {
                 label: 'Ceremony',
                 items: [

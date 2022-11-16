@@ -1,11 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
 import { usePdf } from '@mikecousins/react-pdf';
 import { Button } from 'primereact/button';
-import { Panel } from 'primereact/panel';
 import { ProgressSpinner } from 'primereact/progressspinner';
 import { Menu } from 'primereact/menu';
-import { Toast } from 'primereact/toast';
-import { ScrollPanel } from 'primereact/scrollpanel';
 import { v4 as uuidv4 } from 'uuid';
 import {
   useWS,
@@ -22,9 +19,11 @@ import { Flow } from './Flow'
 import { Participants } from './Participants'
 import { Signatures } from './Signatures'
 import { Mint } from './Mint'
+import { Dialog } from 'primereact/dialog';
+import { useNavigate } from 'react-router-dom'
 
 const Editor = ({ order, setOrder, downloadURL, publicKey, signature }) => {
-  const [body, setBody] = useState('');
+  const [missingRoleDialog, setMissingRoleDialog] = useState(false)
   const [page, setPage] = useState(1);
   const [loaded, setLoaded] = useState(false);
   const [editorSize, setEditorSize] = useState({
@@ -41,17 +40,15 @@ const Editor = ({ order, setOrder, downloadURL, publicKey, signature }) => {
   const [ status, setStatus ] = useState(null);
   const [participantsJoined, setParticipantsJoined] = useState([]);
   const [notary, setNotary] = useState({full_name: ''})
-  const toast = useRef(null);
   const {
     ws,
-    msgs,
     join,
     ping,
-    sendMessage,
   } = useWS();
   const {
     role,
   } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (order) {
@@ -65,7 +62,7 @@ const Editor = ({ order, setOrder, downloadURL, publicKey, signature }) => {
 
   useEffect(() => {
     if (!role) {
-      toastError('Missing ROLE!') //TODO: Redirect
+      setMissingRoleDialog(true)
     }
   }, [role]);
 
@@ -227,23 +224,12 @@ const Editor = ({ order, setOrder, downloadURL, publicKey, signature }) => {
     })
   };
 
-  const todoWidget = (widget) => {
-    toast.current.show({ severity: 'warn', summary: 'TODO', detail: `${widget} widget`, life: 3000 })
-  }
-
-  const toastError = (msg) => {
-    toast.current.show({ severity: 'error', summary: 'Error', detail: msg, life: 3000 })
-  }
-
   return (
-    <div className="grid">
-      <div className="col-12 text-color">
-        ROLE: {role}<br />
-        Status: {status}<br />
-        DownloadURL: <input type="text" value={downloadURL} />
-      </div>
+    <div className="grid w-full mt-4">
+      <Dialog header="Missing role!" visible={missingRoleDialog} style={{ width: '50vw' }} footer={<Button label="Take me to role selection" icon="pi pi-chevron-right" iconPos="right" onClick={() => navigate('/')} autoFocus />} closable={false} resizable={false} draggable={false}>
+        <p>You don't have a role selected. You've probably refreshed the page - please don't do that again.</p>
+      </Dialog>
 
-      <Toast ref={toast} />
       <div className="col-2">
         {
           role === 'notary' && (
@@ -262,13 +248,14 @@ const Editor = ({ order, setOrder, downloadURL, publicKey, signature }) => {
                 {label: 'Notary Stamp', icon: 'pi pi-check-square', command: addNotaryStampWidget},
               ]
             },
-          ]} />
+          ]} className="w-full" />
         )}
 
         {order && (
           <Signatures publicKey={publicKey} widgets={widgets} setPage={setPage} />
         )}
       </div>
+
       <div className="col-8">
         {(!pdfDocument || !loaded) && <ProgressSpinner />}
         <>
@@ -282,29 +269,10 @@ const Editor = ({ order, setOrder, downloadURL, publicKey, signature }) => {
 
         {Boolean(pdfDocument && pdfDocument.numPages) && (
           <div className="flex justify-content-center flex-wrap gap-2 mt-3" style={{ width: editorSize.width }}>
-            <Button className="flex align-items-center justify-content-center" disabled={page === 1} onClick={() => setPage(page - 1)}  label="Previous" icon="pi pi-chevron-left" iconPost="left" />
+            <Button className="flex align-items-center justify-content-center" disabled={page === 1} onClick={() => setPage(page - 1)} label="Previous" icon="pi pi-chevron-left" iconPos="left" />
             <Button className="flex align-items-center justify-content-center p-button-round" disabled={true} label={page} />
             <Button className="flex align-items-center justify-content-center" disabled={page === pdfDocument.numPages} onClick={() => setPage(page + 1)} label="Next" icon="pi pi-chevron-right" iconPos="right" />
           </div>
-        )}
-
-        <div>
-          <ScrollPanel style={{ width: '100%', height: '200px' }}>
-            <ul>
-              {
-                [...msgs].map((m, idx) => m[0] === '>' ? <li key={`msg-${idx}`}>{`${m}`}</li> : <li key={`msg-${idx}`}>{`< ${m}`}</li>)
-              }
-            </ul>
-          </ScrollPanel>
-          <strong>Message:</strong><br />
-          <textarea onChange={e => setBody(e.target.value)} defaultValue={body} /><br />
-          <button onClick={async () => await sendMessage(order.id, body)}>send</button>
-        </div>
-
-        {widgets.length > 0 && (
-          <Panel header="Widgets JSON" toggleable collapsed={true}>
-            <pre>{JSON.stringify(widgets, ' ', '  ')}</pre>
-          </Panel>
         )}
       </div>
 
