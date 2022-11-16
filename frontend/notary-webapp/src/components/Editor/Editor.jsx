@@ -281,9 +281,10 @@ const Editor = ({ order, setOrder, downloadURL, publicKey, signature }) => {
         </>
 
         {Boolean(pdfDocument && pdfDocument.numPages) && (
-          <div className="p-buttonset">
-            <Button disabled={page === 1} onClick={() => setPage(page - 1)}  label="Previous" icon="pi pi-check" />
-            <Button disabled={page === pdfDocument.numPages} onClick={() => setPage(page + 1)}  label="Next" icon="pi pi-trash" />
+          <div className="flex justify-content-center flex-wrap gap-2 mt-3" style={{ width: editorSize.width }}>
+            <Button className="flex align-items-center justify-content-center" disabled={page === 1} onClick={() => setPage(page - 1)}  label="Previous" icon="pi pi-chevron-left" iconPost="left" />
+            <Button className="flex align-items-center justify-content-center p-button-round" disabled={true} label={page} />
+            <Button className="flex align-items-center justify-content-center" disabled={page === pdfDocument.numPages} onClick={() => setPage(page + 1)} label="Next" icon="pi pi-chevron-right" iconPos="right" />
           </div>
         )}
 

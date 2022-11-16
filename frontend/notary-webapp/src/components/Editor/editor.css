@@ -27,9 +27,9 @@
 }
 
 .widget>.context-menu {
-    float: right;
-    margin-top: -16px;
-    margin-right: -16px;
+    position: absolute;
+    top: -16px;
+    right: -1px;
     height: 15px;
     z-index: 100000;
 }
