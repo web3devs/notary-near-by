@@ -46,7 +46,6 @@ const useForm = ({ constraints, data }) => {
   }, [formData, initFormData])
 
   const setFormField = (fieldName, value) => {
-    console.log(formData)
     setFormData((prev) => ({ ...prev, [fieldName]: value }))
   }
 
