@@ -77,8 +77,9 @@ const List = ({ orders, publicKey }) => {
                   <h3>
                     {o.document_type}
                   </h3>
-                  <div className="text-500">
-                    Order ID: {o.id}
+                  <div className="flex flex-column text-500 gap-2">
+                    <span>Order ID: {o.id}</span>
+                    <span>Owner: {o.owner}</span>
                   </div>
                 </div>
               </div>
