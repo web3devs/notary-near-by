@@ -7,7 +7,7 @@ import { useAuth } from '../../context'
 import { Card } from 'primereact/card';
 import { Chip } from 'primereact/chip';
 import NoOrdersImage from '../../assets/no-orders.svg'
-import { StatusNew, StatusDocumentSigned } from '../../order';
+import { StatusNew, StatusDocumentSigned, StatusNotaryJoined } from '../../order';
 import { ipfsURL } from '../../utils/ipfs'
 import { createNotarizedDocument } from '../../contracts/index'
 import { confirmSigning as apiConfirmSigning } from '../../api'
@@ -36,7 +36,6 @@ const List = ({ orders, publicKey }) => {
 
   const join = (o) => navigate('/notary/orders/' + o.id)
   const confirmSigning = async (o) => {
-
     try {
       setIsConfirming(() => true)
       await createNotarizedDocument({
@@ -52,6 +51,14 @@ const List = ({ orders, publicKey }) => {
     finally {
       setIsConfirming(() => false)
     }
+  }
+
+  const canJoin = (o, publicKey) => {
+    // if (o.owner === publicKey) return false //can't join own orders?
+    if (o.status === StatusNew) return true
+    if (o.status === StatusNotaryJoined && o.notary === publicKey) return true
+
+    return false
   }
 
   if (!orders || orders.length === 0) return
@@ -78,10 +85,8 @@ const List = ({ orders, publicKey }) => {
               <div className="flex flex-column">
                 <div className="flex gap-2 mb-2">
                   <Chip label={o.status} className="bg-yellow-500 text-white" />
-                  {o.status === StatusNew && o.owner !== publicKey && (o.notary === '' || o.notary === publicKey) && (<Button label="Join" onClick={() => join(o)} tooltipOptions={{ position: 'bottom' }} tooltip="Join Ceremony" />)}
+                  {canJoin(o, publicKey) && (<Button label="Join" onClick={() => join(o)} tooltipOptions={{ position: 'bottom' }} tooltip="Join Ceremony" />)}
                   {o.status === StatusDocumentSigned && o.notary === publicKey && (<Button label="Confirm signing" onClick={() => confirmSigning(o)} tooltipOptions={{ position: 'bottom' }} tooltip="Calls contract:createNotarizedDocument" disabled={isConfirming} loading={isConfirming} icon={isConfirming ? 'pi pi-spinner' : 'pi pi-pencil'} iconPos="right" />)}
-                  {/* <Button label="Foo" className="p-button-secondary" tooltipOptions={{ position: 'bottom' }} tooltip="Something" />
-                  <Button label="Foo" className="p-button-danger" tooltipOptions={{ position: 'bottom' }} tooltip="Something else" /> */}
                 </div>
               </div>
             </div>
