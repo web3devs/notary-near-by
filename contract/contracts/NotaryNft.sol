@@ -34,7 +34,7 @@ contract NotaryNft is ERC721URIStorage, Ownable {
         _;
     }
 
-    constructor() ERC721("Notary Verification Nft", "Verified Notary") {}
+    constructor() ERC721("Verified Notary Credentials", "Notary Cert") {}
 
     // TODO For the hackathon, anyone can mint, add onlyOwner modifier before MVP
     function mint(
