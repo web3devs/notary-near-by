@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Button, Dialog, ProgressSpinner } from 'primereact';
 import { StatusFinished,StatusDocumentSigned, StatusDocumentSigningConfirmed } from '../../../order';
 import { createNotarizedDocument } from '../../../contracts/index'
+import { confirmSigning as apiConfirmSigning } from '../../../api'
 import { ipfsURL } from '../../../utils/ipfs'
 
 export const Mint = ({ order, status }) => {
@@ -16,7 +17,7 @@ export const Mint = ({ order, status }) => {
                 metadataURI: ipfsURL(o.cid)
             })
 
-            //TODO: update order with new status
+            await apiConfirmSigning({ orderID: o.id })
         } catch (e) {
             console.error(e)
         }
@@ -26,7 +27,7 @@ export const Mint = ({ order, status }) => {
     }
 
     return (
-        <Dialog header="Minting" visible={status === StatusFinished || status === StatusDocumentSigned } closable={false} draggable={false} resizable={false}>
+        <Dialog header="Minting" visible={status === StatusFinished || status === StatusDocumentSigned || status === StatusDocumentSigningConfirmed} closable={false} draggable={false} resizable={false}>
             <div className="flex flex-column">
                 {status === StatusFinished && (<div className="text-center"><ProgressSpinner /><div className="mt-2">Generating files, please wait...</div></div>)}
                 {status === StatusDocumentSigned && (<div className="text-center">

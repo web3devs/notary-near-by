@@ -8,7 +8,6 @@ import { Card } from 'primereact/card';
 import { Chip } from 'primereact/chip';
 import NoOrdersImage from '../../assets/no-orders.svg'
 import { StatusNew, StatusDocumentSigned, StatusDocumentSigningConfirmed, StatusStarted, StatusFinished, StatusCanceled } from '../../order';
-import { createNotarizedDocument } from '../../contracts/index'
 
 const  NoOrders = ({ orders }) => {
   const navigate = useNavigate()

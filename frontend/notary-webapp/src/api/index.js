@@ -120,3 +120,8 @@ export const createOrer = async ({
 
   return data
 }
+
+export const confirmSigning = async ({ orderID }) => {
+  const { data } = await api.patch(`/orders/${orderID}/confirm-signing`, {})
+  return data
+}
