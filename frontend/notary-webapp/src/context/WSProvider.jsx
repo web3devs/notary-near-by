@@ -21,14 +21,16 @@ export const WSProvider = ({ children }) => {
     const [msgs, setMsgs] = useState([]);
 
     useEffect(() => {
-        if (ws === null) {
+        console.log('WS: ', ws)
+        if (ws === null || (ws && ws.readyState >= 2)) {
             const w = new WebSocket('wss://fv7jlocwbk.execute-api.us-east-1.amazonaws.com/dev');
             w.onopen = function () {
                 console.log("Connecting...");
-                setWS(w);
+                setWS(() => w);
             };
             w.onclose = function (evt) {
                 console.log("I'm sorry. Bye!");
+                setWS(() => null);
             };
             w.onmessage = function (evt) {
                 if (evt.data !== '') {
@@ -41,6 +43,7 @@ export const WSProvider = ({ children }) => {
             w.onerror = function (evt) {
                 console.log("ERR: " + evt.data);
                 w.close();
+                setWS(() => null);
             };
         }
     }, [ws]);
