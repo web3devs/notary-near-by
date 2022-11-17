@@ -100,6 +100,8 @@ functions:
 
   participantsCreate:
     handler: bin/participants/create
+    timeout: 30
+    memorySize: 512
     events:
       - httpApi:
           path: /participants
@@ -124,6 +126,8 @@ functions:
 
   notariesCreate:
     handler: bin/notaries/create
+    timeout: 30
+    memorySize: 512
     events:
       - httpApi:
           path: /notaries
@@ -148,6 +152,8 @@ functions:
 
   ordersCreate:
     handler: bin/orders/create
+    timeout: 30
+    memorySize: 512
     events:
       - httpApi:
           path: /orders
