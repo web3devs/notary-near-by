@@ -7,6 +7,9 @@ import { useAuth } from '../../context'
 import { Card } from 'primereact/card';
 import { Chip } from 'primereact/chip';
 import NoOrdersImage from '../../assets/no-orders.svg'
+import { StatusNew, StatusDocumentSigned, StatusStarted, StatusFinished, StatusCanceled } from '../../order';
+import { ipfsURL } from '../../utils/ipfs'
+import { createNotarizedDocument } from '../../contracts/index'
 
 const NoOrders = ({ orders }) => {
   if (orders && orders.length > 0) return
@@ -26,10 +29,19 @@ const NoOrders = ({ orders }) => {
   )
 }
 
-const List = ({ orders }) => {
+const List = ({ orders, publicKey }) => {
   const navigate = useNavigate()
 
-  const join = (o) => navigate('/orders/' + o.id)
+  const join = (o) => navigate('/notary/orders/' + o.id)
+  const confirmSigning = async (o) => {
+    const tx = await createNotarizedDocument({
+      authorizedMinter: o.owner,
+      price: 30, //?????
+      metadataURI: ipfsURL(o.cid)
+    })
+
+    console.log('TX: ', tx)
+  }
 
   if (!orders || orders.length === 0) return
 
@@ -55,9 +67,10 @@ const List = ({ orders }) => {
               <div className="flex flex-column">
                 <div className="flex gap-2 mb-2">
                   <Chip label={o.status} className="bg-yellow-500 text-white" />
-                  <Button label="Join" onClick={() => join(o)} tooltipOptions={{ position: 'bottom' }} tooltip="Join Ceremony" />
-                  <Button label="Foo" className="p-button-secondary" tooltipOptions={{ position: 'bottom' }} tooltip="Something" />
-                  <Button label="Foo" className="p-button-danger" tooltipOptions={{ position: 'bottom' }} tooltip="Something else" />
+                  {o.status === StatusNew && o.owner !== publicKey && (o.notary === '' || o.notary === publicKey) && (<Button label="Join" onClick={() => join(o)} tooltipOptions={{ position: 'bottom' }} tooltip="Join Ceremony" />)}
+                  {o.status === StatusDocumentSigned && o.notary === publicKey && (<Button label="Confirm signing" onClick={() => confirmSigning(o)} tooltipOptions={{ position: 'bottom' }} tooltip="Calls contract:createNotarizedDocument" />)}
+                  {/* <Button label="Foo" className="p-button-secondary" tooltipOptions={{ position: 'bottom' }} tooltip="Something" />
+                  <Button label="Foo" className="p-button-danger" tooltipOptions={{ position: 'bottom' }} tooltip="Something else" /> */}
                 </div>
               </div>
             </div>
@@ -69,7 +82,7 @@ const List = ({ orders }) => {
 }
 
 export default () => {
-  const { accountAddress } = useAuth()
+  const { accountAddress, publicKey } = useAuth()
   const [orders, setOrders] = useState([])
   const [isLoading, setIsLoading] = useState(false)
   const [isSigned, setIsSigned] = useState(false)
@@ -78,25 +91,36 @@ export default () => {
   useEffect(() => {
     ;(async () => {
       try {
-        setIsLoading(true)
+        setIsLoading(() => true)
         const notary = await getNotaryProfile(accountAddress)
         if (notary) {
-          setIsSigned(true)
+          setIsSigned(() => true)
           const o = await getAllOrders()
           setOrders(o)
         } else {
-          setIsSigned(false)
+          setIsSigned(() => false)
         }
       } catch (e) {
         console.error(e)
         if (e.response.status === 404) {
-          setIsSigned(false)
+          setIsSigned(() => false)
         }
       } finally {
-        setIsLoading(false)
+        setIsLoading(() => false)
       }
     })()
   }, [accountAddress])
+
+  useEffect(() => {
+    const f = async () => {
+      const o = await getAllOrders()
+      setOrders(() => o)
+    }
+    const i = setInterval(() => {
+      f()
+    }, 1000)
+    return () => clearInterval(i)
+  }, [])
 
   if (!isSigned && !isLoading) return navigate('/notary/sign-up')
 
@@ -116,7 +140,7 @@ export default () => {
         {(isSigned && !isLoading) && (
           <>
             <NoOrders orders={orders} />
-            <List orders={orders} />
+            <List orders={orders} publicKey={publicKey} />
           </>
         )}
 

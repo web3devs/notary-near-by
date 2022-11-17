@@ -1,10 +1,10 @@
 import { Button, Dialog, Dropdown, InputText } from 'primereact'
 import { useCallback, useEffect, useState } from 'react'
-import { createOrer } from '../../api'
-import FileUpload from '../../components/FileUpload'
-import { useAuth } from '../../context'
+import { createOrer } from '../../../api'
+import FileUpload from '../../../components/FileUpload'
+import { useAuth } from '../../../context'
 import { useNavigate } from 'react-router-dom'
-import useForm from '../../utils'
+import useForm from '../../../utils'
 
 const options = [
   'Attestation of title',

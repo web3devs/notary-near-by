@@ -1,5 +1,4 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import {
   connectToWallet,
   disconnect,
@@ -21,7 +20,8 @@ const AuthContext = createContext({
   logout: () => {
     console.error('not implemented')
   },
-  setRole: (role) => console.log('not implemented')
+  setRole: (role) => console.log('not implemented'),
+  getRole: (useLocationHook) => console.log('not implemented'),
 })
 export const useAuth = () => useContext(AuthContext)
 
@@ -70,7 +70,6 @@ export const AuthProvider = ({ children }) => {
   }
 
   const me = (order) => {
-    console.log('ME.order: ', order)
     let full_name = ''
     if (role === 'notary' && order.notary_joined) {
       full_name = order.notary_joined?.full_name
@@ -91,19 +90,30 @@ export const AuthProvider = ({ children }) => {
     }
   }
 
+  const getRole = (useLocationHook) => {
+    if (role) return role;
+    if (useLocationHook) {
+      const l = useLocationHook()
+      if (l.pathname.startsWith('/notary')) { setRole('notary'); return 'notary' }
+      if (l.pathname.startsWith('/participant')) { setRole('participant'); return 'participant' }
+    }
+
+    return null;
+  };
+
   const value = useMemo(
     () => ({
       isConnected,
       accountAddress,
       publicKey: accountAddress,
       signature,
-      role,
+      getRole,
       setRole,
       logout,
       login,
       me
     }),
-    [isConnected, role, setRole, login, logout, accountAddress]
+    [isConnected, getRole, setRole, login, logout, accountAddress]
   )
   if (noProvider) {
     return <NoeExtensionsPage />

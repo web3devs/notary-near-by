@@ -14,7 +14,8 @@ export const SignatureWidget = ({ disabled, widget, status, participantsJoined, 
     const [signMode, setSignMode] = useState(false);
     const [v, setV] = useState({full_name: '', public_key: ''});
 
-    const { accountAddress, role } = useAuth();
+    const { accountAddress, getRole } = useAuth();
+    const role = getRole();
 
     useEffect(() => {
         if (value) {

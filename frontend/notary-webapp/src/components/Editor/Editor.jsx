@@ -20,7 +20,7 @@ import { Participants } from './Participants'
 import { Signatures } from './Signatures'
 import { Mint } from './Mint'
 import { Dialog } from 'primereact/dialog';
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 
 const Editor = ({ order, setOrder, downloadURL, publicKey, signature }) => {
   const [missingRoleDialog, setMissingRoleDialog] = useState(false)
@@ -46,9 +46,10 @@ const Editor = ({ order, setOrder, downloadURL, publicKey, signature }) => {
     ping,
   } = useWS();
   const {
-    role,
+    getRole,
   } = useAuth();
   const navigate = useNavigate();
+  const role = getRole(useLocation);
 
   useEffect(() => {
     if (order) {
@@ -233,7 +234,7 @@ const Editor = ({ order, setOrder, downloadURL, publicKey, signature }) => {
       <div className="col-2">
         {
           role === 'notary' && (
-            <Flow orderID={order.id} />
+            <Flow orderID={order.id} state={status} />
           )
         }
 
@@ -283,8 +284,8 @@ const Editor = ({ order, setOrder, downloadURL, publicKey, signature }) => {
       )}
 
       {
-        order && (
-          <Mint status={status} />
+        role === 'notary' && (
+          <Mint status={status} order={order} />
         )
       }
     </div>

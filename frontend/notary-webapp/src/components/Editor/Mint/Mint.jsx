@@ -1,32 +1,43 @@
 import { useState } from 'react';
-import { Dialog } from 'primereact/dialog';
-import { StatusNew, StatusStarted, StatusFinished, StatusCanceled } from '../../../order';
-import {
-    useWS,
-    useAuth,
-} from '../../../context';
+import { Button, Dialog, ProgressSpinner } from 'primereact';
+import { StatusFinished,StatusDocumentSigned, StatusDocumentSigningConfirmed } from '../../../order';
+import { createNotarizedDocument } from '../../../contracts/index'
+import { ipfsURL } from '../../../utils/ipfs'
 
-export const Mint = ({ status }) => {
-    const [ state, setState ] = useState(StatusNew);
-    // const {
-    //     mint,
-    // } = useWS();
-    const { publicKey, signature } = useAuth();
+export const Mint = ({ order, status }) => {
+    const [isLoading, setIsLoading] = useState(false);
 
-    const mint = async () => {
-        // await ceremonyAction(order.id, publicKey, signature, 'start')
-        // setState(StatusStarted)
+    const confirmSigning = async (o) => {
+        try {
+            setIsLoading(() => true)
+            await createNotarizedDocument({
+                authorizedMinter: o.owner,
+                price: 30, //?????
+                metadataURI: ipfsURL(o.cid)
+            })
+
+            //TODO: update order with new status
+        } catch (e) {
+            console.error(e)
+        }
+        finally {
+            setIsLoading(() => false)
+        }
     }
 
     return (
-        <Dialog header="Mint" visible={status === StatusFinished} closable={false} draggable={false} resizable={false}>
-            <h1>TODO: </h1>
-            <ol>
-                <li>Waitnig for documents to be signed</li>
-                <li>If signed, show Minting functionality</li>
-                <li>If minted, show document download URL and details</li>
+        <Dialog header="Minting" visible={status === StatusFinished || status === StatusDocumentSigned } closable={false} draggable={false} resizable={false}>
+            <div className="flex flex-column">
+                {status === StatusFinished && (<div className="text-center"><ProgressSpinner /><div className="mt-2">Generating files, please wait...</div></div>)}
+                {status === StatusDocumentSigned && (<div className="text-center">
+                    Please confirm signing with your wallet:<br />
+                    <Button label="Confirm signing" className="mt-2" onClick={() => confirmSigning(order)} disabled={isLoading} loading={isLoading} icon={isLoading ? 'pi pi-spinner' : 'pi pi-pencil'} iconPos="right" />
+                </div>)}
 
-            </ol>
+                {status === StatusDocumentSigningConfirmed && (<div className="text-center">
+                    This is it! You can leave the meeting now!
+                </div>)}
+            </div>
         </Dialog>
     )
 };

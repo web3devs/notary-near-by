@@ -6,16 +6,18 @@ import {
   Routes
 } from 'react-router-dom'
 
-import CreateOrderPage from '../pages/order/CreateOrder.page'
+import CreateOrderPage from '../pages/participant/order/CreateOrder.page'
 import DashboardLayout from '../layouts/Dashboard.layout'
 import NotaryDashPage from '../pages/notary/NotaryDash.page'
 import ParticipantDashPage from '../pages/participant/ParticipantDash.page'
+import ParticipantSessionPage from '../pages/participant/order/Session.page'
+import ParticipantMintPage from '../pages/participant/order/Mint.page'
 import HomePage from '../pages/Home.page'
 import SignInPage from '../pages/SignIn.page'
 import SignUpPage from '../pages/notary/NotarySignUp.page'
 import ParticipantSignUpPage from '../pages/participant/ParticipantSignUp.page'
-import OrderSessionPage from '../pages/order/Session.page'
-import NotaryOrderPage from '../pages/notary/NotaryOrder.page'
+// import OrderSessionPage from '../pages/order/Session.page'
+import NotarySessionPage from '../pages/notary/order/Session.page'
 import { useAuth } from '../context/AuthProvider'
 
 const RequireAuth = ({ children }) => {
@@ -46,11 +48,11 @@ export const AppRouter = () => {
           }
         />
         <Route
-          path="/notary/Order/:id"
+          path="/notary/orders/:id"
           element={
             <RequireAuth>
               <DashboardLayout>
-                <NotaryOrderPage />
+                <NotarySessionPage />
               </DashboardLayout>
             </RequireAuth>
           }
@@ -76,7 +78,7 @@ export const AppRouter = () => {
           }
         />
         <Route
-          path="/participant/create-Order"
+          path="/participant/create-order"
           element={
             <RequireAuth>
               <DashboardLayout>
@@ -86,6 +88,26 @@ export const AppRouter = () => {
           }
         />
         <Route
+          path="/participant/orders/:id"
+          element={
+            <RequireAuth>
+              <DashboardLayout>
+                <ParticipantSessionPage />
+              </DashboardLayout>
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/participant/claim/:id"
+          element={
+            <RequireAuth>
+              <DashboardLayout>
+                <ParticipantMintPage />
+              </DashboardLayout>
+            </RequireAuth>
+          }
+        />
+        {/* <Route
           path="/orders/:id"
           element={
             <RequireAuth>
@@ -94,7 +116,7 @@ export const AppRouter = () => {
               </DashboardLayout>
             </RequireAuth>
           }
-        />
+        /> */}
         <Route
           path="/participant/sign-up"
           element={

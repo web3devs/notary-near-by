@@ -1,0 +1,1 @@
+export const ipfsURL = (cid) => `https://ipfs.io/ipfs/${cid}/metadata.json`

@@ -6,8 +6,8 @@ import {signUpNotary} from '../../api'
 import FileUpload from '../../components/FileUpload'
 import useForm from '../../utils'
 import {useAuth} from '../../context'
-import Settings from '../../settings/contracts.json'
 import {Dialog} from "primereact/dialog";
+import { ipfsURL } from '../../utils/ipfs'
 
 export default () => {
     const [isSubmiting, setIsSubmiting] = useState(false)
@@ -76,7 +76,7 @@ export default () => {
         }).then(n => {
             return cSignupNotary({
                 idNumber: n.id_number,
-                metadataURL: `https://ipfs.io/ipfs/${n.cid}/metadata.json`
+                metadataURL: ipfsURL(n.cid)
             })
         }).then(() => {
             setTokenMinted(true)

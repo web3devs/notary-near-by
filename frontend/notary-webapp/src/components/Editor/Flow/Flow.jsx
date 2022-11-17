@@ -1,13 +1,12 @@
 import { useState } from 'react';
 import { Menu } from 'primereact/menu';
-import { StatusNew, StatusStarted, StatusFinished, StatusCanceled } from '../../../order';
+import { StatusNew, StatusStarted, StatusNotaryJoined, StatusFinished, StatusCanceled } from '../../../order';
 import {
     useWS,
     useAuth,
 } from '../../../context';
 
-export const Flow = ({ orderID }) => {
-    const [ state, setState ] = useState(StatusNew);
+export const Flow = ({ orderID, state }) => {
     const {
         ceremonyAction,
     } = useWS();
@@ -15,27 +14,31 @@ export const Flow = ({ orderID }) => {
 
     const start = async () => {
         await ceremonyAction(orderID, publicKey, signature, 'start')
-        setState(StatusStarted)
+        // setState(StatusStarted)
     }
 
     const finish = async () => {
         await ceremonyAction(orderID, publicKey, signature, 'finish')
-        setState(StatusFinished)
+        // setState(StatusFinished)
     }
 
     const cancel = async () => {
         await ceremonyAction(orderID, publicKey, signature, 'cancel')
-        setState(StatusCanceled)
+        // setState(StatusCanceled)
     }
+
+    const canStart = state === StatusNew || state === StatusNotaryJoined
+    const canFinish = state === StatusStarted //TODO: Verify signatures are signed
+    const canCancel = state === StatusStarted //Can cancel at any time?
 
     return (
         <Menu className="mb-2 w-full" model={[
             {
                 label: 'Ceremony',
                 items: [
-                    { label: 'Start', icon: 'pi pi-play', className: 'bg-primary-500', command: start, disabled: state !== StatusNew },
-                    { label: 'Finish', icon: 'pi pi-stop', className: 'bg-green-500', command: finish, disabled: state !== StatusStarted },
-                    { label: 'Cancel', icon: 'pi pi-exclamation-triangle', className: 'bg-red-500', command: cancel, disabled: state !== StatusStarted },
+                    { label: 'Start', icon: 'pi pi-play', className: 'bg-primary-500', command: start, disabled: !canStart },
+                    { label: 'Finish', icon: 'pi pi-stop', className: 'bg-green-500', command: finish, disabled: !canFinish },
+                    { label: 'Cancel', icon: 'pi pi-exclamation-triangle', className: 'bg-red-500', command: cancel, disabled: !canCancel },
                 ]
             },
         ]} />

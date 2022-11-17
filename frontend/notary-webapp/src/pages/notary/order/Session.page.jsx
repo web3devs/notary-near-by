@@ -1,13 +1,12 @@
 import { useEffect, useState } from 'react'
 import { ProgressSpinner } from 'primereact/progressspinner'
-// import Mint from '../../components/order-participant/Mint'
 import { Panel } from 'primereact/panel';
 import { Card } from 'primereact/card';
 import { Button } from 'primereact/button';
-import Editor from '../../components/Editor/Editor';
-import { useParams } from 'react-router-dom'
-import { useAuth } from '../../context'
-import { getOrder } from '../../api';
+import Editor from '../../../components/Editor/Editor';
+import { useParams, useLocation } from 'react-router-dom'
+import { useAuth } from '../../../context'
+import { getOrder } from '../../../api';
 import { JitsiMeeting } from '@jitsi/react-sdk';
 
 export default () => {
@@ -15,14 +14,15 @@ export default () => {
   const [m, setM] = useState(null);
   const [order, setOrder] = useState(undefined);
   const [downloadURL, setDownloadURL] = useState(undefined);
-  const { accountAddress, me, role } = useAuth()
+  const { accountAddress, me, getRole } = useAuth()
+  const role = getRole(useLocation)
   const pms = useParams();
 
   useEffect(() => {
     ; (async () => {
       if (pms) {
         const { order, download_url } = await getOrder(pms.id);
-        setOrder({ ...order });
+        setOrder(() => ({ ...order }));
         setDownloadURL(download_url);
       }
     })()
@@ -45,7 +45,7 @@ export default () => {
       </div>
 
       {
-        debug && (
+        debug && order && (
           <>
             <div className="text-color">
               Role: {role}<br />

@@ -7,6 +7,8 @@ import { getParticipantProfile, getOwnersOrders } from '../../api'
 import { Card } from 'primereact/card';
 import { Chip } from 'primereact/chip';
 import NoOrdersImage from '../../assets/no-orders.svg'
+import { StatusNew, StatusDocumentSigned, StatusDocumentSigningConfirmed, StatusStarted, StatusFinished, StatusCanceled } from '../../order';
+import { createNotarizedDocument } from '../../contracts/index'
 
 const  NoOrders = ({ orders }) => {
   const navigate = useNavigate()
@@ -31,10 +33,11 @@ const  NoOrders = ({ orders }) => {
   )
 }
 
-const List = ({ orders }) => {
+const List = ({ orders, publicKey }) => {
   const navigate = useNavigate()
 
-  const join = (o) => navigate('/orders/' + o.id)
+  const join = (o) => navigate('/participant/orders/' + o.id)
+  const mint = (o) => navigate('/participant/claim/' + o.id)
 
   if (!orders || orders.length === 0) return
 
@@ -60,9 +63,10 @@ const List = ({ orders }) => {
               <div className="flex flex-column">
                 <div className="flex gap-2 mb-2">
                   <Chip label={o.status} className="bg-yellow-500 text-white" />
-                  <Button label="Join" onClick={() => join(o)} tooltipOptions={{ position: 'bottom' }} tooltip="Join Ceremony" />
-                  <Button label="Foo" className="p-button-secondary" tooltipOptions={{ position: 'bottom' }} tooltip="Something" />
-                  <Button label="Foo" className="p-button-danger" tooltipOptions={{ position: 'bottom' }} tooltip="Something else" />
+                  {o.status === StatusNew && (<Button label="Join" onClick={() => join(o)} tooltipOptions={{ position: 'bottom' }} tooltip="Join Ceremony" />)}
+                  {o.status === StatusDocumentSigningConfirmed && (<Button label="Claim" onClick={() => mint(o)} tooltipOptions={{ position: 'bottom' }} tooltip="Claim ownership of the documents by minting NFT" />)}
+                  {/* <Button label="Foo" className="p-button-secondary" tooltipOptions={{ position: 'bottom' }} tooltip="Something" />
+                  <Button label="Foo" className="p-button-danger" tooltipOptions={{ position: 'bottom' }} tooltip="Something else" /> */}
                 </div>
               </div>
             </div>
@@ -78,7 +82,7 @@ export default () => {
   const [isLoading, setIsLoading] = useState(false)
   const [isSigned, setIsSigned] = useState(false)
 
-  const { accountAddress, role } = useAuth()
+  const { accountAddress, publicKey } = useAuth()
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -98,6 +102,17 @@ export default () => {
         setIsLoading(false)
       }
     })()
+  }, [])
+
+  useEffect(() => {
+    const f = async () => {
+      const o = await getOwnersOrders(accountAddress)
+      setOrders(() => o)
+    }
+    const i = setInterval(() => {
+      f()
+    }, 1000)
+    return () => clearInterval(i)
   }, [])
 
   if (!isSigned && !isLoading) return navigate('/participant/sign-up')
@@ -124,7 +139,7 @@ export default () => {
         {(isSigned && !isLoading) && (
           <>
             <NoOrders orders={orders} />
-            <List orders={orders} />
+            <List orders={orders} publicKey={publicKey} />
           </>
         )}
 
