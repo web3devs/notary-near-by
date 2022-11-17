@@ -5,10 +5,10 @@
 
 | Contract                                                                                               | Mainnet Deployment | Testnet Address                                                                                                                 |
 |--------------------------------------------------------------------------------------------------------|--------------------|---------------------------------------------------------------------------------------------------------------------------------|
-| Notary [[ABI](./artifacts/contracts/Notary.sol/Notary.json)]                                           |    not deployed    | [0x2bEf1F52bf47426AD61Abf8b6F897e6143895d33](https://testnet.aurorascan.dev/address/0x2bEf1F52bf47426AD61Abf8b6F897e6143895d33) |
-| NotarizedDocumentNft [[ABI](./artifacts/contracts/NotarizedDocumentNft.sol/NotarizedDocumentNft.json)] |    not deployed    | [0xA110C8268FC0bb74D9B1F365135bABD06D2209a1](https://testnet.aurorascan.dev/address/0xA110C8268FC0bb74D9B1F365135bABD06D2209a1) |
-| NotaryNft [[ABI](./artifacts/contracts/NotaryNft.sol/NotaryNft.json)] |    not deployed    | [0xaBAaB315B198D09a18647d1764692f87E68E1d7a](https://testnet.aurorascan.dev/address/0xaBAaB315B198D09a18647d1764692f87E68E1d7a) |
-| DocumentPermissionNft [[ABI](./artifacts/contracts/DocumentPermissionNft.sol/DocumentPermissionNft.json)] |    not deployed    | [0x74D842C3A7ca09E376EfEf9E2d3491Ba91370d44](https://testnet.aurorascan.dev/address/0x74D842C3A7ca09E376EfEf9E2d3491Ba91370d44) |
+| Notary [[ABI](./artifacts/contracts/Notary.sol/Notary.json)]                                           |    not deployed    | [0x3fC198a78991F6F7F492EA3cD631eaf59BB16dE3](https://testnet.aurorascan.dev/address/0x3fC198a78991F6F7F492EA3cD631eaf59BB16dE3) |
+| NotarizedDocumentNft [[ABI](./artifacts/contracts/NotarizedDocumentNft.sol/NotarizedDocumentNft.json)] |    not deployed    | [0x974570376D0Aa69Bad101B63c1117f6B3cFcDDb2](https://testnet.aurorascan.dev/address/0x974570376D0Aa69Bad101B63c1117f6B3cFcDDb2) |
+| NotaryNft [[ABI](./artifacts/contracts/NotaryNft.sol/NotaryNft.json)] |    not deployed    | [0x38417c8dDA51444142526F9bE14560e3bEe00B6a](https://testnet.aurorascan.dev/address/0x38417c8dDA51444142526F9bE14560e3bEe00B6a) |
+| DocumentPermissionNft [[ABI](./artifacts/contracts/DocumentPermissionNft.sol/DocumentPermissionNft.json)] |    not deployed    | [0x3BF4B67e1C0d3a05c2d70175701C43e041A19454](https://testnet.aurorascan.dev/address/0x3BF4B67e1C0d3a05c2d70175701C43e041A19454) |
 
 ## Notes about dev install
 The currently implemented dev blockchain is the hardhat standard chain. In the future, the aurora local chain may be needed if the contracts interact with the NEAR precompiles.
