@@ -222,8 +222,11 @@ func (_x *Service) lazyGenerateRootCerts() error {
 //Create creates Notaries
 func (_x *Service) Create(_in *CreateInput) (*CreateOutput, error) {
 	s := &Notary{
-		PublicKey: pk.PublicKey(_in.PublicKey.String()),
-		FullName:  _in.FullName,
+		PublicKey:                pk.PublicKey(_in.PublicKey.String()),
+		FullName:                 _in.FullName,
+		State:                    _in.State,
+		IDNumber:                 _in.IDNumber,
+		CommissionExpirationDate: _in.CommissionExpirationDate,
 	}
 	//TODO: Validate PublicKey and Signature
 	if err := _x.Writer.Create(s); err != nil {
@@ -269,8 +272,11 @@ func (_x *Service) Create(_in *CreateInput) (*CreateOutput, error) {
 		Name:        fmt.Sprintf("Name: %v", s.FullName),
 		Description: fmt.Sprintf("Notary Public"),
 		Properties: map[string]string{
-			"PublicKey": s.PublicKey.String(),
-			"CreatedAt": time.Now().Format(time.RFC3339),
+			"PublicKey":                s.PublicKey.String(),
+			"CreatedAt":                time.Now().Format(time.RFC3339),
+			"State":                    s.State,
+			"IDNumber":                 s.IDNumber,
+			"CommissionExpirationDate": s.CommissionExpirationDate.Format(time.RFC3339),
 		},
 	}
 	mbts, err := json.Marshal(m)
