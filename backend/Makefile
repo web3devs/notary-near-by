@@ -13,6 +13,7 @@ build: gomodgen
 
 	env GOARCH=amd64 GOOS=linux go build -ldflags="-s -w" -o bin/orders/create cmd/orders/create/main.go
 	env GOARCH=amd64 GOOS=linux go build -ldflags="-s -w" -o bin/orders/getOne cmd/orders/getOne/main.go
+	env GOARCH=amd64 GOOS=linux go build -ldflags="-s -w" -o bin/orders/confirmSigning cmd/orders/confirmSigning/main.go
 	env GOARCH=amd64 GOOS=linux go build -ldflags="-s -w" -o bin/orders/getAll cmd/orders/getAll/main.go
 	env GOARCH=amd64 GOOS=linux go build -ldflags="-s -w" -o bin/orders/getByOwner cmd/orders/getByOwner/main.go
 	env GOARCH=amd64 GOOS=linux go build -ldflags="-s -w" -o bin/orders/signDocument cmd/orders/signDocument/main.go

@@ -182,6 +182,18 @@ functions:
         - '!./**'
         - ./bin/orders/getOne
 
+  ordersConfirmSigning:
+    handler: bin/orders/confirmSigning
+    events:
+      - httpApi:
+          path: /orders/{order_id}/confirm-signing
+          method: patch
+    package:
+      individually: true
+      patterns:
+        - '!./**'
+        - ./bin/orders/confirmSigning
+
   ordersGetByOwner:
     handler: bin/orders/getByOwner
     events:

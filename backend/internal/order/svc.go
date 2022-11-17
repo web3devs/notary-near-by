@@ -210,6 +210,22 @@ func (_x *Service) CeremonyStatusChanged(_in *CeremonyStatusChangedInput) (*Cere
 	}, nil
 }
 
+//ConfirmSigning sets connected Witness
+func (_x *Service) ConfirmSigning(_in *ConfirmSigningInput) (*ConfirmSigningOutput, error) {
+	if _in.Order.Status != StatusDocumentSigned {
+		return nil, fmt.Errorf("failed confirming signing. Order in incorrect state: %v", _in.Order.Status)
+	}
+
+	_in.Order.Status = StatusDocumentSigningConfirmed
+	if err := _x.Writer.UpdateStatus(_in.Order); err != nil {
+		return nil, fmt.Errorf("failed updating status: %w", err)
+	}
+
+	return &ConfirmSigningOutput{
+		Order: _in.Order,
+	}, nil
+}
+
 //GeneratePDF applies _x.Widgets to Order's PDF IN file and stores it on S3
 func (_x *Service) GeneratePDF(_in *GeneratePDFInput) (*GeneratePDFOutput, error) {
 	fmt.Println("1. Fetch bytes from S3")

@@ -56,3 +56,13 @@ type SignPDFInput struct {
 type SignPDFOutput struct {
 	Order *Order `json:"order"`
 }
+
+//ConfirmSigningInput input for confirming Signing of the Order related documents
+type ConfirmSigningInput struct {
+	Order *Order `json:"order"`
+}
+
+//ConfirmSigningOutput result of confirming Signing of the Order related documents
+type ConfirmSigningOutput struct {
+	Order *Order `json:"order"`
+}
