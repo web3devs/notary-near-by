@@ -2,20 +2,9 @@ const {expect} = require("chai");
 const {loadFixture} = require("@nomicfoundation/hardhat-network-helpers");
 const {anyValue} = require("@nomicfoundation/hardhat-chai-matchers/withArgs");
 const deployFixture = require("./deployFixture");
+const {executeAndGetEvent} = require("./helpers.js");
 
 const NULL_ADDRESS = '0x0000000000000000000000000000000000000000';
-
-const isNotFound = v => v === -1
-
-async function executeAndGetEvent(response, eventName) {
-    const receipt = await (await response).wait()
-    const index = receipt.events.findIndex(ev => ev.event === eventName)
-    if (isNotFound(index)) {
-        console.log(receipt.events)
-        throw new Error(`Event ${eventName} not found`)
-    }
-    return receipt.events[index].args
-}
 
 describe("Notary contract", function () {
     describe("Initialization", () => {

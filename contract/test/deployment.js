@@ -10,4 +10,11 @@ describe('deployment script', () => {
             expect(contractOwner).to.equal(notaryContract.address)
         })
     })
+    describe('NotarizedDocumentNft', () => {
+        it("should be owned by the Notary contract", async () => {
+            const {notarizedDocumentNftContract, notaryContract} = await loadFixture(deployFixture)
+            const contractOwner = await notarizedDocumentNftContract.owner()
+            expect(contractOwner).to.equal(notaryContract.address)
+        })
+    })
 })

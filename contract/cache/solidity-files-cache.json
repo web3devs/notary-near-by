@@ -518,7 +518,7 @@
       ]
     },
     "/Users/ken/Projects/notary-near-by/contract/contracts/Notary.sol": {
-      "lastModificationDate": 1668543518629,
+      "lastModificationDate": 1668556394971,
       "contentHash": "b27c27c095b7b9c33c926a926f826153",
       "sourceName": "contracts/Notary.sol",
       "solcConfig": {
@@ -558,8 +558,8 @@
       ]
     },
     "/Users/ken/Projects/notary-near-by/contract/contracts/NotarizedDocumentNft.sol": {
-      "lastModificationDate": 1667453005672,
-      "contentHash": "a0fad03dacd0f1de3018695e48534d21",
+      "lastModificationDate": 1668699823614,
+      "contentHash": "723b5594f6380ffd7bfbd542a386760a",
       "sourceName": "contracts/NotarizedDocumentNft.sol",
       "solcConfig": {
         "version": "0.8.4",
@@ -598,8 +598,8 @@
       ]
     },
     "/Users/ken/Projects/notary-near-by/contract/contracts/NotaryNft.sol": {
-      "lastModificationDate": 1668542952596,
-      "contentHash": "a136796969700ac425e543ce480f16b1",
+      "lastModificationDate": 1668630099077,
+      "contentHash": "6c7d0a2e5b1368ae7add7cb8f7460079",
       "sourceName": "contracts/NotaryNft.sol",
       "solcConfig": {
         "version": "0.8.4",
