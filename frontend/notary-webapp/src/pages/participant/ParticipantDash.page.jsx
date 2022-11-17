@@ -7,7 +7,7 @@ import { getParticipantProfile, getOwnersOrders } from '../../api'
 import { Card } from 'primereact/card';
 import { Chip } from 'primereact/chip';
 import NoOrdersImage from '../../assets/no-orders.svg'
-import { StatusNew, StatusDocumentSigned, StatusDocumentSigningConfirmed, StatusStarted, StatusFinished, StatusCanceled } from '../../order';
+import { StatusNew, StatusNotaryJoined, StatusDocumentSigningConfirmed, StatusStarted, StatusFinished, StatusCanceled } from '../../order';
 
 const  NoOrders = ({ orders }) => {
   const navigate = useNavigate()
@@ -38,6 +38,14 @@ const List = ({ orders, publicKey }) => {
   const join = (o) => navigate('/participant/orders/' + o.id)
   const mint = (o) => navigate('/participant/claim/' + o.id)
 
+  const canJoin = (o) => {
+    return o.status === StatusNew || o.status === StatusNotaryJoined
+  }
+
+  const canClaim = (o) => {
+    return o.status === StatusDocumentSigningConfirmed
+  }
+
   if (!orders || orders.length === 0) return
 
   return (
@@ -62,10 +70,8 @@ const List = ({ orders, publicKey }) => {
               <div className="flex flex-column">
                 <div className="flex gap-2 mb-2">
                   <Chip label={o.status} className="bg-yellow-500 text-white" />
-                  {o.status === StatusNew && (<Button label="Join" onClick={() => join(o)} tooltipOptions={{ position: 'bottom' }} tooltip="Join Ceremony" />)}
-                  {o.status === StatusDocumentSigningConfirmed && (<Button label="Claim" onClick={() => mint(o)} tooltipOptions={{ position: 'bottom' }} tooltip="Claim ownership of the documents by minting NFT" />)}
-                  {/* <Button label="Foo" className="p-button-secondary" tooltipOptions={{ position: 'bottom' }} tooltip="Something" />
-                  <Button label="Foo" className="p-button-danger" tooltipOptions={{ position: 'bottom' }} tooltip="Something else" /> */}
+                  {canJoin(o) && (<Button label="Join" onClick={() => join(o)} tooltipOptions={{ position: 'bottom' }} tooltip="Join Ceremony" />)}
+                  {canClaim(o) && (<Button label="Claim" onClick={() => mint(o)} tooltipOptions={{ position: 'bottom' }} tooltip="Claim ownership of the documents by minting NFT" />)}
                 </div>
               </div>
             </div>

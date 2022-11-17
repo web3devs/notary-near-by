@@ -19,6 +19,7 @@ import { Flow } from './Flow'
 import { Participants } from './Participants'
 import { Signatures } from './Signatures'
 import { Mint } from './Mint'
+import { ParticipantFeedback } from './ParticipantFeedback'
 import { Dialog } from 'primereact/dialog';
 import { useNavigate, useLocation } from 'react-router-dom'
 
@@ -286,6 +287,12 @@ const Editor = ({ order, setOrder, downloadURL, publicKey, signature }) => {
       {
         role === 'notary' && (
           <Mint status={status} order={order} />
+        )
+      }
+
+      {
+        role === 'participant' && (
+          <ParticipantFeedback status={status} order={order} />
         )
       }
     </div>
