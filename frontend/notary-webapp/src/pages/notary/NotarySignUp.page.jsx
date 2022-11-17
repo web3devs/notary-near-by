@@ -1,16 +1,21 @@
-import {Button, Dropdown, InputText, Calendar} from 'primereact'
-import {useState, useCallback} from 'react'
+import {Button, Dropdown, InputText, Calendar, Messages} from 'primereact'
+import {useState, useCallback, useRef} from 'react'
 import {useNavigate} from 'react-router-dom'
-import { signUpNotary as cSignupNotary } from '../../contracts'
-import { signUpNotary } from '../../api'
+import {signUpNotary as cSignupNotary} from '../../contracts'
+import {signUpNotary} from '../../api'
 import FileUpload from '../../components/FileUpload'
 import useForm from '../../utils'
-import { useAuth } from '../../context'
+import {useAuth} from '../../context'
+import Settings from '../../settings/contracts.json'
+import {Dialog} from "primereact/dialog";
 
 export default () => {
     const [isSubmiting, setIsSubmiting] = useState(false)
-    const { publicKey, signature } = useAuth()
+    const [isTokenMinted, setTokenMinted] = useState(false)
+    const [wasAdded, setWasAdded] = useState(false)
+    const {publicKey, signature} = useAuth()
     const navigate = useNavigate()
+    const messages = useRef()
 
     const {submit, setFormField, errors, formData, canSubmit} = useForm({
         constraints: {
@@ -63,21 +68,81 @@ export default () => {
 
     const handleSubmit = useCallback(async () => {
         setIsSubmiting(true)
-        const n = await signUpNotary({
+
+        await signUpNotary({
             ...formData,
             publicKey,
             signature,
-        })
-        await cSignupNotary({
-            idNumber: n.id_number,
-            metadataURL: `https://ipfs.io/ipfs/${n.cid}/metadata.json`
-        })
-        setIsSubmiting(false)
-        navigate('/notary')
+        }).then(n => {
+            return cSignupNotary({
+                idNumber: n.id_number,
+                metadataURL: `https://ipfs.io/ipfs/${n.cid}/metadata.json`
+            })
+        }).then(() => {
+            setTokenMinted(true)
+        }).catch(e => {
+            console.error(JSON.stringify(e))
+            messages.current.show({
+                severity: 'error',
+                summary: 'Minting error',
+                detail: e.message,
+                sticky: true
+            });
+
+        }).then(() => setIsSubmiting(false))
     }, [formData])
+
+    const addTokenToMetamask = async () => {
+        const {address, symbol, image} = Settings.NotaryNft
+        try {
+            const wasAdded = await ethereum.request({
+                method: 'wallet_watchAsset',
+                params: {
+                    type: 'ERC20',
+                    options: {
+                        address: address,
+                        symbol: symbol,
+                        decimals: 0,
+                        image: image,
+                    },
+                },
+            });
+            setWasAdded(wasAdded)
+            navigate('/notary')
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    const tokenMintedDialogContents = (
+        <>
+            <p className="p-card-subtitle">
+                Your notary creditials have been verified.
+            </p>
+            <p>
+                An NFT has been added to your Metamask wallet that proves that you are a notary and authorizes
+                you to perform remote notarizations using this system. In order to display it, Metamask needs to
+                be configured with some details about the token. Click the button to add the token details to your
+                metamask wallet.
+            </p>
+            <div className='text-center'>
+                <Button onClick={addTokenToMetamask}>Add token to metamask</Button>
+            </div>
+        </>
+    )
 
     return (
         <div className="flex flex-column align-items-center">
+            <Messages ref={messages}/>
+            <Dialog
+                header="Congratulations!"
+                visible={isTokenMinted && !wasAdded}
+                style={{width: '50vw'}}
+                onHide={() => navigate('/notary')}
+            >
+                {tokenMintedDialogContents}
+            </Dialog>
+
             <div className="flex flex-column align-items-center mb-4" style={{maxWidth: '400px'}}>
                 <h1>New Notary</h1>
                 <div className="text-500 text-center">lorem dolorem lorem dolorem lorem dolorem lorem dolorem lorem
