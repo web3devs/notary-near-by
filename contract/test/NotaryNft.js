@@ -18,10 +18,10 @@ describe("NotaryNFT contract", function () {
     it("should set the token name and symbol", async function () {
         const {contractInstance} = await loadFixture(contractFixture)
         const name = await contractInstance.name();
-        expect(name).to.equal("Notary Verification Nft");
+        expect(name).to.equal("Verified Notary Credentials");
 
         const symbol = await contractInstance.symbol()
-        expect(symbol).to.equal('Verified Notary')
+        expect(symbol).to.equal('Notary Cert')
     });
 
     it("should mint an NFT", async () => {
