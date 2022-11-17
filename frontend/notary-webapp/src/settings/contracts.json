@@ -1,10 +1,20 @@
 {
-  "Notary": "0x2bEf1F52bf47426AD61Abf8b6F897e6143895d33",
-  "NotarizedDocumentNft": "0xA110C8268FC0bb74D9B1F365135bABD06D2209a1",
+  "Notary": {
+    "address": "0x2bEf1F52bf47426AD61Abf8b6F897e6143895d33"
+  },
+  "NotarizedDocumentNft": {
+    "address": "0xA110C8268FC0bb74D9B1F365135bABD06D2209a1",
+    "symbol": "Notarized Doc",
+    "image": "http://localhost:5173/src/assets/logo-alt.svg"
+  },
   "NotaryNft": {
     "address": "0xaBAaB315B198D09a18647d1764692f87E68E1d7a",
     "symbol": "Notary Cert",
     "image": "http://localhost:5173/src/assets/logo-alt.svg"
   },
-  "DocumentPermissionNft": "0x74D842C3A7ca09E376EfEf9E2d3491Ba91370d44"
+  "DocumentPermissionNft": {
+    "address": "0x74D842C3A7ca09E376EfEf9E2d3491Ba91370d44",
+    "symbol": "View Auth",
+    "image": "http://localhost:5173/src/assets/logo-alt.svg"
+  }
 }

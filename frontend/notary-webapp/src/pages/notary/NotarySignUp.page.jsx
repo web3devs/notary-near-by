@@ -1,7 +1,7 @@
 import {Button, Dropdown, InputText, Calendar, Messages} from 'primereact'
 import {useState, useCallback, useRef} from 'react'
 import {useNavigate} from 'react-router-dom'
-import {signUpNotary as cSignupNotary} from '../../contracts'
+import {addNotaryNftToMetamask, signUpNotary as cSignupNotary} from '../../contracts'
 import {signUpNotary} from '../../api'
 import FileUpload from '../../components/FileUpload'
 import useForm from '../../utils'
@@ -93,23 +93,10 @@ export default () => {
     }, [formData])
 
     const addTokenToMetamask = async () => {
-        const {address, symbol, image} = Settings.NotaryNft
-        try {
-            const wasAdded = await ethereum.request({
-                method: 'wallet_watchAsset',
-                params: {
-                    type: 'ERC20',
-                    options: {
-                        address: address,
-                        symbol: symbol,
-                        decimals: 0,
-                        image: image,
-                    },
-                },
-            });
+        if (await addNotaryNftToMetamask()) {
             setWasAdded(wasAdded)
             navigate('/notary')
-        } catch (error) {
+        } else {
             console.log(error);
         }
     }
