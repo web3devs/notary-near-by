@@ -13,11 +13,23 @@ type Status string
 //StatusNew for new Orders
 const StatusNew Status = "new"
 
+//StatusNotaryJoined for Orders joined by notary
+const StatusNotaryJoined Status = "notary-joined"
+
 //StatusStarted for started Orders
 const StatusStarted Status = "started"
 
 //StatusFinished for finished Orders
 const StatusFinished Status = "finished"
+
+//StatusDocumentSigned for signed documents
+const StatusDocumentSigned Status = "document-signed"
+
+//StatusDocumentSigningConfirmed for documents signing confirmed by notary on blockchain
+const StatusDocumentSigningConfirmed Status = "document-signing-confirmed"
+
+//StatusNFTMinted for Order NFT minted
+const StatusNFTMinted Status = "nft-minted"
 
 //StatusCanceled for canceled Orders
 const StatusCanceled Status = "canceled"

@@ -116,6 +116,7 @@ func (_x *Service) Create(_in *CreateInput) (*CreateOutput, error) {
 
 //NotaryJoined sets connected Notary
 func (_x *Service) NotaryJoined(o *Order, p *Person) error {
+	o.Status = StatusNotaryJoined
 	o.NotaryJoined = p
 
 	return _x.Writer.NotaryJoined(o)
@@ -184,6 +185,18 @@ func (_x *Service) CeremonyStatusChanged(_in *CeremonyStatusChangedInput) (*Cere
 	case "finish":
 		s = StatusFinished
 	case "cancel":
+		s = StatusCanceled
+	case string(StatusNew):
+		s = StatusNew
+	case string(StatusStarted):
+		s = StatusStarted
+	case string(StatusFinished):
+		s = StatusFinished
+	case string(StatusDocumentSigned):
+		s = StatusDocumentSigned
+	case string(StatusNFTMinted):
+		s = StatusNFTMinted
+	case string(StatusCanceled):
 		s = StatusCanceled
 	}
 
@@ -319,6 +332,7 @@ func (_x *Service) SignPDF(_in *SignPDFInput) (*SignPDFOutput, error) {
 	}
 
 	_in.Order.CID = o.Value.CID
+	_in.Order.Status = StatusDocumentSigned
 	if err := _x.Writer.UpdateCID(_in.Order); err != nil {
 		return nil, fmt.Errorf("failed saving CID: %w", err)
 	}

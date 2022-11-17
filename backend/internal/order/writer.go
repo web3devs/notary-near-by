@@ -35,6 +35,8 @@ func (_x *Writer) NotaryJoined(i *Order) error {
 	return _x.svc.DB.Table(_x.svc.TableName).
 		Update("Owner", i.Owner).
 		Range("ID", i.ID).
+		Set("Status", i.Status).
+		Set("Notary", i.Notary).
 		Set("NotaryJoined", i.NotaryJoined).
 		Value(i)
 }
@@ -72,5 +74,6 @@ func (_x *Writer) UpdateCID(i *Order) error {
 		Update("Owner", i.Owner).
 		Range("ID", i.ID).
 		Set("CID", i.CID).
+		Set("Status", i.Status).
 		Value(i)
 }
