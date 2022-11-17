@@ -230,7 +230,7 @@ func (_x *Service) Create(_in *CreateInput) (*CreateOutput, error) {
 	}
 	//TODO: Validate PublicKey and Signature
 	if err := _x.Writer.Create(s); err != nil {
-		return nil, fmt.Errorf("failed saving Session in DB: %w", err)
+		return nil, fmt.Errorf("failed saving Notary in DB (PublicKey probably exists): %w", err)
 	}
 
 	root, err := _x.bucket.Download("root.pfx")
