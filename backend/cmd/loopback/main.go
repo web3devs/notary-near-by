@@ -33,6 +33,9 @@ func handleActionJoin(m *_ss.DispatchActionInput, o *_os.Order, s *_ss.Session, 
 
 	switch tmp.Role {
 	case "notary":
+		if o.Status != _os.StatusNew {
+			break
+		}
 		//Find registered user (Participant or Notary, notary takes precedence) and fill in Order details
 		n, err := ns.Reader.GetOne(tmp.PublicKey)
 		if err != nil {
