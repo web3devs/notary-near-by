@@ -12,56 +12,14 @@ import (
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/apigatewaymanagementapi"
 
 	_ns "notarynearby/internal/notary"
 	_os "notarynearby/internal/order"
 	_ps "notarynearby/internal/participant"
 	_pk "notarynearby/internal/pk"
 	_ss "notarynearby/internal/session"
+	_socket "notarynearby/internal/socket"
 )
-
-func postToConnections(sessions []_ss.Session, excludedConnectionID string, msg []byte) error {
-	var errs []string
-	for _, c := range sessions {
-		if excludedConnectionID != "" && c.ConnectionID == excludedConnectionID {
-			continue
-		}
-		apigw := apigatewaymanagementapi.New(sess, &aws.Config{
-			Endpoint: aws.String(c.CallbackURL),
-		})
-		_, err := apigw.PostToConnection(&apigatewaymanagementapi.PostToConnectionInput{
-			ConnectionId: aws.String(c.ConnectionID),
-			Data:         msg,
-		})
-		if err != nil {
-			fmt.Println("ERROR: failed posting to Connections: ", err)
-			errs = append(errs, fmt.Sprintf("failed posting to Connection %v: %v", c.ConnectionID, err))
-			continue
-		}
-	}
-
-	if len(errs) > 0 {
-		return fmt.Errorf("some errors: %v", strings.Join(errs, " | "))
-	}
-
-	return nil
-}
-
-func notifyUpdateOrder(cs []_ss.Session, o *_os.Order) error {
-	a, err := json.Marshal(struct {
-		Action string     `json:"action"`
-		Data   *_os.Order `json:"data"`
-	}{
-		Action: "update-order",
-		Data:   o,
-	})
-	if err != nil {
-		return fmt.Errorf("failed notifying about updated order: %w", err)
-	}
-
-	return postToConnections(cs, "", a)
-}
 
 func handleActionJoin(m *_ss.DispatchActionInput, o *_os.Order, s *_ss.Session, cs []_ss.Session) error {
 	var tmp struct {
@@ -82,6 +40,7 @@ func handleActionJoin(m *_ss.DispatchActionInput, o *_os.Order, s *_ss.Session, 
 		}
 
 		if n.PublicKey != "" {
+			o.Notary = n.PublicKey
 			if err := oss.NotaryJoined(o, &_os.Person{
 				FullName: n.FullName,
 			}); err != nil {
@@ -127,7 +86,7 @@ func handleActionJoin(m *_ss.DispatchActionInput, o *_os.Order, s *_ss.Session, 
 
 	cs = append(cs, *s)
 
-	return notifyUpdateOrder(cs, o)
+	return sckt.NotifyUpdateOrder(cs, o)
 }
 
 func handleActionUpdateWidget(m *_ss.DispatchActionInput, o *_os.Order, s *_ss.Session, cs []_ss.Session) error {
@@ -166,7 +125,7 @@ func handleActionUpdateWidget(m *_ss.DispatchActionInput, o *_os.Order, s *_ss.S
 		}
 	}
 
-	return notifyUpdateOrder(cs, o)
+	return sckt.NotifyUpdateOrder(cs, o)
 }
 
 func handleActionAddWidget(m *_ss.DispatchActionInput, o *_os.Order, s *_ss.Session, cs []_ss.Session) error {
@@ -195,7 +154,7 @@ func handleActionAddWidget(m *_ss.DispatchActionInput, o *_os.Order, s *_ss.Sess
 		return fmt.Errorf("failed updating widgets: %w", err)
 	}
 
-	return notifyUpdateOrder(cs, o)
+	return sckt.NotifyUpdateOrder(cs, o)
 }
 
 func handleActionRemoveWidget(m *_ss.DispatchActionInput, o *_os.Order, s *_ss.Session, cs []_ss.Session) error {
@@ -237,7 +196,7 @@ func handleActionRemoveWidget(m *_ss.DispatchActionInput, o *_os.Order, s *_ss.S
 		return fmt.Errorf("failed updating widgets: %w", err)
 	}
 
-	return notifyUpdateOrder(cs, o)
+	return sckt.NotifyUpdateOrder(cs, o)
 }
 
 func handleActionCeremonyStatusChanged(m *_ss.DispatchActionInput, o *_os.Order, s *_ss.Session, cs []_ss.Session) error {
@@ -251,11 +210,21 @@ func handleActionCeremonyStatusChanged(m *_ss.DispatchActionInput, o *_os.Order,
 		return fmt.Errorf("failed updating order status: %w", err)
 	}
 
-	return notifyUpdateOrder(cs, o)
+	return sckt.NotifyUpdateOrder(cs, o)
 }
 
 func handleActionCeremonyFinish(m *_ss.DispatchActionInput, o *_os.Order, s *_ss.Session, cs []_ss.Session) error {
-	_, err := oss.GeneratePDF(&_os.GeneratePDFInput{
+	_, err := oss.CeremonyStatusChanged(&_os.CeremonyStatusChangedInput{
+		Order:  o,
+		Status: string(_os.StatusFinished),
+	})
+	if err != nil {
+		return fmt.Errorf("failed updating order status: %w", err)
+	}
+
+	sckt.NotifyUpdateOrder(cs, o)
+
+	_, err = oss.GeneratePDF(&_os.GeneratePDFInput{
 		Order: o,
 	})
 	if err != nil {
@@ -310,7 +279,7 @@ func Handler(context context.Context, records events.SNSEvent) error {
 				continue
 			}
 
-			postToConnections(cs, m.ConnectionID, a)
+			sckt.PostToConnections(cs, m.ConnectionID, a)
 			break
 		case _ss.ActionUpdateWidget:
 			if err := handleActionUpdateWidget(&m, o, &s, cs); err != nil {
@@ -350,6 +319,7 @@ var ss *_ss.Service
 var oss *_os.Service
 var ps *_ps.Service
 var ns *_ns.Service
+var sckt *_socket.Service
 
 func main() {
 	sess, err = session.NewSession(&aws.Config{
@@ -377,6 +347,11 @@ func main() {
 	oss, err = _os.New(sess)
 	if err != nil {
 		panic(fmt.Errorf("failed starting Orders Service: %w", err))
+	}
+
+	sckt, err = _socket.New(sess)
+	if err != nil {
+		panic(fmt.Errorf("failed starting Sockets Service: %w", err))
 	}
 
 	lambda.Start(Handler)
