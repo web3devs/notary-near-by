@@ -40,7 +40,7 @@ const List = ({ orders, publicKey }) => {
       setIsConfirming(() => true)
       await createNotarizedDocument({
         authorizedMinter: o.owner,
-        price: 30, //?????
+        price: 0.000001, //?????
         metadataURI: ipfsURL(o.cid)
       })
 
@@ -86,7 +86,7 @@ const List = ({ orders, publicKey }) => {
               <div className="flex flex-column">
                 <div className="flex gap-2 mb-2">
                   <Chip label={o.status} className="bg-yellow-500 text-white" />
-                  {canJoin(o, publicKey) && (<Button label="Join" onClick={() => join(o)} tooltipOptions={{ position: 'bottom' }} tooltip="Join Ceremony" />)}
+                  {canJoin(o, publicKey) && (<Button label="Join" onClick={() => join(o)} tooltipOptions={{ position: 'bottom' }} tooltip="Join Ceremony" icon="pi pi-sign-in" iconPos="right" />)}
                   {o.status === StatusDocumentSigned && o.notary === publicKey && (<Button label="Confirm signing" onClick={() => confirmSigning(o)} tooltipOptions={{ position: 'bottom' }} tooltip="Calls contract:createNotarizedDocument" disabled={isConfirming} loading={isConfirming} icon={isConfirming ? 'pi pi-spinner' : 'pi pi-pencil'} iconPos="right" />)}
                 </div>
               </div>

@@ -15,7 +15,7 @@ export const Mint = ({ order, status }) => {
             setIsLoading(() => true)
             await createNotarizedDocument({
                 authorizedMinter: o.owner,
-                price: 30, //?????
+                price: 0.000001, //?????
                 metadataURI: ipfsURL(o.cid)
             })
 
