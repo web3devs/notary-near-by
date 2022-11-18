@@ -96,8 +96,9 @@ export default () => {
         <div className="flex-column w-full">
 
           <div className="field mb-3">
-            <div className="text-lg text-300 mb-4">Document</div>
+            <label htmlFor="type">Document</label>
             <Dropdown
+              id="type"
               options={options}
               value={formData.type}
               onChange={(e) => {
@@ -115,7 +116,7 @@ export default () => {
           </div>
 
           <div className="field mb-3">
-            <div className="text-lg text-300 mb-4">Participants</div>
+            <label>Participants</label>
             {formData.participants.map((w) => {
               return (
                 <div
@@ -128,7 +129,7 @@ export default () => {
               )
             })}
             {formData.participants.length === 0 && (
-              <div className="text-sm text-100 mb-4">No participants yet</div>
+              <div className="text-sm text-500 mb-4">No participants yet</div>
             )}
             <Button
               label="Add"
@@ -141,7 +142,7 @@ export default () => {
 
 
           <div className="field mb-3">
-            <div className="text-lg text-300 mb-4">Witnesses</div>
+            <label>Witnesses</label>
             {formData.witnesses.map((w) => {
               return (
                 <div
@@ -154,7 +155,7 @@ export default () => {
               )
             })}
             {formData.witnesses.length === 0 && (
-              <div className="text-sm text-100 mb-4">No witnesses yet</div>
+              <div className="text-sm text-500 mb-4">No witnesses yet</div>
             )}
             <Button
               label="Add"
