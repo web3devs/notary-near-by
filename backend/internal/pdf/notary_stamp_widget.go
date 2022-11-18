@@ -24,6 +24,7 @@ func (_x NotaryStampWidget) Render(pdf *fpdf.Fpdf) {
 	h := 100.0
 	lw := 1.0 //line width
 	mt := 8.0 //margin top
+	pdf.SetDrawColor(189, 11, 255)
 
 	margin := 1.0
 	pdf.SetCellMargin(margin)
@@ -34,23 +35,23 @@ func (_x NotaryStampWidget) Render(pdf *fpdf.Fpdf) {
 	pdf.SetXY(_x.X, _x.Y)
 	pdf.SetLineWidth(lw)
 	pdf.SetLineJoinStyle("bevel")
-	pdf.MultiCell(w, h, "", "1", "CT", true)
+	pdf.MultiCell(w, h, "", "1", "CT", false)
 
 	//Notary Public title
 	pdf.SetXY(_x.X+lw, _x.Y+lw+mt)
 	pdf.SetFont("Arial", "B", 12)
 	pdf.SetLineWidth(0.0)
-	pdf.MultiCell(w-2*lw, 15-2*lw, "Notary Public\nState of Washington", "0", "CT", true)
+	pdf.MultiCell(w-2*lw, 15-2*lw, "Notary Public\nState of Washington", "0", "CT", false)
 
 	//Notary name
 	pdf.SetXY(_x.X+lw, pdf.GetY()+6)
 	pdf.SetFont("Times", "IB", 14)
-	pdf.MultiCell(w-2*lw, 15-2*lw, _x.Value.FullName, "0", "CT", true)
+	pdf.MultiCell(w-2*lw, 15-2*lw, _x.Value.FullName, "0", "CT", false)
 
 	//Commission exp.
 	pdf.SetXY(_x.X+lw, pdf.GetY()+7)
 	pdf.SetFont("Arial", "", 11)
-	pdf.MultiCell(w-2*lw, 15-2*lw, "My Commission Expires\nNovember 18, 2035", "0", "CT", true)
+	pdf.MultiCell(w-2*lw, 15-2*lw, "My Commission Expires\nNovember 18, 2035", "0", "CT", false)
 }
 
 //AddNotaryStampWidget adds date field to Editor / PDF

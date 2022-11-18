@@ -31,7 +31,8 @@ func (_x DateWidget) Render(pdf *fpdf.Fpdf) {
 
 	v := _x.Value.Format(time.RFC3339Nano)
 
-	pdf.CellFormat(_x.W, fontSize+2*margin, v, "1", 0, "LT", true, 0, "")
+	pdf.SetDrawColor(189, 11, 255)
+	pdf.CellFormat(_x.W, fontSize+2*margin, v, "1", 0, "LT", false, 0, "")
 }
 
 //AddDateWidget adds date widget to Editor / PDF

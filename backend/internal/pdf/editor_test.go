@@ -40,7 +40,9 @@ func TestAddMapping(t *testing.T) {
     "id": "asdasdasd-1",
     "type": "notary-stamp",
     "page": 1,
-    "value": "Judas Priest",
+    "value": {
+      "full_name": "Judas Priest"
+    },
     "x": 166,
     "y": 354
   },

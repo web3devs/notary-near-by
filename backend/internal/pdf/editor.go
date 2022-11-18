@@ -18,6 +18,7 @@ type Editor struct {
 	templates          []int
 	textWidgets        []TextWidget
 	dateWidgets        []DateWidget
+	signatureWidgets   []SignatureWidget
 	notaryStampWidgets []NotaryStampWidget
 	rs                 *io.ReadSeeker
 	imp                *gofpdi.Importer
@@ -102,6 +103,13 @@ func (_x *Editor) RenderWidgets() {
 			}
 		}
 
+		//Signatures
+		for _, t := range _x.signatureWidgets {
+			if t.Page == p {
+				t.Render(_x.pdf)
+			}
+		}
+
 		//Notary stamps
 		for _, t := range _x.notaryStampWidgets {
 			if t.Page == p {
@@ -150,6 +158,14 @@ func (_x *Editor) LoadWidgets(j []byte) error {
 			}
 
 			_x.AddDateWidget(w.Page-1, w.Value, w.X, w.Y, w.W, w.H)
+		case "signature":
+			var w SignatureWidget
+			err := json.Unmarshal(f, &w)
+			if err != nil {
+				return fmt.Errorf("widget parsing mapping: %w", err)
+			}
+
+			_x.AddSignatureWidget(w.Page-1, w.Value, w.X, w.Y, w.W, w.H)
 		case "notary-stamp":
 			var w NotaryStampWidget
 			err := json.Unmarshal(f, &w)

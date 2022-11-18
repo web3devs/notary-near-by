@@ -27,7 +27,8 @@ func (_x TextWidget) Render(pdf *fpdf.Fpdf) {
 	pdf.SetFillColor(35, 186, 156)
 	pdf.SetLineWidth(0.1)
 
-	pdf.CellFormat(_x.W, fontSize+2*margin, _x.Value, "1", 0, "LT", true, 0, "")
+	pdf.SetDrawColor(189, 11, 255)
+	pdf.CellFormat(_x.W, fontSize+2*margin, _x.Value, "1", 0, "LT", false, 0, "")
 }
 
 //AddTextWidget adds text widget to Editor / PDF
