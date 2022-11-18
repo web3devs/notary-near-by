@@ -36,9 +36,9 @@ export const Flow = ({ orderID, state }) => {
             {
                 label: 'Ceremony',
                 items: [
-                    { label: 'Start', icon: 'pi pi-play', className: 'bg-primary-500', command: start, disabled: !canStart },
-                    { label: 'Finish', icon: 'pi pi-stop', className: 'bg-green-500', command: finish, disabled: !canFinish },
-                    { label: 'Cancel', icon: 'pi pi-exclamation-triangle', className: 'bg-red-500', command: cancel, disabled: !canCancel },
+                    { label: 'Start', icon: 'pi pi-play', className: 'bg-primary-500X', command: start, disabled: !canStart },
+                    { label: 'Finish', icon: 'pi pi-stop', className: 'bg-green-500X', command: finish, disabled: !canFinish },
+                    { label: 'Cancel', icon: 'pi pi-exclamation-triangle', className: 'bg-red-500X', command: cancel, disabled: !canCancel },
                 ]
             },
         ]} />
