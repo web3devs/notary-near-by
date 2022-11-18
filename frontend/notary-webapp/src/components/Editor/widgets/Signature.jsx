@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Rnd } from 'react-rnd';
 import { Dialog } from 'primereact/dialog';
 import { Dropdown } from 'primereact/dropdown';
+import { Button } from 'primereact/button';
 import { useAuth } from '../../../context';
 import { StatusNew, StatusStarted } from '../../../order';
 
@@ -66,7 +67,11 @@ export const SignatureWidget = ({ disabled, widget, status, participantsJoined, 
     const selectParticipant = ({public_key, full_name}) => {
         const n = { label: `${full_name}`, public_key, full_name };
         setV(n)
-        updateWidget({...widget, value: n})
+    }
+
+    const save = async () => {
+        await updateWidget({ ...widget, value: v });
+        setEditMode(false);
     }
 
     return (
@@ -109,7 +114,7 @@ export const SignatureWidget = ({ disabled, widget, status, participantsJoined, 
                 )
             }
 
-            <Dialog header="Edit" visible={editMode} onHide={() => setEditMode(false)}>
+            <Dialog header="Edit" visible={editMode} onHide={() => setEditMode(false)} footer={<Button onClick={save} label="Save" />}>
                 <Dropdown optionLabel="label" value={v} options={participants} onChange={(e) => selectParticipant(e.value)} placeholder="Select Participant" />
             </Dialog>
 
