@@ -3,6 +3,7 @@ package order
 import (
 	"encoding/json"
 	"fmt"
+	"time"
 
 	_pk "notarynearby/internal/pk"
 )
@@ -47,7 +48,8 @@ type Order struct {
 	Participants []_pk.PublicKey   `dynamo:"Participants" json:"participants" validate:"required"`
 	Witnesses    []_pk.PublicKey   `dynamo:"Witnesses" json:"witnesses" validate:"required"`
 	Widgets      []json.RawMessage `dynamo:"Widgets" json:"widgets"`
-	CreatedAt    string            `dynamo:"CreatedAt" json:"created_at"`
+	CreatedAt    time.Time         `dynamo:"CreatedAt" json:"created_at"`
+	FinishedAt   time.Time         `dynamo:"FinishedAt" json:"finished_at"`
 	Status       Status            `dynamo:"Status" json:"status"`
 	CID          string            `dynamo:"CID" json:"cid"`
 	TokenID      string            `dynamo:"TokenID" json:"token_id"`

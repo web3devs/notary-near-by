@@ -217,11 +217,7 @@ func handleActionCeremonyStatusChanged(m *_ss.DispatchActionInput, o *_os.Order,
 }
 
 func handleActionCeremonyFinish(m *_ss.DispatchActionInput, o *_os.Order, s *_ss.Session, cs []_ss.Session) error {
-	_, err := oss.CeremonyStatusChanged(&_os.CeremonyStatusChangedInput{
-		Order:  o,
-		Status: string(_os.StatusFinished),
-	})
-	if err != nil {
+	if err := oss.MakeFinished(o); err != nil {
 		return fmt.Errorf("failed updating order status: %w", err)
 	}
 

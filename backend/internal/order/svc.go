@@ -95,7 +95,7 @@ func (_x *Service) Create(_in *CreateInput) (*CreateOutput, error) {
 		Witnesses:    wts,
 		Widgets:      []json.RawMessage{},
 		DocumentType: _in.DocumentType,
-		CreatedAt:    time.Now().Format(time.RFC3339),
+		CreatedAt:    time.Now(),
 		Status:       StatusNew,
 	}
 	//TODO: Validate PublicKey and Signature
@@ -213,6 +213,17 @@ func (_x *Service) CeremonyStatusChanged(_in *CeremonyStatusChangedInput) (*Cere
 	return &CeremonyStatusChangedOutput{
 		Order: _in.Order,
 	}, nil
+}
+
+//MakeFinished XXX: Super quick dirty bla bla bla.....
+func (_x *Service) MakeFinished(o *Order) error {
+	o.Status = StatusFinished
+	o.FinishedAt = time.Now()
+	if err := _x.Writer.UpdateFinished(o); err != nil {
+		return fmt.Errorf("failed updating status: %w", err)
+	}
+
+	return nil
 }
 
 //ConfirmSigning confirms Order's been signed by Notary (Notary tokens minted)
