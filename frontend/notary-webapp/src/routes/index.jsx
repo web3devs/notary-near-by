@@ -26,7 +26,7 @@ const RequireAuth = ({ children }) => {
 
   const location = useLocation()
   if (!isConnected) {
-    return <Navigate to="/sign-in" state={{ from: location }} replace />
+    return <Navigate to="/" state={{ from: location }} replace />
   }
   return children
 }
