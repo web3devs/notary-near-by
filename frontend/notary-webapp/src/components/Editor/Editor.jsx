@@ -13,6 +13,7 @@ import {
   TextWidget,
   DateWidget,
   SignatureWidget,
+  NotarySignatureWidget,
   NotaryStampWidget,
 } from './widgets';
 import { Flow } from './Flow'
@@ -167,6 +168,8 @@ const Editor = ({ order, setOrder, downloadURL, publicKey, signature }) => {
         return <DateWidget order={order} disabled={role !== 'notary'} key={`widget-${widget.type}-${widget.id}`} widget={widget} updateWidget={upsertWidget} deleteWidget={deleteWidget} />
       case 'signature':
         return <SignatureWidget status={status} participantsJoined={participantsJoined} disabled={role !== 'notary'} key={`widget-${widget.type}-${widget.id}`} widget={widget} updateWidget={upsertWidget} deleteWidget={deleteWidget} />
+      case 'notary-signature':
+        return <NotarySignatureWidget status={status} participantsJoined={participantsJoined} disabled={role !== 'notary'} key={`widget-${widget.type}-${widget.id}`} widget={widget} updateWidget={upsertWidget} deleteWidget={deleteWidget} />
       case 'notary-stamp':
         return <NotaryStampWidget status={status} participantsJoined={participantsJoined} disabled={role !== 'notary'} key={`widget-${widget.type}-${widget.id}`} widget={widget} updateWidget={upsertWidget} deleteWidget={deleteWidget} />
       default:
@@ -213,6 +216,19 @@ const Editor = ({ order, setOrder, downloadURL, publicKey, signature }) => {
     })
   };
 
+  const addNotarySignatureWidget = () => {
+    upsertWidget({
+      id: uuidv4(),
+      type: 'notary-signature',
+      page: page,
+      value: notary,
+      x: 0,
+      y: 0,
+      w: 250,
+      h: 15,
+    })
+  };
+
   const addNotaryStampWidget = () => {
     upsertWidget({
       id: uuidv4(),
@@ -247,7 +263,8 @@ const Editor = ({ order, setOrder, downloadURL, publicKey, signature }) => {
                 {label: 'Text', icon: 'pi pi-book', command: addTextWidget},
                 {label: 'Date', icon: 'pi pi-calendar', command: addDateWidget },
                 {label: 'Signature', icon: 'pi pi-pencil', command: addSignatureWidget},
-                {label: 'Notary Stamp', icon: 'pi pi-check-square', command: addNotaryStampWidget},
+                { label: 'Notary Signature', icon: 'pi pi-check-square', command: addNotarySignatureWidget },
+                {label: 'Notary Stamp', icon: 'pi pi-verified', command: addNotaryStampWidget},
               ]
             },
           ]} className="w-full" />
