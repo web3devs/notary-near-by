@@ -12,16 +12,17 @@ import (
 
 //Editor edits PDF document
 type Editor struct {
-	filePath           string
-	pdf                *fpdf.Fpdf
-	pageSizes          map[int]map[string]map[string]float64
-	templates          []int
-	textWidgets        []TextWidget
-	dateWidgets        []DateWidget
-	signatureWidgets   []SignatureWidget
-	notaryStampWidgets []NotaryStampWidget
-	rs                 *io.ReadSeeker
-	imp                *gofpdi.Importer
+	filePath               string
+	pdf                    *fpdf.Fpdf
+	pageSizes              map[int]map[string]map[string]float64
+	templates              []int
+	textWidgets            []TextWidget
+	dateWidgets            []DateWidget
+	signatureWidgets       []SignatureWidget
+	notarySignatureWidgets []NotarySignatureWidget
+	notaryStampWidgets     []NotaryStampWidget
+	rs                     *io.ReadSeeker
+	imp                    *gofpdi.Importer
 }
 
 //New instantiates Editor with provided original PDF file
@@ -142,6 +143,13 @@ func (_x *Editor) RenderWidgets() {
 			}
 		}
 
+		//Notary signatures
+		for _, t := range _x.notarySignatureWidgets {
+			if t.Page == p {
+				t.Render(_x.pdf)
+			}
+		}
+
 		//Notary stamps
 		for _, t := range _x.notaryStampWidgets {
 			if t.Page == p {
@@ -198,6 +206,14 @@ func (_x *Editor) LoadWidgets(j []byte) error {
 			}
 
 			_x.AddSignatureWidget(w.Page-1, w.Value, w.X, w.Y, w.W, w.H)
+		case "notary-signature":
+			var w NotarySignatureWidget
+			err := json.Unmarshal(f, &w)
+			if err != nil {
+				return fmt.Errorf("widget parsing mapping: %w", err)
+			}
+
+			_x.AddNotarySignatureWidget(w.Page-1, w.Value, w.X, w.Y)
 		case "notary-stamp":
 			var w NotaryStampWidget
 			err := json.Unmarshal(f, &w)
