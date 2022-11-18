@@ -77,3 +77,13 @@ func (_x *Writer) UpdateCID(i *Order) error {
 		Set("Status", i.Status).
 		Value(i)
 }
+
+//UpdateTokenID update TokenID in DB
+func (_x *Writer) UpdateTokenID(i *Order) error {
+	return _x.svc.DB.Table(_x.svc.TableName).
+		Update("Owner", i.Owner).
+		Range("ID", i.ID).
+		Set("TokenID", i.TokenID).
+		Set("Status", i.Status).
+		Value(i)
+}

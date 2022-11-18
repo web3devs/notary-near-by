@@ -50,6 +50,7 @@ type Order struct {
 	CreatedAt    string            `dynamo:"CreatedAt" json:"created_at"`
 	Status       Status            `dynamo:"Status" json:"status"`
 	CID          string            `dynamo:"CID" json:"cid"`
+	TokenID      string            `dynamo:"TokenID" json:"token_id"`
 
 	DocumentType string `dynamo:"DocumentType" json:"document_type" validate:"required"`
 

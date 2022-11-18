@@ -165,7 +165,12 @@ func (_x *Service) GetOne(_in *GetOneInput) (*GetOneOutput, error) {
 		return nil, fmt.Errorf("could not find Order: %w", err)
 	}
 
-	downloadURL, err := _x.bucket.GetDownloadURL(o.GetInFilePath())
+	fp := o.GetInFilePath()
+	if _in.DownloadURLSigned {
+		fp = o.GetSignedFilePath()
+	}
+
+	downloadURL, err := _x.bucket.GetDownloadURL(fp)
 	if err != nil {
 		return nil, fmt.Errorf("could not create download URL: %w", err)
 	}
@@ -210,7 +215,7 @@ func (_x *Service) CeremonyStatusChanged(_in *CeremonyStatusChangedInput) (*Cere
 	}, nil
 }
 
-//ConfirmSigning sets connected Witness
+//ConfirmSigning confirms Order's been signed by Notary (Notary tokens minted)
 func (_x *Service) ConfirmSigning(_in *ConfirmSigningInput) (*ConfirmSigningOutput, error) {
 	if _in.Order.Status != StatusDocumentSigned {
 		return nil, fmt.Errorf("failed confirming signing. Order in incorrect state: %v", _in.Order.Status)
@@ -222,6 +227,23 @@ func (_x *Service) ConfirmSigning(_in *ConfirmSigningInput) (*ConfirmSigningOutp
 	}
 
 	return &ConfirmSigningOutput{
+		Order: _in.Order,
+	}, nil
+}
+
+//ConfirmMinting confirms Order NFT access token's been minted by Participant (Participant tokens minted)
+func (_x *Service) ConfirmMinting(_in *ConfirmMintingInput) (*ConfirmMintingOutput, error) {
+	if _in.Order.Status != StatusDocumentSigningConfirmed {
+		return nil, fmt.Errorf("failed confirming minting. Order in incorrect state: %v", _in.Order.Status)
+	}
+
+	_in.Order.TokenID = _in.TokenID
+	_in.Order.Status = StatusNFTMinted
+	if err := _x.Writer.UpdateTokenID(_in.Order); err != nil {
+		return nil, fmt.Errorf("failed updating status: %w", err)
+	}
+
+	return &ConfirmMintingOutput{
 		Order: _in.Order,
 	}, nil
 }

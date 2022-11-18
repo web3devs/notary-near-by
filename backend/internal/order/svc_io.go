@@ -22,7 +22,8 @@ type CreateOutput struct {
 
 //GetOneInput input for getting Order with additional fields
 type GetOneInput struct {
-	OrderID string `json:"order_id"`
+	OrderID           string `json:"order_id"`
+	DownloadURLSigned bool
 }
 
 //GetOneOutput result of GetOneInput
@@ -64,5 +65,16 @@ type ConfirmSigningInput struct {
 
 //ConfirmSigningOutput result of confirming Signing of the Order related documents
 type ConfirmSigningOutput struct {
+	Order *Order `json:"order"`
+}
+
+//ConfirmMintingInput input for confirming Minting of Participant NFT for the Order
+type ConfirmMintingInput struct {
+	Order   *Order `json:"-"`
+	TokenID string `json:"token_id"`
+}
+
+//ConfirmMintingOutput result of confirming Minting of Participant NFT for the Order
+type ConfirmMintingOutput struct {
 	Order *Order `json:"order"`
 }

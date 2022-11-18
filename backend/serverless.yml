@@ -100,7 +100,7 @@ functions:
 
   participantsCreate:
     handler: bin/participants/create
-    timeout: 30
+    timeout: 29
     memorySize: 512
     events:
       - httpApi:
@@ -126,7 +126,7 @@ functions:
 
   notariesCreate:
     handler: bin/notaries/create
-    timeout: 30
+    timeout: 29
     memorySize: 512
     events:
       - httpApi:
@@ -152,7 +152,7 @@ functions:
 
   ordersCreate:
     handler: bin/orders/create
-    timeout: 30
+    timeout: 29
     memorySize: 512
     events:
       - httpApi:
@@ -188,6 +188,18 @@ functions:
         - '!./**'
         - ./bin/orders/getOne
 
+  ordersGetDownloadURL:
+    handler: bin/orders/getDownloadURL
+    events:
+      - httpApi:
+          path: /orders/{order_id}/download-url
+          method: get
+    package:
+      individually: true
+      patterns:
+        - '!./**'
+        - ./bin/orders/getDownloadURL
+
   ordersConfirmSigning:
     handler: bin/orders/confirmSigning
     events:
@@ -199,6 +211,18 @@ functions:
       patterns:
         - '!./**'
         - ./bin/orders/confirmSigning
+
+  ordersConfirmMinting:
+    handler: bin/orders/confirmMinting
+    events:
+      - httpApi:
+          path: /orders/{order_id}/confirm-minting
+          method: patch
+    package:
+      individually: true
+      patterns:
+        - '!./**'
+        - ./bin/orders/confirmMinting
 
   ordersGetByOwner:
     handler: bin/orders/getByOwner
