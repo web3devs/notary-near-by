@@ -3,11 +3,11 @@ import { ProgressSpinner } from 'primereact'
 import { useNavigate } from 'react-router-dom'
 import { Button } from 'primereact'
 import { useAuth } from '../../context'
-import { getParticipantProfile, getOwnersOrders } from '../../api'
+import { getParticipantProfile, getOwnersOrders, getDownloadURL } from '../../api'
 import { Card } from 'primereact/card';
 import { Chip } from 'primereact/chip';
 import NoOrdersImage from '../../assets/no-orders.svg'
-import { StatusNew, StatusNotaryJoined, StatusDocumentSigningConfirmed, StatusStarted, StatusFinished, StatusCanceled } from '../../order';
+import { StatusNew, StatusNotaryJoined, StatusDocumentSigningConfirmed, StatusNFTMinted } from '../../order';
 
 const  NoOrders = ({ orders }) => {
   const navigate = useNavigate()
@@ -37,6 +37,11 @@ const List = ({ orders, publicKey }) => {
 
   const join = (o) => navigate('/participant/orders/' + o.id)
   const mint = (o) => navigate('/participant/claim/' + o.id)
+  const download = async (o) => {
+    const {download_url} = await getDownloadURL(o.id)
+    window.open(download_url, '_blank').focus();
+  }
+  const video = () => window.open('https://www.youtube.com/watch?v=dQw4w9WgXcQ', '_blank').focus();
 
   const canJoin = (o) => {
     return o.status === StatusNew || o.status === StatusNotaryJoined
@@ -44,6 +49,14 @@ const List = ({ orders, publicKey }) => {
 
   const canClaim = (o) => {
     return o.status === StatusDocumentSigningConfirmed
+  }
+
+  const canDownloadSigned = (o) => {
+    return o.status === StatusNFTMinted
+  }
+
+  const canDownloadVideo = (o) => {
+    return o.status === StatusNFTMinted
   }
 
   if (!orders || orders.length === 0) return
@@ -70,8 +83,10 @@ const List = ({ orders, publicKey }) => {
               <div className="flex flex-column">
                 <div className="flex gap-2 mb-2">
                   <Chip label={o.status} className="bg-yellow-500 text-white" />
-                  {canJoin(o) && (<Button label="Join" onClick={() => join(o)} tooltipOptions={{ position: 'bottom' }} tooltip="Join Ceremony" />)}
-                  {canClaim(o) && (<Button label="Claim" onClick={() => mint(o)} tooltipOptions={{ position: 'bottom' }} tooltip="Claim ownership of the documents by minting NFT" />)}
+                  {canJoin(o) && (<Button label="Join" onClick={() => join(o)} tooltipOptions={{ position: 'bottom' }} tooltip="Join Ceremony" icon="pi pi-sign-in" iconPos="right" />)}
+                  {canClaim(o) && (<Button label="Claim" onClick={() => mint(o)} tooltipOptions={{ position: 'bottom' }} tooltip="Claim ownership of the documents by minting NFT" icon="pi pi-exclamation-circle" iconPos="right" />)}
+                  {canDownloadSigned(o) && (<Button label="PDF" className="p-button-success" onClick={() => download(o)} tooltipOptions={{ position: 'bottom' }} tooltip="Download signed file" icon="pi pi-download" iconPos="right" />)}
+                  {canDownloadVideo(o) && (<Button label="Video" className="p-button-success" onClick={() => video()} tooltipOptions={{ position: 'bottom' }} tooltip="Download video recording of the ceremony" icon="pi pi-video" iconPos="right" />)}
                 </div>
               </div>
             </div>
@@ -147,17 +162,6 @@ export default () => {
             <List orders={orders} publicKey={publicKey} />
           </>
         )}
-
-        {/* {(!isSigned && !isLoading) && (
-          <>
-            <div className="mb-4">
-              You are not registered as a Participant yet.
-            </div>
-            <Link to="/participant/sign-up">
-              <Button label="Sign up " />
-            </Link>
-          </>
-        )} */}
       </Card>
     </div>
   )

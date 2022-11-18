@@ -4,12 +4,12 @@ import MintImage from '../../../assets/mint-image.png'
 import { ipfsURL } from '../../../utils/ipfs'
 import { mintNotarizedDocumentNft } from '../../../contracts/index'
 import { useParams } from 'react-router-dom'
-import { getOrder } from '../../../api';
+import { getOrder, confirmMinting, getDownloadURL } from '../../../api';
 
 export default () => {
   const [isLoading, setIsLoading] = useState(false)
   const [order, setOrder] = useState(undefined);
-  const [tokenMinted, setTokenMinted] = useState(false)
+  const [tokenMinted, setTokenMinted] = useState(true)
   const pms = useParams();
 
   useEffect(() => {
@@ -23,33 +23,34 @@ export default () => {
 
   const mint = async (o) => {
     try {
-      setIsLoading(() => setIsLoading(true))
+      setIsLoading(() => true)
       const tokenID = await mintNotarizedDocumentNft({
         metadataURI: ipfsURL(o.cid),
-        price: 30, //?????
+        price: 0.000001, //?????
       })
+      setTokenMinted(() => true)
+
+      console.log('tokenID: ', tokenID, )
+      await confirmMinting({ orderID: o.id, tokenID: tokenID.toString() })
     } catch (e) {
-      setTokenMinted(true) //XXX: REMOVE THIS
+      console.error(e)
     }
     finally {
-      setIsLoading(() => setIsLoading(false))
+      setIsLoading(() => false)
     }
-
-    console.log('tokenID: ', tokenID)
   }
 
   const download = async (o) => {
     try {
       setIsLoading(() => setIsLoading(true))
-      
+      const { download_url } = await getDownloadURL(o.id)
+      window.open(download_url, '_blank').focus();
     } catch (e) {
-      setTokenMinted(true) //XXX: REMOVE THIS
+      console.error(e)
     }
     finally {
       setIsLoading(() => setIsLoading(false))
     }
-
-    console.log('tokenID: ', tokenID)
   }
 
   return (
@@ -80,8 +81,8 @@ export default () => {
                 If you have the NFT in your wallet, you'll always be able to download the documents here.
               </div>
               <div className="mt-3">
-                {!tokenMinted && <Button disabled={isLoading} label="Mint" onClick={() => mint(order)} icon={isLoading ? 'pi pi-spinner' : 'pi pi-bitcoin'} iconPos="right" />}
-                {tokenMinted && <Button disabled={isLoading} label="Download" onClick={() => mint(order)} icon={isLoading ? 'pi pi-spinner' : 'pi pi-download'} iconPos="right" />}
+                {!tokenMinted && <Button disabled={isLoading} loading={isLoading} label="Mint" onClick={() => mint(order)} icon={isLoading ? 'pi pi-spinner' : 'pi pi-bitcoin'} iconPos="right" />}
+                {tokenMinted && <Button disabled={isLoading} loading={isLoading} label="Download" onClick={() => download(order)} icon={isLoading ? 'pi pi-spinner' : 'pi pi-download'} iconPos="right" />}
               </div>
             </>
           )}
