@@ -132,8 +132,15 @@ export default () => {
 
             <div className="flex flex-column align-items-center mb-4" style={{maxWidth: '400px'}}>
                 <h1>New Notary</h1>
-                <div className="text-500 text-center">lorem dolorem lorem dolorem lorem dolorem lorem dolorem lorem
-                    dolorem lorem dolorem lorem dolorem lorem dolorem lorem dolorem lorem dolorem
+                <div className="text-500 text-center">
+                    <p>
+                        NEAR Notary allows the commissioned Notary to verify government-issued photo IDs and
+                        Passports as well as uses your digital wallet signature as a second authentication.
+                    </p>
+                    <p>
+                        NEAR Notary has real-time document editing and preparation tools to reduce signing
+                        time and errors.
+                    </p>
                 </div>
             </div>
             <div className="flex justify-content-center align-items-top h-screen" style={{width: '400px'}}>
