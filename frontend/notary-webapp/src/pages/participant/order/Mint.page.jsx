@@ -9,7 +9,7 @@ import { getOrder, confirmMinting, getDownloadURL } from '../../../api';
 export default () => {
   const [isLoading, setIsLoading] = useState(false)
   const [order, setOrder] = useState(undefined);
-  const [tokenMinted, setTokenMinted] = useState(true)
+  const [tokenMinted, setTokenMinted] = useState(false)
   const pms = useParams();
 
   useEffect(() => {

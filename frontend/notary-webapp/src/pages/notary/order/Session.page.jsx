@@ -78,6 +78,9 @@ export default () => {
                   node.style.width = '100%'
                   node.style.height = '600px'
                 }}
+                configOverwrite={{
+                  prejoinPageEnabled: false
+                }}
               />
             )}
             <Editor order={order} setOrder={setOrder} downloadURL={downloadURL} publicKey={accountAddress} signature={'TODO'} />

@@ -8,6 +8,7 @@ import { Card } from 'primereact/card';
 import { Chip } from 'primereact/chip';
 import NoOrdersImage from '../../assets/no-orders.svg'
 import { StatusNew, StatusNotaryJoined, StatusDocumentSigningConfirmed, StatusNFTMinted } from '../../order';
+import { ipfsURLDownload } from '../../utils/ipfs'
 
 const  NoOrders = ({ orders }) => {
   const navigate = useNavigate()
@@ -40,6 +41,10 @@ const List = ({ orders, publicKey }) => {
   const download = async (o) => {
     const {download_url} = await getDownloadURL(o.id)
     window.open(download_url, '_blank').focus();
+  }
+  const downloadFromIPFS = async (o) => {
+    console.log(ipfsURLDownload(o.cid))
+    window.open(ipfsURLDownload(o.cid), '_blank').focus();
   }
   const video = () => window.open('https://www.youtube.com/watch?v=dQw4w9WgXcQ', '_blank').focus();
 
@@ -86,6 +91,7 @@ const List = ({ orders, publicKey }) => {
                   {canJoin(o) && (<Button label="Join" onClick={() => join(o)} tooltipOptions={{ position: 'bottom' }} tooltip="Join Ceremony" icon="pi pi-sign-in" iconPos="right" />)}
                   {canClaim(o) && (<Button label="Claim" onClick={() => mint(o)} tooltipOptions={{ position: 'bottom' }} tooltip="Claim ownership of the documents by minting NFT" icon="pi pi-exclamation-circle" iconPos="right" />)}
                   {canDownloadSigned(o) && (<Button label="PDF" className="p-button-success" onClick={() => download(o)} tooltipOptions={{ position: 'bottom' }} tooltip="Download signed file" icon="pi pi-download" iconPos="right" />)}
+                  {canDownloadSigned(o) && (<Button label="IPFS" className="p-button-success" onClick={() => downloadFromIPFS(o)} tooltipOptions={{ position: 'bottom' }} tooltip="Download signed file from IPFS" icon="pi pi-download" iconPos="right" />)}
                   {canDownloadVideo(o) && (<Button label="Video" className="p-button-success" onClick={() => video()} tooltipOptions={{ position: 'bottom' }} tooltip="Download video recording of the ceremony" icon="pi pi-video" iconPos="right" />)}
                 </div>
               </div>

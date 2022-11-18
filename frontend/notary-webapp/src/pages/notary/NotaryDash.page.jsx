@@ -80,6 +80,7 @@ const List = ({ orders, publicKey }) => {
                   <div className="flex flex-column text-500 gap-2">
                     <span>Order ID: {o.id}</span>
                     <span>Owner: {o.owner}</span>
+                    <span>Finished at: {o.finished_at}</span>
                   </div>
                 </div>
               </div>
