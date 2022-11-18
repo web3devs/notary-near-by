@@ -29,7 +29,8 @@ func New(filePath string) *Editor {
 	var imp *gofpdi.Importer
 	var rs io.ReadSeeker
 	// pdf := fpdf.New("P", "pt", "Letter", "")
-	pdf := fpdf.New("P", "pt", "Legal", "")
+	// pdf := fpdf.New("P", "pt", "Legal", "")
+	pdf := fpdf.New("P", "pt", "A4", "")
 
 	pageSizes := map[int]map[string]map[string]float64{}
 
@@ -47,7 +48,38 @@ func New(filePath string) *Editor {
 		imp = gofpdi.NewImporter()
 		imp.ImportPageFromStream(pdf, &rs, 1, "/MediaBox")
 		pageSizes = imp.GetPageSizes()
+
+		ps := pageSizes[1]["/MediaBox"]
+		fmt.Println("PAGE SIZES: ", ps["w"], ps["h"])
+
+		//Detect page size....stupid FPDF
+		pszs := []struct {
+			name string
+			w    float64
+			h    float64
+		}{
+			{name: "a3", w: 841.89, h: 1190.55},
+			{name: "a4", w: 595.28, h: 841.89},
+			{name: "a5", w: 420.94, h: 595.28},
+			{name: "a6", w: 297.64, h: 420.94},
+			{name: "a2", w: 1190.55, h: 1683.78},
+			{name: "a1", w: 1683.78, h: 2383.94},
+			{name: "letter", w: 612, h: 792},
+			{name: "legal", w: 612, h: 1008},
+			{name: "tabloid", w: 792, h: 1224},
+		}
+
+		for _, psz := range pszs {
+			if ps["w"] == psz.w && ps["h"] == psz.h {
+				pdf = fpdf.New("P", "pt", psz.name, "")
+				break
+			}
+		}
 	}
+
+	fmt.Println(pdf.PageSize(1))
+
+	pdf.SetAutoPageBreak(false, 0)
 
 	editor := &Editor{
 		filePath:  filePath,
