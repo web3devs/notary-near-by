@@ -83,7 +83,7 @@ export default () => {
   return (
     <div className="flex justify-content-center align-items-center h-screen">
       <div className="w-7 flex flex-column justify-content-center align-items-center">
-        <Link to="/"><img src={Logo} alt="Homepage" /></Link>
+        <Link to="/"><img src={Logo} alt="Homepage" style={{ width: '100px' }} /></Link>
         <h1 className="home-welcome">Welcome to <span className="text-primary">NEAR Notary</span></h1>
         <div className="home-welcome-text">Anim aute id magna aliqua ad ad non deserunt sunt. Qui irure qui lorem cupidatat commodo. Elit sunt amet fugiat veniam occaecat fugiat aliqua. </div>
 
