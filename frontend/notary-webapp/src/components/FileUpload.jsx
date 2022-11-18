@@ -24,7 +24,7 @@ export default ({
           icon="pi pi-upload"
           iconPos="right"
         />
-        {helper && (<Button icon="pi pi-info" className="p-button-rounded p-button-blue-500 text-white p-button-sm" style={{ height: '1.5rem', width: '1.5rem' }} aria-label="Submit" tooltip={helper} />)}
+        {helper && (<Button icon="pi pi-info" className="p-button-rounded p-button-blue-500 text-white p-button-sm" style={{ height: '1.5rem', width: '1.5rem', padding: '1rem' }} aria-label="Submit" tooltip={helper} />)}
       </div>
       {error && <div className="p-error">{error}</div>}
       <input
