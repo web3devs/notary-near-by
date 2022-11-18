@@ -85,7 +85,10 @@ export default () => {
       <div className="w-7 flex flex-column justify-content-center align-items-center">
         <Link to="/"><img src={Logo} alt="Homepage" style={{ width: '100px' }} /></Link>
         <h1 className="home-welcome">Welcome to <span className="text-primary">NEAR Notary</span></h1>
-        <div className="home-welcome-text">Anim aute id magna aliqua ad ad non deserunt sunt. Qui irure qui lorem cupidatat commodo. Elit sunt amet fugiat veniam occaecat fugiat aliqua. </div>
+        <div className="home-welcome-text">
+          NEAR Notary is an online notarization solution that allows a person to appear before a verified
+          commissioned notary public in real-time using secure audio/video technology 24/7.
+        </div>
 
         {isConnected && (
           <div className="mt-6 flex gap-3">
