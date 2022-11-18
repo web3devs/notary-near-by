@@ -25,7 +25,8 @@ const RequireAuth = ({ children }) => {
   const { isConnected } = useAuth()
 
   const location = useLocation()
-  if (!isConnected) {
+
+  if (!isConnected && location.pathname !== '/test') {
     return <Navigate to="/" state={{ from: location }} replace />
   }
   return children
@@ -128,16 +129,16 @@ export const AppRouter = () => {
             </RequireAuth>
           }
         />
-          <Route
-              path="/test"
-              element={
-                  <RequireAuth>
-                      <DashboardLayout>
-                          <TestPage />
-                      </DashboardLayout>
-                  </RequireAuth>
-              }
-          />
+        <Route
+            path="/test"
+            element={
+              <RequireAuth>
+                  <DashboardLayout>
+                      <TestPage />
+                  </DashboardLayout>
+              </RequireAuth>
+            }
+        />
       </Routes>
     </BrowserRouter>
   )
