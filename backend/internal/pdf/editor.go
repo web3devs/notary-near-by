@@ -27,7 +27,8 @@ type Editor struct {
 func New(filePath string) *Editor {
 	var imp *gofpdi.Importer
 	var rs io.ReadSeeker
-	pdf := fpdf.New("P", "pt", "Letter", "")
+	// pdf := fpdf.New("P", "pt", "Letter", "")
+	pdf := fpdf.New("P", "pt", "Legal", "")
 
 	pageSizes := map[int]map[string]map[string]float64{}
 
