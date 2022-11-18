@@ -85,6 +85,11 @@ export const getOrder = async (orderId) => {
   return data
 }
 
+export const getDownloadURL = async (orderId) => {
+  const { data } = await api.get(`/orders/${orderId}/download-url`)
+  return data
+}
+
 export const getAllOrders = async () => {
   const { data } = await api.get('/orders')
 
@@ -123,5 +128,12 @@ export const createOrer = async ({
 
 export const confirmSigning = async ({ orderID }) => {
   const { data } = await api.patch(`/orders/${orderID}/confirm-signing`, {})
+  return data
+}
+
+export const confirmMinting = async ({ orderID, tokenID }) => {
+  const { data } = await api.patch(`/orders/${orderID}/confirm-minting`, {
+    token_id: tokenID,
+  })
   return data
 }
