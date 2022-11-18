@@ -27,6 +27,7 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 
 	o, err := ps.Create(req)
 	if err != nil {
+		fmt.Println("ERROR: failed creating Notary: ", err)
 		return _api.ResponseError(fmt.Errorf("Failed creating Notary: %w", err)), nil
 	}
 
