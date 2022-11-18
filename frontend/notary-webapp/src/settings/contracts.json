@@ -4,7 +4,7 @@
   },
   "NotarizedDocumentNft": {
     "address": "0x974570376D0Aa69Bad101B63c1117f6B3cFcDDb2",
-    "symbol": "Notarized Doc",
+    "symbol": "Doc",
     "image": "http://localhost:5173/src/assets/logo-alt.svg"
   },
   "NotaryNft": {

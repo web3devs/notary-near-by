@@ -1,6 +1,8 @@
 import {ethers} from 'ethers'
 import contracts from '../settings/contracts.json'
 import NotaryContractABI from '../settings/Notary.json'
+import NotaryNftContractABI from '../settings/NotaryNft.json'
+import NotarizedDocumentNftABI from '../settings/NotarizedDocumentNft.json'
 import Settings from "../settings/contracts.json";
 
 let provider = null
@@ -62,6 +64,35 @@ export const initProvider = async () => {
 
 function getNotaryContract() {
   return new ethers.Contract(contracts.Notary.address, NotaryContractABI.abi, signer);
+}
+
+function getNotaryNftContract() {
+  return new ethers.Contract(contracts.NotaryNft.address, NotaryNftContractABI.abi, signer);
+}
+
+function getNotarizedDocumentNftContract() {
+  return new ethers.Contract(contracts.NotarizedDocumentNft.address, NotarizedDocumentNftABI.abi, signer);
+}
+
+/**
+ * Checks whether the connected account has a notary token
+ * @returns {Promise<boolean>}
+ */
+export const hasNotaryToken = async () => {
+  const contract = getNotaryNftContract();
+  const balance = (await contract.balanceOf(accountAddress)).toNumber()
+  return !!balance
+}
+
+/**
+ * Checks whether a NotarizedDocument has been minted into an NFT
+ * @param metadataURI
+ * @returns {Promise<boolean>}
+ */
+export const isDocumentTokenMinted = async ({metadataURI}) => {
+  const contract = getNotarizedDocumentNftContract()
+  const tokenId = contract.tokenByUri(metadataURI)
+  return !!tokenId
 }
 
 /**

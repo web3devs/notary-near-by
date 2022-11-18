@@ -18,6 +18,7 @@ import SignUpPage from '../pages/notary/NotarySignUp.page'
 import ParticipantSignUpPage from '../pages/participant/ParticipantSignUp.page'
 // import OrderSessionPage from '../pages/order/Session.page'
 import NotarySessionPage from '../pages/notary/order/Session.page'
+import TestPage from '../pages/Test.page'
 import { useAuth } from '../context/AuthProvider'
 
 const RequireAuth = ({ children }) => {
@@ -127,6 +128,16 @@ export const AppRouter = () => {
             </RequireAuth>
           }
         />
+          <Route
+              path="/test"
+              element={
+                  <RequireAuth>
+                      <DashboardLayout>
+                          <TestPage />
+                      </DashboardLayout>
+                  </RequireAuth>
+              }
+          />
       </Routes>
     </BrowserRouter>
   )
