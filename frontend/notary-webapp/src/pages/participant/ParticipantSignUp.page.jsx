@@ -48,7 +48,16 @@ export default () => {
     <div className="flex flex-column align-items-center">
       <div className="flex flex-column align-items-center mb-4" style={{ maxWidth: '400px' }}>
         <h1>New Participant</h1>
-        <div className="text-500 text-center">lorem dolorem lorem dolorem lorem dolorem lorem dolorem lorem dolorem lorem dolorem lorem dolorem lorem dolorem lorem dolorem lorem dolorem </div>
+        <div className="text-500 text-center">
+          <p>
+            Don’t drive around looking for a notary. Get your documents notarized from the comfort of
+            your home or office.
+          </p>
+          <p>
+            Never worry about misplacing your important documents, securely notarized online means you
+            control documents directly in your wallet.
+          </p>
+        </div>
       </div>
 
       <div className="flex justify-content-center align-items-top h-screen" style={{ width: '400px' }}>
