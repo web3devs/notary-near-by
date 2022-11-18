@@ -1,10 +1,10 @@
-import { Button } from 'primereact'
+// import { Button } from 'primereact'
 import { Link } from 'react-router-dom'
 import Logo from '../assets/logo-alt.svg'
-import { useAuth } from '../context/AuthProvider'
+// import { useAuth } from '../context/AuthProvider'
 
 export default ({ className }) => {
-  const { logout } = useAuth()
+  // const { logout } = useAuth()
   return (
     <div
       className={`flex flex-row justify-content-between align-items-center ${className} bg-primary`}
@@ -14,12 +14,13 @@ export default ({ className }) => {
         left: 0,
         width: '100%',
         padding: '1em 2em',
+        zIndex: 1000,
       }}
     >
       <div>
         <Link to="/"><img src={Logo} alt="Homepage" /></Link>
       </div>
-      <div>
+      {/* <div>
         <Button
           className="p-button-outlined"
           label="Disconnect"
@@ -27,7 +28,7 @@ export default ({ className }) => {
             logout()
           }}
         />
-      </div>
+      </div> */}
     </div>
   )
 }
