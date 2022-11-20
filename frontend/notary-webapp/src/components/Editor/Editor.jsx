@@ -251,7 +251,7 @@ const Editor = ({ order, setOrder, downloadURL, publicKey, signature }) => {
       <div className="col-2">
         {
           role === 'notary' && (
-            <Flow orderID={order.id} state={status} />
+            <Flow orderID={order.id} state={status} widgets={widgets} />
           )
         }
 

@@ -71,7 +71,7 @@ export const DateWidget = ({ disabled, widget, updateWidget, deleteWidget }) => 
                 </div>
             )}
 
-            <Dialog header="Edit" footer={<Button onClick={save} label="Save" />} visible={editMode} onHide={() => setEditMode(false)}>
+            <Dialog header="Edit" closable={false} footer={<Button onClick={save} label="Save" />} visible={editMode} onHide={() => setEditMode(false)}>
                 <Calendar value={v} onChange={(e) => {
                     console.log('E:', e.target.value)
                     setV(e.target.value.toISOString())

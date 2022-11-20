@@ -14,6 +14,7 @@ export const SignatureWidget = ({ disabled, widget, status, participantsJoined, 
     const [isSignable, setIsSignable] = useState(false);
     const [signMode, setSignMode] = useState(false);
     const [v, setV] = useState({full_name: '', public_key: ''});
+    const [saved, setSaved] = useState(false)
 
     const { accountAddress, getRole, publicKey } = useAuth();
     const role = getRole();
@@ -26,7 +27,7 @@ export const SignatureWidget = ({ disabled, widget, status, participantsJoined, 
 
     useEffect(() => {
         const { full_name, public_key } = v;
-        if (full_name !== '', public_key !== '') {
+        if (full_name !== '' && public_key !== '') {
             setValid(true);
             return;
         }
@@ -130,7 +131,15 @@ export const SignatureWidget = ({ disabled, widget, status, participantsJoined, 
                 )
             }
 
-            <Dialog header="Edit" visible={editMode} onHide={() => setEditMode(false)} footer={<Button onClick={save} label="Save" />}>
+            {
+                (role === 'notary' && !signature) && (
+                    <div className="sign-menu cursor-auto">
+                        <i className="bg-red-500 text-white pi pi-stop cursor-auto" />
+                    </div>
+                )
+            }
+
+            <Dialog header="Edit" visible={editMode} closable={false} onHide={() => setEditMode(false)} footer={<Button onClick={save} label="Save" />}>
                 <Dropdown optionLabel="label" value={v} options={participants} onChange={(e) => selectParticipant(e.value)} placeholder="Select Participant" />
             </Dialog>
 

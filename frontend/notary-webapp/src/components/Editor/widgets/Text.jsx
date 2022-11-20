@@ -71,7 +71,7 @@ export const TextWidget = ({ disabled, widget, updateWidget, deleteWidget }) => 
                 </div>
             )}
 
-            <Dialog header="Edit" footer={<Button onClick={save} label="Save" />} visible={editMode} onHide={() => setEditMode(false)}>
+            <Dialog header="Edit" closable={false} footer={<Button onClick={save} label="Save" />} visible={editMode} onHide={() => setEditMode(false)}>
                 <InputTextarea rows={5} cols={30} value={v} onChange={(e) => setV(e.target.value)} autoResize />
             </Dialog>
         </Rnd>
