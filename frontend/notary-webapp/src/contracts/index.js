@@ -15,6 +15,11 @@ export const signMessage = async () => {
   return sig
 }
 
+export const sign = async (message) => {
+  const sig = await signer.signMessage(message)
+  return sig
+}
+
 export const unregisterCallback = (key) => {
   delete callbacks[key]
 }

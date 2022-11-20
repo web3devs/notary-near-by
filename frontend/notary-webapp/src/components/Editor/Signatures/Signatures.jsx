@@ -16,8 +16,8 @@ export const Signatures = ({ publicKey, widgets, setPage }) => {
     return (
         <Menu model={[
             {
-              label: 'Signatures',
-              items: sigs.map((s) => ({label: `${s.value.full_name} / p. ${s.page}`, icon: 'pi pi-pencil', command: () => setPage(s.page) }))
+                label: 'Signatures',
+                items: sigs.map((s) => ({ label: `${s.value.full_name} / p. ${s.page}`, icon: s.value.signature ? 'pi pi-check-square' : 'pi pi-stop', command: () => setPage(s.page) }))
             },
         ]} className="w-full" />
     )
